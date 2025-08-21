@@ -1,28 +1,45 @@
 import { Search,Heart, ShoppingCart,Menu,X  } from 'lucide-react';
 import { useState } from 'react';
 
-const Navbar = () => {
+type NavbarProps={
+    loggedin?:boolean;
+}
+
+const sidebarOptions=[
+    {
+        id:1,
+        name:"Home"
+    },
+    {
+        id:2,
+        name:"Contact"
+    },
+    {
+        id:3,
+        name:"About"
+    },
+    {
+        id:4,
+        name:"Sign Up"
+    },
+
+]
+
+const Navbar = ({loggedin}: NavbarProps) => {
     const [sidebarOpen,setSidebarOpen]=useState<boolean>(false)
   return (
     <div className="flex w-full max-w-6xl bg-grey-400 mx-auto my-2 items-center justify-between ">
         <h1 className=" font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">Trendora</h1>
+        {/* Navbar Options */}
         <div className="hidden text-md font-medium text-heading md:flex items-center justify-center gap-6">
-            <p className="relative group">
-                Home
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </p>
-            <p className="relative group">
-                Contact
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </p>
-            <p className="relative group">
-                About
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </p>
-            <p className="relative  group">
-                Sign Up
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </p>
+            {
+                sidebarOptions.map(item=>(
+                    <p key={item.id} className="relative group">
+                        {item.name}
+                        <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                    </p>
+                ))
+            }
         </div>
 
         <div className="flex items-center justify-center gap-3 p-2">
@@ -32,6 +49,7 @@ const Navbar = () => {
             </div>
             <Heart size={24} className='text-heading hover:scale-105 '/>
             <ShoppingCart size={24} className='text-heading hover:scale-105'/>
+            {/* Navbar Small Screen */}
             <div className='md:hidden mx-2' onClick={()=>setSidebarOpen(!sidebarOpen)}>
                 {sidebarOpen ? <X size={24}/>:<Menu size={24}/>}                
             </div>
@@ -39,10 +57,14 @@ const Navbar = () => {
             <div className={`absolute top-0 left-0 h-full w-[60%] bg-bg-grey transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col items-center justify-start`}>
                         <h1 className="mt-10 font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">Trendora</h1>
                         <div className='mt-5 w-full flex flex-col'>
-                            <div className='font-medium w-full text-center p-2 border-b border-zinc-400'>Home</div>
-                            <div className='font-medium w-full text-center p-2 border-b border-zinc-400'>Contact</div>
-                            <div className='font-medium w-full text-center p-2 border-b border-zinc-400'>About</div>
-                            <div className='font-medium w-full text-center p-2 border-b border-zinc-400'>Sign Up</div>
+                            {
+                                sidebarOptions.map(item=>(
+                                    <div key={item.id} className='font-medium w-full text-center p-2 border-b border-zinc-400'>
+                                        {item.name}
+                                    </div>
+                                ))
+                            }
+                            
             </div>
             </div>
 
