@@ -8,3 +8,133 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole{
+  ADMIN
+  USER
+  SELLER
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  name String?
+  image String?
+  role UserRole @default(USER)
+  password String
+  phone String?
+  address Address[]
+  cart Cart?
+  wishlist Wishlist?
+  rating Rating[]
+  stock Stock? 
+  orders Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Address{
+  id Int @id @default(autoincrement())
+  user_id Int
+  line1 String
+  line2 String?
+  city String
+  state String
+  pincode String 
+  user User @relation(fields: [user_id],references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product{
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  discountedPrice Float
+  actualPrice Float
+  categoryId Int
+  images String[]
+  category Category @relation(fields: [categoryId],references: [id])
+  carts Cart[] @relation("CartProducts")
+  wishlist Wishlist[] @relation("WishedProducts")
+  avgRating Float @default(0.0)
+  numRating Int @default(0) 
+
+  rating Rating[]
+  stockId Int 
+  stock Stock @relation(fields: [stockId],references: [id])
+  orderItems OrderItem[]
+  @@unique([name, stockId])  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String
+  slug String @unique
+  parentId Int?
+  parent Category? @relation("CategoryToSubcategory",fields: [parentId],references: [id])
+  children Category[] @relation("CategoryToSubcategory")
+  products Product[]
+}
+
+model Cart{
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  products Product[] @relation("CartProducts")
+  user User @relation(fields: [userId],references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wishlist{
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  products Product[] @relation("WishedProducts")
+  user User @relation(fields: [userId],references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rating{
+  id Int @id @default(autoincrement())
+  rating Int
+  notes String?
+  productId Int
+  product Product @relation(fields: [productId],references: [id])
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, productId])
+}
+
+model Stock{
+  id Int @id @default(autoincrement())
+  sellerId Int @unique
+  seller User @relation(fields: [sellerId],references: [id]) 
+  product Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order{
+  orderId String @id @default(cuid()) 
+  userId Int
+  totalPrice Float
+  user User @relation(fields: [userId],references: [id])
+  items OrderItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem{
+  orderId String 
+  productId Int
+  quantity Int
+  priceAtPurchase Float
+  product Product @relation(fields: [productId],references: [id])
+  order Order @relation(fields: [orderId], references: [orderId])
+  @@id([orderId, productId]) 
+}

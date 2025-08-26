@@ -3,6 +3,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "lib": ["ESNext"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   }
 }
