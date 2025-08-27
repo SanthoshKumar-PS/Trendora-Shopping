@@ -1,8 +1,89 @@
 import Navbar from '../components/Navbar'
 import Endbar from '../components/Endbar'
 import { useNavigate } from 'react-router-dom'
+import axios, {AxiosError } from "axios"
+import { useState } from 'react'
+import { CircleAlert } from 'lucide-react'
+
+
 const SignUp = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
   const navigate=useNavigate()
+
+  const [name,setName]=useState<string|null>(null)
+  const [email,setEmail]=useState<string|null>(null)
+  const [password,setPassword]=useState<string|null>(null)
+  const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
+  const [error,setError]=useState<string|null>(null)
+
+  async function validateAndRegister(){
+
+    if(!name && !email && !password){
+      setError("All Fields must not be empty")
+      return
+    }
+
+    if((name??"").length<3){
+      setError("Name must have atleast 3 letters");
+      return
+    }
+    
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if(!emailRegex.test(email??"")){
+      setError("Please enter a valid email address");
+      return
+    }
+
+    if((password??"").length<6){
+      setError("Password must be at least 6 characters long");
+      return
+    }
+    registerUser()
+  }
+
+  async function registerUser() {
+    try{
+      const payload={
+        name:name,
+        email:email,
+        password:password,
+        role:role
+      }
+      const response = await axios.post(`${BACKEND_URL}/user/register`,payload , {withCredentials:true})
+
+      if(response.status===201){
+        console.log("User has been registered")
+        const data=response.data as any
+        console.log("User has been registered")
+        if(data.role ==='USER'){
+          navigate('/home')
+        }
+        if(data.role ==='SELLER'){
+          navigate('/dashboard')
+        }
+      }
+
+    }
+    catch(error){
+      const err=error as AxiosError;
+
+      if(err.response.status===409){
+        console.log("User email already exists");
+        setError(err.response.data.message);
+      }
+      else if (err.response.status===500){
+        console.log("Internal Server Error");
+        setError(err.response.data.message)
+      }
+      else{
+        console.log("Unexpected Error while registering");
+        setError("Unexpected error occurred");
+      }
+      }
+    }
+
+
+
   return (
   <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
     <Navbar/>
@@ -18,11 +99,21 @@ const SignUp = () => {
             <p className="text-sm text-heading font-medium font-serif">Enter your details below</p>
         </div>
 
-        <input type="text" placeholder="Name" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Email or Phone Number" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Password" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+        <input type="text" placeholder="Name" value={name??''} onChange={(e)=>setName(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+        <input type="text" placeholder="Email " value={email??''} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+        <input type="text" placeholder="Password" value={password??''} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+        {error &&(
+          <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
+            <span><CircleAlert size={20}/></span>
+            {error}
+          </div>
+        )}
 
-        <button className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Create Account</button>
+        <button onClick={validateAndRegister} className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">
+          Create Account
+        </button>
+
+        {/* SignUp With google */}
         <button className="flex justify-center items-center gap-2 bg-white border-1 border-zinc-400 w-[60%] py-2 rounded-md text-heading hover:cursor-pointer hover:scale-105 duration-300 transition-all"><img src="/Icon-Google.png" alt="" className="h-5 w-5 object-contain"/>Sign Up With Google</button>
             <p onClick={()=>navigate('/login')} className="text-sm">Already have an account? <span className="relative group text-md font-medium">
                 Log in 

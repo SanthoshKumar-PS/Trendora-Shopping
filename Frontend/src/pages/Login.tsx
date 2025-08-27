@@ -1,8 +1,84 @@
 import Navbar from '../components/Navbar'
 import Endbar from '../components/Endbar'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
+import axios, { AxiosError } from 'axios';
+import { CircleAlert } from 'lucide-react';
 const Login = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
   const navigate=useNavigate()
+  const [email,setEmail]=useState<string|null>(null)
+  const [password,setPassword]=useState<string|null>(null)
+  const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
+  const [error,setError]=useState<string|null>(null)
+
+  async function validateAndLogin(){
+
+    if(!email && !password){
+      setError("Enter Email and Password Fields")
+      return
+    }
+    
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if(!emailRegex.test(email??"")){
+      setError("Please enter a valid email address");
+      return
+    }
+
+    if((password??"").length<6){
+      setError("Password must be at least 6 characters long");
+      return
+    }
+    loginUser()
+  }
+
+  async function loginUser() {
+    try{
+      const payload={
+        email:email,
+        password:password,
+      }
+      const response = await axios.post(`${BACKEND_URL}/user/login`,payload , {withCredentials:true})
+
+      if(response.status===200){
+        const data=response.data as any
+        console.log("User has been registered")
+        if(data.role ==='USER'){
+          navigate('/home')
+        }
+        if(data.role ==='SELLER'){
+          navigate('/dashboard')
+        }
+      }
+
+    }
+    catch(error){
+      const err=error as AxiosError;
+
+      if (err.response) {
+        if (err.response.status === 500) {
+          console.log("Internal Server Error");
+          setError(err.response.data?.message || "Server error");
+        } 
+        else if (err.response.status === 404) {
+          console.log("User not exists");
+          setError(err.response.data?.message || "User not exists");
+        } 
+        else {
+          console.log("Unexpected Error while registering");
+          setError("Unexpected error occurred");
+        }
+      } else {
+        console.log("Network or other error", err.message);
+        setError("Network error. Please try again.");
+      }
+      }
+    }
+
+
+
+
+
   return (
   <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
     <Navbar/>
@@ -18,11 +94,18 @@ const Login = () => {
             <p className="text-sm text-heading font-medium font-serif">Enter your details below</p>
         </div>
 
-        <input type="text" placeholder="Name" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Email or Phone Number" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Password" className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
 
-        <button className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Create Account</button>
+        <input type="text" placeholder="Email " value={email??""} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+
+        <input type="text" placeholder="Password" value={password??""} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+        {error &&(
+          <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
+            <span><CircleAlert size={20}/></span>
+            {error}
+          </div>
+        )}
+
+        <button onClick={validateAndLogin} className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Create Account</button>
         <button className="flex justify-center items-center gap-2 bg-white border-1 border-zinc-400 w-[60%] py-2 rounded-md text-heading hover:cursor-pointer hover:scale-105 duration-300 transition-all"><img src="/Icon-Google.png" alt="" className="h-5 w-5 object-contain"/>Sign Up With Google</button>
             <p onClick={()=>navigate('/')} className="text-sm">Don't have an account? <span className="relative group text-md font-medium">
                 Create Account

@@ -86,7 +86,7 @@ const Home = () => {
         {/* Products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
             {Array.from({ length: 10 }).map((_, i) =>(
-            <div className="relative flex flex-col gap-2  items-start justify-start mx-1">
+            <div key={i} className="relative flex flex-col gap-2  items-start justify-start mx-1">
                 <div key={i} className="bg-[#F5F5F5] h-50 w-50 md:h-60 md:w-60  rounded-md overflow-hidden">
                     <img src="/Products/Camera.png" alt="Product Image" className="object-cover w-full h-full" />
                 </div>
