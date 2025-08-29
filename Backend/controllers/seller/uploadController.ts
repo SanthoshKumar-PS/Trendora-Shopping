@@ -1,20 +1,22 @@
-import {Request, Response} from "express"
+import {Request, RequestHandler, Response} from "express"
 import cloudinary from "../../config/cloudinary"
 
-export const uploadImages = async (req:Request, res:Response)=>{
+
+export const uploadImages : RequestHandler = async (req:Request, res:Response)=>{
     try{
         const {sellerName,productName}=req.body;
         const files = req.files as Express.Multer.File[];
         if(!files || files.length===0){
-            return res.status(400).json({message:"No Files Uploaded"});
+            res.status(400).json({message:"No Files Uploaded"});
+            return 
         }
 
-        const uploadPromises = req.files.map((file:any)=>{
+        const uploadPromises = files.map((file:any)=>
             cloudinary.uploader.upload(file.path,{
-                folder: `${sellerName}/${productName}`,
+                folder: `Trendora/${sellerName}/${productName}`,
                 resource_type:"image",
             })
-        })
+        );
 
         const results= await Promise.all(uploadPromises)
         const urls=results.map((r)=>r.secure_url);

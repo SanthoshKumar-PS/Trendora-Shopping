@@ -1,37 +1,41 @@
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
 async function main() {
-  const categories = [
-    { name: "Electronics", slug: "electronics" },
-    { name: "Mobiles", slug: "mobiles", parent: "electronics" },
-    { name: "Laptops", slug: "laptops", parent: "electronics" },
-    { name: "Fashion", slug: "fashion" },
-    { name: "Men", slug: "men", parent: "fashion" },
-    { name: "Women", slug: "women", parent: "fashion" },
-  ];
+  // Create Parent Category
+  const electronics = await prisma.category.create({
+    data: {
+      name: "Electronics & Gadgets",
+      slug: "electronics-gadgets",
+    },
+  });
 
-  // Create top-level first
-  const created: Record<string, number> = {};
-
-  for (const cat of categories) {
-    const parentId = cat.parent ? created[cat.parent] : null;
-
-    const c = await prisma.category.create({
-      data: {
-        name: cat.name,
-        slug: cat.slug,
-        parentId: parentId ?? undefined,
+  // Create Subcategories
+  await prisma.category.createMany({
+    data: [
+      {
+        name: "Mobiles",
+        slug: "mobiles",
+        parentId: electronics.id,
       },
-    });
+      {
+        name: "Laptops",
+        slug: "laptops",
+        parentId: electronics.id,
+      },
+    ],
+  });
 
-    created[cat.slug] = c.id;
-  }
+  console.log("✅ Seeded categories successfully!");
 }
 
 main()
-  .then(() => prisma.$disconnect())
-  .catch((e) => {
-    console.error(e);
-    prisma.$disconnect();
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error("❌ Error while seeding:", e);
+    await prisma.$disconnect();
+    process.exit(1);
   });

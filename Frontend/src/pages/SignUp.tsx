@@ -55,6 +55,7 @@ const SignUp = () => {
         console.log("User has been registered")
         const data=response.data as any
         console.log("User has been registered")
+        localStorage.setItem('username',data.name)
         if(data.role ==='USER'){
           navigate('/home')
         }

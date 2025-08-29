@@ -3,6 +3,9 @@ import { PrismaClient } from "@prisma/client";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
+import uploadRouter from "./routes/seller/uploadRouter";
+import { dataRouter } from "./routes/dataRouter";
+import { productRouter } from "./routes/seller/productRouter";
 
 const prisma = new PrismaClient();
 
@@ -14,7 +17,12 @@ app.use(cors({
   credentials: true // allows sending cookies
 }));
 
+app.use("/api",dataRouter)
 app.use("/user",userRouter)
+
+app.use("/seller",uploadRouter)
+app.use("/seller",productRouter)
+
 
 app.get('/', async (__dirname,res)=>{
     res.send("Welcome Boss")

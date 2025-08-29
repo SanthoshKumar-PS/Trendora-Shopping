@@ -1,4 +1,4 @@
-import { ChevronDown, CircleAlert, Eye, Heart, Pencil, X } from "lucide-react"
+import { ChevronDown, CircleAlert, Delete, DeleteIcon, Eye, Heart, Pencil, Plus, SquarePlus, Trash, X } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import { useNavigate } from "react-router-dom"
 import axios from "axios";
@@ -12,27 +12,31 @@ import {
 } from "../../components/ui/dropdown-menu"
 import { Input } from "../../components/ui/input"
 import { Textarea } from "../../components/ui/textarea"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Loading from "../../components/Loading";
+import type { Category } from "../../types";
+import LoadingScreen from "../../components/LoadingScreen";
 const AddProduct = () => {
   const h1Style="text-md font-serif font-medium  md:text-end md:max-w-[80%]"
   const navigate=useNavigate()
-  const categories=[
-    {id:1,value:"Mens Wear"},
-    {id:2,value:"Womans Wear"},
-    {id:3,value:"Children Wear"},
-    {id:4,value:"Mobile"},
-    {id:5,value:"Laptop"},
-    {id:6,value:"Accessories"},
-  ]
+
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const [loading,setLoading] = useState<boolean>(false);
   const [images,setImages]=useState<File[]>([])
   const [urls,setUrls]=useState<string[]>([]);
-  const [selectedCategory,setSelectedCategory]=useState<string>('Select')
+  
+  const [categories ,setCategories]=useState<Category[]>([])
+  const [selectedCategoryName,setSelectedCategoryName]=useState<string>('Select')
+  const [selectedCategoryId,setSelectedCategoryId]=useState<number|null>(null)
+  
   const [productName,setProductName]=useState<string|null>(null)
   const [productDescription,setProductDescription] = useState<string|null>(null)
   const [discountedPrice,setDiscountedPrice]=useState<number|null>(null)
   const [actualPrice,setActualPrice] = useState<number|null>(null)
   const [error,setError] = useState<string|null>(null)
+
+  const [featureInputs,setFeatureInputs] = useState([{label:"",value:""}]);
+
 
   function handleOnChange(e : React.ChangeEvent<HTMLInputElement>){
     if(!e.target.files) return;
@@ -51,12 +55,12 @@ const AddProduct = () => {
   };
 
   const validateAndUpload= ()=>{
-    if(selectedCategory==='Select' && !productName && !productDescription && !discountedPrice && !actualPrice){
+    if(selectedCategoryName==='Select' && !productName && !productDescription && !discountedPrice && !actualPrice){
       setError("Enter all fields to add product");
       return
     }
 
-    if(selectedCategory==='Select'){
+    if(selectedCategoryName==='Select'){
       setError("Select Category according to your product")
       return
     }
@@ -84,31 +88,116 @@ const AddProduct = () => {
   }
 
   const handleUploadImages = async () => {
+    setLoading(true)
     
     const formData = new FormData();
     images.forEach((img)=> formData.append('images',img));
-    formData.append("sellerName","santhosh");
-    // formData.append("productName",productName??"");
-    formData.append("productName","testing");
+    const userName = localStorage.getItem('username')
+    const formattedName = userName?.replace(/\s+/g, "").toLowerCase();
+    const formattedProductName = productName?.replace(/\s+/g, "").toLowerCase();
+    formData.append("sellerName",formattedName??"");
+    formData.append("productName",formattedProductName??"");
 
+    interface AddProductResponse{
+      message:string
+      urls:string[]
+    }
 
     try {
-      const res = await axios.post(`${BACKEND_URL}/seller/uploadProductImages`,formData,
+      const res = await axios.post<AddProductResponse>(`${BACKEND_URL}/seller/uploadProductImages`,formData,
         {
           headers: { "Content-Type" : "multipart/form-data"},
 
         }
       )
-
-      const data:any=res.data 
+      
+      const data=res.data 
       setUrls(data.urls);
       console.log(data.urls)
-      alert("Images uploaded successfully!");
+      console.log("Images uploaded successfully!");
+      AddProductDetails(data.urls)
     } catch (err) {
       console.log(err);
       alert("Upload failed. Please try again.");
     }
   };
+
+  const AddProductDetails = async (imagesUrls : string[]) =>{
+    try{
+      setLoading(true);
+      const cleanedFeatures = featureInputs.filter(
+        (f) => f.label.trim() !== "" && f.value.trim() !== ""
+      )
+      const payload={     
+        categoryId: selectedCategoryId,
+        productName: productName,
+        productDescription : productDescription,
+        productFeatures : cleanedFeatures,
+        discountedPrice : discountedPrice,
+        actualPrice : actualPrice,
+        imageUrls : imagesUrls
+      }
+      const response = await axios.post<{message:string}>(`${BACKEND_URL}/seller/addProduct`,payload,{withCredentials:true})
+      if(response.status===201){
+        console.log(response.data.message)
+      }
+
+
+    }
+    catch(error){
+      console.log("Error occured while adding product");
+      console.log(error);
+    }
+    finally{
+      setLoading(false)
+    }
+  }
+
+  const handleFeatureChange = (index: number, field: "label" | "value", value: string) => {
+    setFeatureInputs((prev) =>
+      prev.map((feature, i) =>
+        i === index ? { ...feature, [field]: value } : feature
+      )
+    )
+  }
+
+  const handleAddFeature = () =>{
+    setFeatureInputs([...featureInputs,{label:"",value:""}])
+  }
+
+  const handleDeleteFeature = (index:number) => {
+    setFeatureInputs(featureInputs.filter((_,i)=>i!=index))
+  }
+
+  useEffect(()=>{
+    interface CategoriesResponse {
+      message: string;
+      categories?: Category[];
+    }
+    const getCategories = async () =>{
+      setLoading(true)
+      try{
+        const response = await axios.get<CategoriesResponse>(`${BACKEND_URL}/api/categories`)
+        setCategories(response.data.categories??[])
+      }
+      catch(error){
+        console.log("Error while fetching categories");
+      }
+      finally{
+        setLoading(false)
+      }
+    }
+    
+    getCategories();
+  },[])
+
+  if(loading)
+    {
+      return(
+        <LoadingScreen/>
+      )
+    }
+
   return (
     <div>
         <Navbar seller={true}/>
@@ -120,13 +209,17 @@ const AddProduct = () => {
             <h1 className={h1Style}>Select Category *</h1>
             <DropdownMenu>
               <DropdownMenuTrigger className='px-3 py-2  border-1 rounded-md flex justify-between items-center gap-2'>
-                {selectedCategory} <span><ChevronDown size={20} /></span>
+                {selectedCategoryName} <span><ChevronDown size={20} /></span>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>Category</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {categories.map(category=>(
-                  <DropdownMenuItem key={category.id} onClick={()=>setSelectedCategory(category.value)}>{category.value}</DropdownMenuItem>
+                  <DropdownMenuItem key={category.id} 
+                    onClick={()=>{
+                      setSelectedCategoryName(category.name)
+                      setSelectedCategoryId(category.id)
+                    }}>{category.name}</DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -138,6 +231,32 @@ const AddProduct = () => {
           {/* Product Description */}
             <h1 className={h1Style}>Product Description</h1>
             <Textarea  placeholder="Enter Product Description" value={productDescription??""} onChange={(e)=>{setProductDescription(e.target.value)}} className=" h-20"/>
+
+          {/* Product Features */}
+             <h1 className={h1Style}>Product Features</h1>
+             <div className="flex flex-col">
+                {featureInputs.map((feature,index)=>(
+                  <div key={index} className="flex items-center gap-3">
+                    <Input  className='text-xs'  placeholder="Eg.Processor" value={feature.label} 
+                        onChange={(e) => handleFeatureChange(index, "label", e.target.value)}/>
+                    <Textarea className='text-xs h-10' placeholder="Eg. 16GB RAM" value={feature.value}
+                        onChange={(e) => handleFeatureChange(index, "value", e.target.value)}/>
+                    <Trash onClick={()=>handleDeleteFeature(index)} className="text-red-500 hover:scale-110" size={46}/>
+                  </div>
+                ))}
+             </div>
+
+
+
+
+            <div className="hidden md:col-span-1 md:flex"></div>
+            {/* Add Feature Button */}
+            <div className="col-span-1 md:col-span-1 flex justify-center items-center">
+              <div onClick={handleAddFeature} className="flex justify-center items-center gap-1 bg-blue-500 px-3 py-2 text-white rounded-sm hover:scale-95">
+                <p className="text-sm">Add Feature </p><Plus size={18}/> 
+              </div>
+            </div>
+
 
           {/* Discounted Price */}
             <h1 className={h1Style}>Discounted Price</h1>
@@ -198,12 +317,6 @@ const AddProduct = () => {
             </div>
           )}
 
-          {message &&(
-            <div className='col-span-1 md:col-span-2 my-3 font-sans font-medium text-green-500 text-sm flex justify-center gap-2 items-center'>
-              <span><CircleAlert size={20}/></span>
-              {message}
-            </div>
-          )}
 
           {/* Upload Button  */}
           <div className="col-span-1 md:col-span-2 flex justify-center items-center">

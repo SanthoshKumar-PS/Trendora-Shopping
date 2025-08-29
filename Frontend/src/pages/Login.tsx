@@ -43,6 +43,7 @@ const Login = () => {
       if(response.status===200){
         const data=response.data as any
         console.log("User has been registered")
+        localStorage.setItem('username',data.name)
         if(data.role ==='USER'){
           navigate('/home')
         }

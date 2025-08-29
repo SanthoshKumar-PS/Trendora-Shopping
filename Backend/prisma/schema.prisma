@@ -50,6 +50,8 @@ model Product{
   id Int @id @default(autoincrement())
   name String
   description String?
+  features Json?
+  discountPercentage Float? @default(0.0)
   discountedPrice Float
   actualPrice Float
   categoryId Int

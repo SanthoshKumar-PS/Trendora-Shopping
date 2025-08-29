@@ -2,8 +2,8 @@ import { PrismaClient, User } from "@prisma/client"
 const prisma=new PrismaClient()
 import jwt from"jsonwebtoken"
 
-const generateToken=(email:string)=>{
-    return jwt.sign({email},"_secret",{expiresIn:'1h'})
+const generateToken=(id:number,email:string)=>{
+    return jwt.sign({id,email},"_secret",{expiresIn:'1h'})
 }
 
 export const register= async (req:any,res:any)=>{
@@ -38,12 +38,13 @@ export const register= async (req:any,res:any)=>{
         }
 
 
-        const token=generateToken(email)
+        const token=generateToken(createdUser.id,createdUser.email)
         res.cookie("token",token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV==="production",
+            secure:false,
+            // secure:process.env.NODE_ENV==="production",
             maxAge: 60 * 60 * 1000,
-            sameSite:"strict"
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
         return res.status(201).json({message:"Account created succesfully"})
 
@@ -67,14 +68,15 @@ export const login = async (req:any,res:any) => {
             return res.status(401).json({message:"Wrong Password. Please Enter Again"})
         }
 
-        const token=generateToken(email)
+        const token=generateToken(loggingUser.id,loggingUser.email)
         res.cookie("token",token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV==="production",
+            secure:false,
+            // secure:process.env.NODE_ENV==="production",
             maxAge: 60 * 60 * 1000,
-            sameSite:"strict"
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
-        return res.status(200).json({message:"Login Successful",role:loggingUser.role})
+        return res.status(200).json({message:"Login Successful",role:loggingUser.role, name:loggingUser.name})
         
     } 
     catch (error) {
