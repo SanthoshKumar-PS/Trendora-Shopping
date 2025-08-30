@@ -43,7 +43,7 @@ export const register= async (req:any,res:any)=>{
             httpOnly:true,
             secure:false,
             // secure:process.env.NODE_ENV==="production",
-            maxAge: 60 * 60 * 1000,
+            maxAge: 7*24* 60 * 60 * 1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
         return res.status(201).json({message:"Account created succesfully"})
@@ -73,7 +73,7 @@ export const login = async (req:any,res:any) => {
             httpOnly:true,
             secure:false,
             // secure:process.env.NODE_ENV==="production",
-            maxAge: 60 * 60 * 1000,
+            maxAge: 7*24*60 * 60 * 1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
         return res.status(200).json({message:"Login Successful",role:loggingUser.role, name:loggingUser.name})

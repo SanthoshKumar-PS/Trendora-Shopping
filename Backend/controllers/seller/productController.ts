@@ -17,7 +17,6 @@ export const viewSellerProducts = async (req:any,res:any) => {
             where : {stockId : userStock.id}
         }) 
 
-        console.log("User Products : ", sellerProducts)
         return res.status(200).json({message:"Returing all products to the seller", products : sellerProducts})
 
 
@@ -35,8 +34,6 @@ export const addProduct = async (req:any,res:any) => {
 
         const {categoryId, productName, productDescription,productFeatures, discountedPrice, actualPrice, imageUrls} = req.body
         if (!categoryId || !productName || !productDescription || !discountedPrice || !actualPrice || !imageUrls){
-            // console.log(categoryId ,productName ,productDescription ,discountedPrice ,actualPrice,imageUrls)
-            console.log("400 error is here")
             return res.status(400).json({message:"All fields are required"});
         }
 
