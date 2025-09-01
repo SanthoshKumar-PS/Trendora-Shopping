@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import RatingStars from '../../components/RatingStars'
 import { BadgeCheck, ShoppingCart, Zap } from 'lucide-react'
-import Products from './Products'
 import { useParams } from 'react-router-dom'
 import LoadingScreen from '../../components/LoadingScreen'
 import axios from 'axios'
@@ -35,10 +34,12 @@ const Product = () => {
                 withCredentials : true
             })
             if(response.status===200){
-                console.log(response.data)
+                // console.log(response.data)
                 setCurrentProduct(response.data.product)
                 setProductCategory(response.data.product?.categoryId)
-                await getProductRecommendation()
+                if (response.data.product?.categoryId) {
+                    await getProductRecommendation(response.data.product.categoryId)
+                }
 
             }
             else{
@@ -51,19 +52,19 @@ const Product = () => {
             setError("Error while calling the selected product")
             console.log(error);
         }
-        // finally{
-        //     setLoading(false)
-        // }
+
     } 
 
-    async function getProductRecommendation(){
+    async function getProductRecommendation(categoryProduct:number){
         type ProductsRecommendType = {
             message : string
             products : ProductType[]
         }
         try{
+            // console.log("Payload : ",categoryProduct)
             const payload = {
-                productCategory:productCategory
+                productId : productId,
+                productCategory : categoryProduct
             }
             const response = await axios.get<ProductsRecommendType>(`${BACKEND_URL}/api/recommendproducts`,{
                 params:payload,
@@ -88,7 +89,7 @@ const Product = () => {
 
     useEffect(()=>{
         getProductDetails()
-    },[])
+    },[id])
 
 
     if(loading){
