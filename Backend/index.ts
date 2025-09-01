@@ -5,7 +5,8 @@ import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
 import uploadRouter from "./routes/seller/uploadRouter";
 import { dataRouter } from "./routes/dataRouter";
-import { productRouter } from "./routes/seller/productRouter";
+import { sellerProductRouter } from "./routes/seller/sellerProductRouter";
+import { productRouter } from "./routes/productRouter";
 
 const prisma = new PrismaClient();
 
@@ -18,10 +19,11 @@ app.use(cors({
 }));
 
 app.use("/api",dataRouter)
+app.use("/api",productRouter)
 app.use("/user",userRouter)
 
 app.use("/seller",uploadRouter)
-app.use("/seller",productRouter)
+app.use("/seller",sellerProductRouter)
 
 
 app.get('/', async (__dirname,res)=>{

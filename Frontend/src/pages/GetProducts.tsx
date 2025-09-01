@@ -1,62 +1,15 @@
-import { Eye, Heart, Pencil } from "lucide-react"
-import Navbar from "../../components/Navbar"
+import { Eye,  Pencil } from "lucide-react"
+import type { ProductType } from "../types"
 import { useNavigate } from "react-router-dom"
-import RatingStars from "../../components/RatingStars"
-import { useEffect, useState } from "react"
-import type { ProductType } from "../../types"
-import axios from "axios"
-import LoadingScreen from "../../components/LoadingScreen"
+import RatingStars from "../components/RatingStars"
 
-const Products = () => {
-  const navigate=useNavigate()
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const [loading,setLoading] = useState(false);
-  const [products,setProducts] = useState<ProductType[]>([])
 
-  const getSellerProducts = async () => {
-    interface ViewProductResponse {
-      message : string
-      products? : ProductType[]
-
-    }
-    try{
-      setLoading(true)
-      const response = await axios.get<ViewProductResponse>(`${BACKEND_URL}/seller/viewproducts`,{withCredentials:true})
-      setProducts(response.data.products||[])
-      //console.log(response.data.products||[])
-
-    }
-    catch(error){
-      console.log(error)
-    }
-    finally{
-      setLoading(false)
-    }
-  }
-
-  useEffect(()=> {
-    getSellerProducts();
-  },[])
-
-  if(loading){
-    return <LoadingScreen/>
-  }
-
+const GetProducts = ({products}:{products:ProductType[]}) => {
+    const navigate = useNavigate()
+ 
 
   return (
     <div>
-        <Navbar seller={true}/>
-        <div className="w-full border-b border-zinc-300"></div>
-
-        <div className="max-w-7xl mx-auto mt-6">
-          {/* Heading */}
-          <div className="flex items-center justify-between px-3 gap-6 mx-6">
-            <h1 className="text-xl text-heading font-medium font-serif  ">All Products</h1>
-            <button className="bg-zinc-800 px-3 py-2 rounded-md text-white font-serif hover:cursor-pointer hover:scale-105"
-              onClick={()=>navigate("/addproduct")}>
-              Add Product
-            </button>
-          </div>
 
           {/* Products */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
@@ -103,8 +56,7 @@ const Products = () => {
 
         </div>
 
-    </div>
   )
 }
 
-export default Products
+export default GetProducts

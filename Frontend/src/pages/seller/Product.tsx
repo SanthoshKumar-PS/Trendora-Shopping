@@ -1,27 +1,113 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import RatingStars from '../../components/RatingStars'
 import { BadgeCheck, ShoppingCart, Zap } from 'lucide-react'
 import Products from './Products'
-
+import { useParams } from 'react-router-dom'
+import LoadingScreen from '../../components/LoadingScreen'
+import axios from 'axios'
+import type { Feature, ProductType } from '../../types'
+import GetProducts from '../GetProducts'
 const Product = () => {
-    const features=[{"label": "Processor", "value": "Intel Core i5-1135G7"}, {"label": "RAM", "value": "8GB DDR4"}, {"label": "Storage", "value": "512GB SSD"}, {"label": "Display", "value": "15.6\" Full HD IPS"}, {"label": "Graphics", "value": "Intel Iris Xe Graphics"}, {"label": "Operating System", "value": "Windows 11 Home"}, {"label": "Battery Life", "value": "Up to 7 hours"}, {"label": "Weight", "value": "1.65 kg"}, {"label": "Connectivity", "value": "Wi-Fi 6, Bluetooth 5.0"}, {"label": "Ports", "value": "USB-C, USB-A, HDMI, SD card reader"}]
+    const {id}=useParams<{id:string}>()
+    const productId = Number(id)
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    const [loading,setLoading] = useState<boolean>(true );
+    const [currentProduct,setCurrentProduct] = useState<ProductType|null>(null)
+    const [productCategory,setProductCategory] = useState<number|undefined>(undefined);
     const [selectedImageIndex,setSelectedImageIndex] = useState<number>(0);
 
+    // Recommedatation Products
+    const [products, setProducts] = useState<ProductType[]>([])
+    const [error, setError] = useState<string | null>(null)
+    
+
+    async function getProductDetails(){
+        interface ProductDetailRespone{
+            message : string
+            product : ProductType | null
+        }
+        try{
+            setLoading(true)
+            const payload = { productId : productId}
+            const response = await axios.get<ProductDetailRespone>(`${BACKEND_URL}/api/productdetails`,{
+                params : payload,
+                withCredentials : true
+            })
+            if(response.status===200){
+                console.log(response.data)
+                setCurrentProduct(response.data.product)
+                setProductCategory(response.data.product?.categoryId)
+                await getProductRecommendation()
+
+            }
+            else{
+                setError("Error while calling the selected product")
+                console.log("Error occured in Product.tsx while getting details")
+            }
+
+        }
+        catch(error){
+            setError("Error while calling the selected product")
+            console.log(error);
+        }
+        // finally{
+        //     setLoading(false)
+        // }
+    } 
+
+    async function getProductRecommendation(){
+        type ProductsRecommendType = {
+            message : string
+            products : ProductType[]
+        }
+        try{
+            const payload = {
+                productCategory:productCategory
+            }
+            const response = await axios.get<ProductsRecommendType>(`${BACKEND_URL}/api/recommendproducts`,{
+                params:payload,
+                withCredentials:true
+            })
+
+            if(response.status===200){
+                console.log(response.data)
+                setProducts(response.data.products)
+            }
+
+
+        }
+        catch(error){
+            setError("Error While Getting recommended products");
+            console.log(error)
+        }
+        finally{
+            setLoading(false)
+        }
+    }
+
+    useEffect(()=>{
+        getProductDetails()
+    },[])
+
+
+    if(loading){
+        return <LoadingScreen/>
+    }
 
   return (
     <div>
         <Navbar seller={true}/>
         <div className="w-full border-b border-zinc-300"></div>
 
-        {/* Show Now Top Bar */}
+        {/* Show Now Top Bar - Only in Middle Screen */}
         <div className='hidden w-full bg-zinc-50 md:flex items-center justify-center gap-4 py-2'>
-            <img src="/Products/Camera.png" alt="" className='w-12 h-12 object-cover ' />
+            <img src={currentProduct?.images[0]} alt="" className='w-12 h-12 object-cover ' />
             <div className='flex-col max-w-sm'>
-                <p className='truncate'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Numquam, totam!</p>
-                <RatingStars rating={4.0}/>
+                <p className='truncate'>{currentProduct?.description}</p>
+                <RatingStars rating={currentProduct?.avgRating??0}/>
             </div>
-            <h1>$21.00</h1>
+            <h1>${currentProduct?.discountedPrice}</h1>
             <button className='px-3 py-2 text-white font-medium bg-yellow-400 rounded-lg hover:cursor-pointer hover:scale-95'>Buy Now</button>
 
         </div>
@@ -33,15 +119,15 @@ const Product = () => {
                 {/* Image Section */}
                 <div className='md:sticky md:top-0 w-full md:w-[50%] flex flex-col items-center justify-center mx-2 my-3  overflow-hidden '>
                     {/* Main Image */}
-                    <div className=' mt-2 '>
-                        <img src="/Products/Camera.png" alt="" className='object-cover' />
+                    <div className='mt-2 w-96 h-75  flex items-center justify-center overflow-hidden rounded-md'>
+                        <img src={currentProduct?.images[selectedImageIndex]} alt="" className=' object-cover' />
                     </div>
                     {/* Sub Images */}
                     <div className='flex gap-2 mx-2 my-2'>
                         {Array.from({length:5}).map((_,index)=>(
                             <div key={index} onClick={()=>{setSelectedImageIndex(index)}} 
-                            className={`min-h-16 min-w-16 flex ietms-center justify-center bg-zinc-100 rounded-sm overflow-hidden hover:cursor-pointer ${selectedImageIndex===index?"border-2 border-blue-500":""}`}>
-                                <img src="/Products/Camera.png" alt="" className='object-cover'/>
+                            className={` max-h-20 max-w-20 flex items-center justify-center bg-zinc-100 rounded-sm overflow-hidden hover:cursor-pointer ${selectedImageIndex===index?"border-2 border-blue-500":""}`}>
+                                <img src={currentProduct?.images[index]} alt="" className='object-cover'/>
                             </div>
                         ))}
 
@@ -58,23 +144,25 @@ const Product = () => {
                         </button>
                     </div>
 
-
-
                 </div>
+
                 {/* Description Section */}
                 <div className='flex flex-col items-center justify-center gap-3 w-full md:w-[50%] mx-2 my-3 md:mr-5 '>
                     {/* Product Description */}
                     <div className='text-md font-medium'>
-                        Canon EOS R50 Mirrorless Camera RF - S 18 - 45 mm f/4.5 - 6.3 IS STM and RF - S 55 - 210 mm f/5 - 7.1 IS STM  (Black)
+                        {currentProduct?.description}
                     </div>
 
                     {/* Price Details */}
                     <div className='w-full flex flex-col gap-1 items-start justify-start'>
                         <p className='text-green-600 text-md font-medium'>Special Price</p>
                         <div className='flex items-end gap-2'>
-                            <p className='text-lg font-medium'>$52000</p>
-                            <p className='text-md font-medium text-zinc-500 line-through'>$54200</p>
-                            <p className='text-green-600 text-md font-medium'>13% off</p>
+                            <p className='text-lg font-medium'>${currentProduct?.discountedPrice}</p>
+                            <p className='text-md font-medium text-zinc-500 line-through'>${currentProduct?.actualPrice}</p>
+                            {(currentProduct?.discountPercentage ?? 0) > 0 &&(
+                                <p className='text-green-600 text-md font-medium'>{currentProduct?.discountPercentage}% off</p>
+                            )}
+
                         </div>
                         <p>+ ₹99 Protect Promise Fee <span className='text-blue-500 font-medium underline hover:cursor-pointer'>Learn More</span></p>
                         <p className='text-red-500 text-sm font-medium'>Hurry, Only 2 left!</p>
@@ -82,8 +170,8 @@ const Product = () => {
                     </div>
                     
                     <div className='self-start flex gap-4'>
-                        <RatingStars rating={4}/> 
-                        <p>256 Ratings</p>
+                        <RatingStars rating={currentProduct?.avgRating??0}/> 
+                        <p>{currentProduct?.numRating} Ratings</p>
                     </div>
 
 
@@ -94,7 +182,7 @@ const Product = () => {
                     {/* Features Table */}
                     <table className='self-start'>
                         <tbody className='table-auto border-collapse border-spacing-x-4 border-spacing-y-4 '>
-                            {features.map((feature,index)=>(
+                            {currentProduct?.features && currentProduct.features.map((feature:Feature,index:number)=>(
                                 <tr key={index} className=''>
                                     <td className='align-top pr-1 p-1 text-sm font-medium'>{feature.label}</td>
                                     <td className='align-top p-1 text-sm'>:</td>
@@ -119,7 +207,8 @@ const Product = () => {
 
         </div>
 
-        <Products/>
+        <GetProducts products={products}/>
+        {/* <Products/> */}
 
 
         

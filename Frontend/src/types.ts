@@ -6,11 +6,15 @@ export interface Category{
     parentId:number
 }
 
+export interface Feature{
+  label : string;
+  value : string
+}
 export interface ProductType {
   id: number;
   name: string;
   description?: string;
-  features?: Record<string, string>; 
+  features?: Feature[]; 
   discountPercentage?: number; 
   discountedPrice: number;
   actualPrice: number;
