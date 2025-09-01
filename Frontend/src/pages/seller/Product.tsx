@@ -20,6 +20,12 @@ const Product = () => {
     const [products, setProducts] = useState<ProductType[]>([])
     const [error, setError] = useState<string | null>(null)
     
+    // Pagination
+    const [page,setPage] = useState<number>(1);
+    const [limit,setLimit] = useState<number>(24);
+    const [hasMore,setHasMore] = useState<boolean>(true);
+    const [infiniteLoading,setInfiniteLoading] = useState<boolean>(false);
+    
 
     async function getProductDetails(){
         interface ProductDetailRespone{
@@ -34,11 +40,12 @@ const Product = () => {
                 withCredentials : true
             })
             if(response.status===200){
-                // console.log(response.data)
                 setCurrentProduct(response.data.product)
                 setProductCategory(response.data.product?.categoryId)
                 if (response.data.product?.categoryId) {
-                    await getProductRecommendation(response.data.product.categoryId)
+                    setPage(1)
+                    setHasMore(true)
+                    await getProductRecommendation(response.data.product.categoryId,1)
                 }
 
             }
@@ -52,19 +59,28 @@ const Product = () => {
             setError("Error while calling the selected product")
             console.log(error);
         }
+        finally{
+            setLoading(false);
+        }
 
     } 
 
-    async function getProductRecommendation(categoryProduct:number){
+    async function getProductRecommendation(categoryProduct:number,pageNum:number){
         type ProductsRecommendType = {
             message : string
-            products : ProductType[]
+            products : ProductType[],
+            currentPage : number,
+            totalPages : number
         }
         try{
+            console.log("Started to fetch")
+            setInfiniteLoading(true)
             // console.log("Payload : ",categoryProduct)
             const payload = {
                 productId : productId,
-                productCategory : categoryProduct
+                productCategory : categoryProduct,
+                pageStr:pageNum,
+                limitStr:limit
             }
             const response = await axios.get<ProductsRecommendType>(`${BACKEND_URL}/api/recommendproducts`,{
                 params:payload,
@@ -73,7 +89,14 @@ const Product = () => {
 
             if(response.status===200){
                 console.log(response.data)
-                setProducts(response.data.products)
+                if(pageNum===1){
+                    setProducts(response.data.products)
+                }
+                else{
+                    const newProducts= response.data.products
+                    setProducts((prev)=>[...prev,...newProducts])
+                    setHasMore(pageNum<response.data.totalPages)
+                }
             }
 
 
@@ -83,13 +106,36 @@ const Product = () => {
             console.log(error)
         }
         finally{
-            setLoading(false)
+            setInfiniteLoading(false)
         }
     }
 
     useEffect(()=>{
         getProductDetails()
     },[id])
+
+    useEffect(()=>{
+        const handleScroll = () =>{
+            if(!hasMore || infiniteLoading) return;
+
+            const scrollTop = window.scrollY;
+            const windowSize = window.innerHeight;
+            const websiteHeight = document.documentElement.scrollHeight;
+            
+            if(((scrollTop+windowSize)/websiteHeight)>0.8){
+                setPage(prev=>{
+                    const nextPage = prev+1;
+                    if(productCategory){
+                        getProductRecommendation(productCategory,nextPage)
+                    }
+                    return nextPage
+                })
+            }
+        }
+
+        window.addEventListener("scroll",handleScroll)
+        return () => window.removeEventListener("scroll",handleScroll)
+    },[productCategory, hasMore, infiniteLoading])
 
 
     if(loading){
@@ -210,6 +256,12 @@ const Product = () => {
 
         <GetProducts products={products}/>
         {/* <Products/> */}
+        {infiniteLoading &&(
+            <div> Loading</div>
+        )}
+        {!hasMore && (
+            <div>No more data to load</div>
+        )}
 
 
         

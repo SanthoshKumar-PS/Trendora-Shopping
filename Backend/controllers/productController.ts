@@ -21,18 +21,14 @@ export const getProductDetailsById = async (req:any,res:any)=>{
 
 export const getRecommendedProducts = async (req:any, res:any)=>{
     try{
-        const {productId, productCategory} = req.query;
-        const [page,limit] = [1,24]
+        const {productId, productCategory,pageStr,limitStr} = req.query;
+        const page = Number(pageStr)
+        const limit = Number(limitStr)
+
         const productIdNum=Number(productId)
         const categoryId = Number(productCategory)
         console.log(productCategory)
 
-        // const productsByCategory = await prisma.product.findMany({
-        //     where: {
-        //         categoryId:categoryId,
-        //         id:{not:productIdNum} //excluding the main product
-        //     }
-        // })
         const category = await prisma.category.findUnique({
             where: { id: categoryId },
             include: { parent: true, children: true }, 
@@ -63,6 +59,7 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
         const products = await prisma.product.findMany({
             where: {
             categoryId: { in: categoryIds },
+            id: {not:productIdNum}
             },
             orderBy: { createdAt: "desc" }, // optional
             skip,
