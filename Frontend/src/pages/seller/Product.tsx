@@ -75,7 +75,6 @@ const Product = () => {
         try{
             console.log("Started to fetch")
             setInfiniteLoading(true)
-            // console.log("Payload : ",categoryProduct)
             const payload = {
                 productId : productId,
                 productCategory : categoryProduct,

@@ -72,6 +72,7 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
         const totalProducts = await prisma.product.count({
             where: {
             categoryId: { in: categoryIds },
+            id: {not:productIdNum}
             },
         });
 
