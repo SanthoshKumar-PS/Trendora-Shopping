@@ -1,10 +1,10 @@
 import { useState } from "react"
 import Navbar from "../components/Navbar"
-import { Badge, BadgeCheck, Bell, ChevronDown, CircleAlert, CircleMinus, CirclePlus, CreditCard, Fingerprint, LaptopMinimal, ListOrdered, MapPinned, Star, Truck } from "lucide-react"
+import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CircleAlert, CircleMinus, CirclePlus, CreditCard, Fingerprint, LaptopMinimal, ListOrdered, MapPinned, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
 
 const CheckOut = () => {
-    const activeTab = useState<number>(1)
+    const [activeTab,setActiveTab] = useState<number>(1)
   return (
     <div className="bg-zinc-100 min-h-screen">
         <Navbar/>
@@ -226,19 +226,99 @@ const CheckOut = () => {
                         <div className="w-full border-b-1 text-zinc-500"></div>
 
                         {/* Payment Options */}
-                        <div className="w-full flex justify-between items-center">
-                            <div className="flex justify-start items-center gap-2">
-                                <LaptopMinimal size={18}/>
-                                <p className="flex flex-col">
-                                    <span className="font-medium text-md ">UPI</span>
-                                    <span className="text-sm text-zinc-400">Pay by any UPI app</span>
-                                </p>
-                                <p></p>
+                        <div className="flex flex-col w-full justify-start items-center">
+                            <div className="w-full flex justify-between items-center"
+                                onClick={()=>setActiveTab(prev => (prev===1?0:1))}>
+                                <div className="flex justify-start items-center gap-2">
+                                    <LaptopMinimal size={18}/>
+                                    <p className="flex flex-col">
+                                        <span className="font-medium text-md ">UPI</span>
+                                        {activeTab!==1&&(
+                                            <span className="text-sm text-zinc-400">Pay by any UPI app</span>
+                                        )}
+                                    </p>
+                                </div>
+                                {activeTab===1?
+                                    <ChevronUp size={18} />:
+                                    <ChevronDown size={18} />}
                             </div>
-                            <ChevronDown size={18}/>
+                            {activeTab===1 && (
+                                <div className="border-1 border-zinc-300 bg-zinc-100 flex flex-col gap-3 justify-center items-center w-full m-4 px-4 py-4 rounded-sm ">
+                                    <div className="w-full flex gap-4 justify-between items-center h-9">
+                                        <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md h-9"
+                                        placeholder="Enter your UPI ID"/>
+                                        
+                                        <button className="h-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md hover:scale-95 hover:cursor-pointer">
+                                            Verify
+                                        </button>
+                                    </div>
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
+                                        Pay $10000
+                                    </button>
 
-                        </div>
-                        
+                                </div>
+                            )}
+                        </div>                  
+
+                        <div className="w-full border-b-1 text-zinc-500"></div>
+
+                        {/* Credit Debit Options */}
+                        <div className="flex flex-col w-full justify-start items-center">
+                            <div className="w-full flex justify-between items-center"
+                                onClick={()=>setActiveTab(prev => (prev===2?0:2))}>
+                                <div className="flex justify-start items-center gap-2">
+                                    <CreditCard size={18}/>
+                                    <p className="flex flex-col">
+                                        <span className="font-medium text-md ">Credit / Debit / ATM Card</span>
+                                        {activeTab!==2 &&(
+                                            <span className="text-sm text-zinc-400">Add and secure cards as per RBI guidelines</span>
+                                        )}
+                                        {activeTab!==2 &&(
+                                            <span className="text-sm text-green-500">Get upto 5% cashback - 2 offers available</span>
+                                        )}
+                                        {activeTab===2 &&(
+                                            <span className="text-sm text-gray-500"><span className="font-medium">Note:</span> Please ensure your card canbe used for online transactions. <span className="text-blue-600 font-medium">Learn More</span></span>
+                                        )}
+                                    </p>
+                                </div>
+                                {activeTab===2?
+                                    <ChevronUp size={18} />:
+                                    <ChevronDown size={18} />}
+                            </div>
+                            {activeTab===2 && (
+                                <div className="border-1 border-zinc-300 bg-zinc-100 flex flex-col gap-10 justify-center items-start w-full m-4 px-4 py-4 rounded-sm ">
+                                    {/* Card Number */}
+                                    <div className="flex flex-col gap-2">
+                                        <p className="text-md ">Card Number</p>
+                                        <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                        placeholder="XXXX XXXX XXXX XXXX" />
+                                    </div>
+
+                                    {/* Valid thru and CVV */}
+                                    <div className="w-full flex gap-4 justify-between items-center h-9">
+                                        {/* Valid Thru */}
+                                        <div className="flex flex-col gap-2">
+                                            <p>Valid Thru</p>
+                                            <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                            placeholder="MM / YY" />
+                                        </div>
+
+
+                                        <div className="flex flex-col gap-2">
+                                            <p>Card Number</p>
+                                            <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                            placeholder="XXXX XXXX XXXX XXXX" />
+                                        </div>
+                                      
+                                    </div>
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
+                                        Pay $10000
+                                    </button>
+
+                                </div>
+                            )}
+                        </div>                  
+
 
 
                     </div>
