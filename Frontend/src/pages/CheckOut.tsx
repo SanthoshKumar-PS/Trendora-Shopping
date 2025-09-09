@@ -5,6 +5,22 @@ import { Input } from "../components/ui/input"
 
 const CheckOut = () => {
     const [activeTab,setActiveTab] = useState<number>(1)
+    const [cardNumber, setCardNumber] = useState("");
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+
+        // Remove all non-digits
+        value = value.replace(/\D/g, "");
+
+        // Limit to 16 digits
+        value = value.slice(0, 16);
+
+        // Insert a space every 4 digits
+        value = value.replace(/(.{4})/g, "$1 ").trim();
+
+        setCardNumber(value);
+    };
   return (
     <div className="bg-zinc-100 min-h-screen">
         <Navbar/>
@@ -288,7 +304,7 @@ const CheckOut = () => {
                             {activeTab===2 && (
                                 <div className="border-1 border-zinc-300 bg-zinc-100 flex flex-col gap-10 justify-center items-start w-full m-4 px-4 py-4 rounded-sm ">
                                     {/* Card Number */}
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 ">
                                         <p className="text-md ">Card Number</p>
                                         <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
                                         placeholder="XXXX XXXX XXXX XXXX" />
@@ -297,14 +313,14 @@ const CheckOut = () => {
                                     {/* Valid thru and CVV */}
                                     <div className="w-full flex gap-4 justify-between items-center h-9">
                                         {/* Valid Thru */}
-                                        <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col gap-2 w-full">
                                             <p>Valid Thru</p>
-                                            <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                            <input type="number" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
                                             placeholder="MM / YY" />
                                         </div>
 
 
-                                        <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col gap-2 w-full">
                                             <p>Card Number</p>
                                             <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
                                             placeholder="XXXX XXXX XXXX XXXX" />
