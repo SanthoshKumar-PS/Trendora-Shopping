@@ -1,26 +1,37 @@
 import { useState } from "react"
 import Navbar from "../components/Navbar"
-import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CircleAlert, CircleMinus, CirclePlus, CreditCard, Fingerprint, LaptopMinimal, ListOrdered, MapPinned, Star, Truck } from "lucide-react"
+import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CircleAlert, CircleMinus, CirclePlus, CreditCard, Fingerprint, Home, LaptopMinimal, ListOrdered, ListPlus, LocateFixed, MapPinned, Smile, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
 
 const CheckOut = () => {
-    const [activeTab,setActiveTab] = useState<number>(1)
+    const [checkOutActive,seCheckOutActive] = useState<number>(1);
+    const [activeTab,setActiveTab] = useState<number>(0)
+    
+    
     const [cardNumber, setCardNumber] = useState("");
+    const [cardExpiry, setCardExpiry] = useState("");
+    const [cardCVV, setCardCVV] = useState("");
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value;
-
-        // Remove all non-digits
-        value = value.replace(/\D/g, "");
-
-        // Limit to 16 digits
+    const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, "");
         value = value.slice(0, 16);
-
-        // Insert a space every 4 digits
-        value = value.replace(/(.{4})/g, "$1 ").trim();
-
-        setCardNumber(value);
+        const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1 ");
+        setCardNumber(formattedValue);
     };
+    const handleCardExpiryChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, "");
+        value = value.slice(0, 4);
+        if (value.length > 2) {
+        value = value.slice(0, 2) + " / " + value.slice(2);
+        }
+        setCardExpiry(value);
+    };
+    const handleCardCVVChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, "");
+        value = value.slice(0, 4);
+        setCardCVV(value);
+    };
+
   return (
     <div className="bg-zinc-100 min-h-screen">
         <Navbar/>
@@ -29,29 +40,10 @@ const CheckOut = () => {
         <div className="max-w-4xl mx-auto my-6 ">
             <div className="flex flex-col justify-start items-start w-full space-y-6 ">
 
-                {/* One pair of container - Login Or Signup */}
-                <div className="mx-2 max-w-sm md:max-w-full flex flex-col w-full bg-white">
+                {/* First pair of container - Login Or Signup */}
+                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden">
                     {/* Blue Login Signup */}
-                    <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-t-sm text-white">
-                        <Fingerprint size={20} />
-                        <p className="font-medium text-white ">LOGIN OR SIGNUP</p>
-                    </div>
-                    {/* Email/Mobile Number */}
-                    <div className="max-w-sm my-3 mx-3 md:mx-5 flex flex-col gap-3">
-                        <Input placeholder="Enter Email/Mobile Number"
-                            className="w-full border-0 border-b border-gray-400 rounded-none 
-                            focus:outline-none focus-visible:outline-none 
-                            focus:ring-0 focus-visible:ring-0 
-                            focus:border-blue-500 shadow-none" />
-                        <p className="text-sm text-zinc-400 font-mono">By continuing, you agree to Trendora's <span className="text-blue-600">Terms Of Use </span>and <span className="text-blue-600">Privacy Policy</span></p>
-                        <button className="text-sm md:text-md text-white font-semibold bg-orange-500     flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">CONTINUE</button>        
-                    </div>
-                </div>
-
-                {/* One pair of container - Login Or Signup */}
-                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
-                    {/* Blue Login Signup */}
-                    <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-t-sm text-white">
+                    <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600  text-white">
                         <Fingerprint size={20} />
                         <p className="font-medium text-white ">LOGIN OR SIGNUP</p>
                     </div>
@@ -171,8 +163,66 @@ const CheckOut = () => {
                         </div>       
                     </div>
 
-
                 </div>
+
+                {/* Add New Address */}
+                    <div className="mx-auto max-w-sm md:max-w-md lg:min-w-full rounded-sm bg-blue-100 p-3 lg:p-4 flex justify-start items-start gap-2">
+                        <ListPlus size={22} className="mt-0.5 text-blue-600"  />
+                        <div className="w-full flex flex-col justify-start items-start gap-3">
+                            <p className="text-blue-600 text-md font-medium">ADD A NEW ADDRESS</p>
+                            <button className="bg-blue-600 rounded-sm px-4 py-2 text-white font-medium flex items-center gap-2">
+                                <LocateFixed size={20} />
+                                <p>Enter your location</p>
+                            </button>
+
+                            <form className="w-full flex flex-col items-center gap-4">
+                                <div className="w-full flex justify-between gap-2 h-11">
+                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="Name"/>
+                                    <input type="number" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="10-digit mobile number"/>
+                                </div>
+                                <div className="w-full flex justify-between gap-2 h-11">
+                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="Line 1"/>
+                                    <input type="text" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white " 
+                                    placeholder="Line 2"/>
+                                </div>
+                                <div className="w-full flex justify-between gap-2 h-11">
+                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="City"/>
+                                    <input type="text" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white " 
+                                    placeholder="State"/>
+                                </div>
+                                <div className="w-full flex justify-between gap-2 h-11">
+                                    <input type="number" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="Pincode"/>
+                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
+                                    placeholder="Landmark"/>
+                           
+                                </div>
+                                
+
+                                <div className="w-full flex flex-col justify-start items-start">
+                                    <p className="text-gray-600">Address Type</p>
+                                    <div className="flex justify-start items-center gap-4">
+                                        <label className="flex items-center gap-2">
+                                            <input type="radio" name="addressType" value="Home" required />
+                                            Home
+                                        </label>
+                                        <label className="flex items-center gap-2">
+                                            <input type="radio" name="addressType" value="Work" required />
+                                            Work (Delivery between 10 AM - 5 PM)
+                                        </label>
+                                    </div>
+
+                                </div>
+
+
+                                
+                            </form>
+                        </div>
+                    </div>
 
                 {/* Third pair of container - Order Summary */}
                 <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
@@ -306,8 +356,9 @@ const CheckOut = () => {
                                     {/* Card Number */}
                                     <div className="flex flex-col gap-2 ">
                                         <p className="text-md ">Card Number</p>
-                                        <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
-                                        placeholder="XXXX XXXX XXXX XXXX" />
+                                        <input type="text" inputMode="numeric" value={cardNumber} onChange={handleCardNumberChange}
+                                            className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                            placeholder="XXXX XXXX XXXX XXXX" />
                                     </div>
 
                                     {/* Valid thru and CVV */}
@@ -315,15 +366,17 @@ const CheckOut = () => {
                                         {/* Valid Thru */}
                                         <div className="flex flex-col gap-2 w-full">
                                             <p>Valid Thru</p>
-                                            <input type="number" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
-                                            placeholder="MM / YY" />
+                                            <input type="text" inputMode="numeric" value={cardExpiry} onChange={handleCardExpiryChange}
+                                                className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                                placeholder="MM / YY" />
                                         </div>
 
-
+                                        {/* CVV */}
                                         <div className="flex flex-col gap-2 w-full">
-                                            <p>Card Number</p>
-                                            <input type="text" className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
-                                            placeholder="XXXX XXXX XXXX XXXX" />
+                                            <p>CVV</p>
+                                            <input type="password" inputMode="numeric" value={cardCVV} onChange={handleCardCVVChange}
+                                            className="w-full appearance-none outline-none border border-gray-300 rounded-md px-2 py-1 focus:border-1 focus:border-blue-400 focus:shadow text-md h-9"
+                                            placeholder="CVV" />
                                         </div>
                                       
                                     </div>
@@ -336,8 +389,48 @@ const CheckOut = () => {
                         </div>                  
 
 
+                        <div className="w-full border-b-1 text-zinc-500"></div>
+
+                        {/* Cash On Delivery */}
+                        <div className="flex flex-col w-full justify-start items-center">
+                            <div className="w-full flex justify-between items-center"
+                                onClick={()=>setActiveTab(prev => (prev===3?0:3))}>
+                                <div className="flex justify-start items-center gap-2">
+                                    <CreditCard size={18}/>
+                                    <p className="flex flex-col">
+                                        <span className="font-medium text-md ">Cash On Delivery</span>
+                                        {activeTab!==3 &&(
+                                            <span className="text-sm text-zinc-400">Pay after you recieved the product.</span>
+                                        )}
+                                    </p>
+                                </div>
+                                {activeTab===3?
+                                    <ChevronUp size={18} />:
+                                    <ChevronDown size={18} />}
+                            </div>
+                            {activeTab===3 && (
+                                <div className="border-1 border-zinc-300 bg-zinc-100 flex flex-col gap-10 justify-center items-start w-full m-4 px-4 py-4 rounded-sm ">
+                                    <p className="text-sm text-zinc-500 font-medium">42,225 people used online payment options in the last hour. Pay online now for safe and contactless delivery.</p>
+
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
+                                        Place Order
+                                    </button>
+
+                                </div>
+                            )}
+                        </div>                  
+
+                        <div className="w-full border-b-1 text-zinc-500"></div>
 
                     </div>
+
+                </div>
+
+                {/* Fifth pair Emoji and message */}
+                <div className="mx-auto flex flex-col items-center justify-center">
+                    <p className="text-zinc-600 font-medium text-md">35 Crore Happy Customers and Counting!</p>
+                    <Smile size={30} className="text-zinc-600"/>
+
 
                 </div>
 

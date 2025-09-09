@@ -97,9 +97,9 @@ const Login = () => {
 
         
         <form onSubmit={validateAndLogin} className="w-full flex flex-col items-center gap-4">
-          <input type="text" required placeholder="Email " value={email??""} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+          <input type="text" name='username' required placeholder="Email " value={email??""} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
 
-          <input type="text" required placeholder="Password" value={password??""} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+          <input type="text" name='password' required placeholder="Password" value={password??""} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
           {error &&(
             <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
               <span><CircleAlert size={20}/></span>
