@@ -16,7 +16,8 @@ const SignUp = () => {
   const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
   const [error,setError]=useState<string|null>(null)
 
-  async function validateAndRegister(){
+  async function validateAndRegister(e:React.FormEvent){
+    e.preventDefault();
 
     if(!name && !email && !password){
       setError("All Fields must not be empty")
@@ -100,19 +101,21 @@ const SignUp = () => {
             <p className="text-sm text-heading font-medium font-serif">Enter your details below</p>
         </div>
 
-        <input type="text" placeholder="Name" value={name??''} onChange={(e)=>setName(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Email " value={email??''} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        <input type="text" placeholder="Password" value={password??''} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-        {error &&(
-          <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
-            <span><CircleAlert size={20}/></span>
-            {error}
-          </div>
-        )}
+        <form onSubmit={validateAndRegister} className="w-full flex flex-col items-center gap-4">          
+          <input type="text" required placeholder="Name" value={name??''} onChange={(e)=>setName(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+          <input type="text" required placeholder="Email " value={email??''} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+          <input type="text" required placeholder="Password" value={password??''} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+          {error &&(
+            <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
+              <span><CircleAlert size={20}/></span>
+              {error}
+            </div>
+          )}
 
-        <button onClick={validateAndRegister} className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">
-          Create Account
-        </button>
+          <button type='submit' className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">
+            Create Account
+          </button>
+        </form>
 
         {/* SignUp With google */}
         <button className="flex justify-center items-center gap-2 bg-white border-1 border-zinc-400 w-[60%] py-2 rounded-md text-heading hover:cursor-pointer hover:scale-105 duration-300 transition-all"><img src="/Icon-Google.png" alt="" className="h-5 w-5 object-contain"/>Sign Up With Google</button>
