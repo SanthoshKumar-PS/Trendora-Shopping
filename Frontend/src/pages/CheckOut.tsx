@@ -1,17 +1,28 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
-import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CircleAlert, CircleMinus, CirclePlus, CreditCard, Fingerprint, Home, LaptopMinimal, ListOrdered, ListPlus, LocateFixed, MapPinned, Smile, Star, Truck } from "lucide-react"
+import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
+import AddAddress from "../components/AddAddress"
+import Addresses from "./CheckOut/Addresses"
+import OrderSummary from "./CheckOut/OrderSummary"
 
 const CheckOut = () => {
-    const [checkOutActive,seCheckOutActive] = useState<number>(1);
+    
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
+
+    const [checkOutActive,seCheckOutActive] = useState<number>(1); //1-Login 2-Address 3-Order Summary 4-payment
     const [activeTab,setActiveTab] = useState<number>(0)
-    
-    
+
+    const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)    
+    const [showAddAddress, setShowAddAddress] = useState<boolean>(false);
+
+
+
+
+    //Payment Details
     const [cardNumber, setCardNumber] = useState("");
     const [cardExpiry, setCardExpiry] = useState("");
     const [cardCVV, setCardCVV] = useState("");
-
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value.replace(/\D/g, "");
         value = value.slice(0, 16);
@@ -31,6 +42,8 @@ const CheckOut = () => {
         value = value.slice(0, 4);
         setCardCVV(value);
     };
+
+
 
   return (
     <div className="bg-zinc-100 min-h-screen">
@@ -80,191 +93,25 @@ const CheckOut = () => {
                 </div>
 
                 {/* Second pair of container - Delivery Address */}
-                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
-                    {/* Delivery Address Header */}
-                    <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-t-sm text-white">
-                        <MapPinned size={20} />
-                        <p className="font-medium text-white ">DELIVERY ADDRESS</p>
-                    </div>
+                <Addresses 
+                    selectedAddressId={selectedAddressId} 
+                    setSelectedAddressId={setSelectedAddressId} 
+                    showAddAddress={showAddAddress}
+                    setShowAddAddress={setShowAddAddress}
+                />
 
-                    {/* Main body */}
-                    <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
-                        <div className="mx-3 md:mx-5 my-3 md:my-5 w-full flex justify-between items-start ">
-                            <div className="flex gap-2 items-start justify-start">
-                                {/* Selection Badge */}
-                                <div className="mt-1 ml-1">
-                                    <BadgeCheck size={18} color="#2563EB" className=""/>
-                                </div>
-                                {/* Actual Address Line by Line */}
-                                <div className="flex flex-col gap-2 justify-start items-start">
-                                    {/* Line 1 */}
-                                    <div className="flex gap-2 items-center">
-                                        <p className="font-medium">Dr. Selvaranai</p>
-                                        <p className="bg-zinc-200 p-1 text-zinc-600 text-xs font-medium">HOME</p>
-                                        <p className="font-medium">9597889163</p>
-
-                                    </div>
-                                    
-                                    {/* Line 2 */}
-                                    <div className="flex flex-col">
-                                        <p className="max-w-md">12/10, SRS illam near Masweltech Company, Amman Nagar, Dinnur, Hosur</p>
-                                        <p className="font-medium">635109</p>
-                                    </div>
-
-                                    {/* Deliver Here Button */}
-                                    <button className="text-sm md:text-md text-white font-semibold bg-orange-500 flex-1 flex items-center justify-center gap-2 px-6 md:px-8 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">DELIVER HERE</button>
-
-                                </div>
-                            </div>
-
-                            {/* Edit */}
-                            <div className="text-blue-600 font-medium cursor-pointer text-sm md:text-md mx-1">
-                                EDIT
-                            </div>
-
-                        </div>       
-                    </div>
-
-                    {/* Main body */}
-                    <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
-                        <div className="mx-3 md:mx-5 my-3 md:my-5 w-full flex justify-between items-start ">
-                            <div className="flex gap-2 items-start justify-start">
-                                {/* Selection Badge */}
-                                <div className="mt-1 ml-1">
-                                    <BadgeCheck size={18} color="#2563EB" className=""/>
-                                </div>
-                                {/* Actual Address Line by Line */}
-                                <div className="flex flex-col gap-2 justify-start items-start">
-                                    {/* Line 1 */}
-                                    <div className="flex gap-2 items-center">
-                                        <p className="font-medium">Dr. Selvaranai</p>
-                                        <p className="bg-zinc-200 p-1 text-zinc-600 text-xs font-medium">HOME</p>
-                                        <p className="font-medium">9597889163</p>
-
-                                    </div>
-                                    
-                                    {/* Line 2 */}
-                                    <div className="flex flex-col">
-                                        <p className="max-w-md">12/10, SRS illam near Masweltech Company, Amman Nagar, Dinnur, Hosur</p>
-                                        <p className="font-medium">635109</p>
-                                    </div>
-
-                                    {/* Deliver Here Button */}
-                                    <button className="text-sm md:text-md text-white font-semibold bg-orange-500 flex-1 flex items-center justify-center gap-2 px-6 md:px-8 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">DELIVER HERE</button>
-
-                                </div>
-                            </div>
-
-                            {/* Edit */}
-                            <div className="text-blue-600 font-medium cursor-pointer text-sm md:text-md mx-1">
-                                EDIT
-                            </div>
-
-                        </div>       
-                    </div>
-
-                </div>
 
                 {/* Add New Address */}
-                    <div className="mx-auto max-w-sm md:max-w-md lg:min-w-full rounded-sm bg-blue-100 p-3 lg:p-4 flex justify-start items-start gap-2">
-                        <ListPlus size={22} className="mt-0.5 text-blue-600"  />
-                        <div className="w-full flex flex-col justify-start items-start gap-3">
-                            <p className="text-blue-600 text-md font-medium">ADD A NEW ADDRESS</p>
-                            <button className="bg-blue-600 rounded-sm px-4 py-2 text-white font-medium flex items-center gap-2">
-                                <LocateFixed size={20} />
-                                <p>Enter your location</p>
-                            </button>
+                {showAddAddress && (
+                    <AddAddress 
+                        showAddAddress={showAddAddress}
+                        setShowAddAddress={setShowAddAddress}/>
+                )}
 
-                            <form className="w-full flex flex-col items-center gap-4">
-                                <div className="w-full flex justify-between gap-2 h-11">
-                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="Name"/>
-                                    <input type="number" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="10-digit mobile number"/>
-                                </div>
-                                <div className="w-full flex justify-between gap-2 h-11">
-                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="Line 1"/>
-                                    <input type="text" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white " 
-                                    placeholder="Line 2"/>
-                                </div>
-                                <div className="w-full flex justify-between gap-2 h-11">
-                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="City"/>
-                                    <input type="text" required inputMode="numeric" className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white " 
-                                    placeholder="State"/>
-                                </div>
-                                <div className="w-full flex justify-between gap-2 h-11">
-                                    <input type="number" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="Pincode"/>
-                                    <input type="text" required className="w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white "
-                                    placeholder="Landmark"/>
-                           
-                                </div>
-                                
-
-                                <div className="w-full flex flex-col justify-start items-start">
-                                    <p className="text-gray-600">Address Type</p>
-                                    <div className="flex justify-start items-center gap-4">
-                                        <label className="flex items-center gap-2">
-                                            <input type="radio" name="addressType" value="Home" required />
-                                            Home
-                                        </label>
-                                        <label className="flex items-center gap-2">
-                                            <input type="radio" name="addressType" value="Work" required />
-                                            Work (Delivery between 10 AM - 5 PM)
-                                        </label>
-                                    </div>
-
-                                </div>
-
-
-                                
-                            </form>
-                        </div>
-                    </div>
 
                 {/* Third pair of container - Order Summary */}
-                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
-                    {/* Order Summary Header */}
-                    <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-t-sm text-white">
-                        <ListOrdered size={20} />
-                        <p className="font-medium text-white ">ORDER SUMMARY</p>
-                    </div>
+                <OrderSummary/>
 
-                    {/* Order Details */}
-                    <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start p-3 md:p-5 gap-5 md:gap-10"> 
-                        {/* Image and Count */}
-                        <div className="flex flex-col gap-2 justify-center items-center h-50">
-                            <img src="/Products/Camera.png" alt="" className="w-40 h-40 object-cover " />
-                            <div className="flex gap-2 items-center">
-                                <CircleMinus size={20} className="text-zinc-400"/>
-                                <div className="py-0.5 w-14 text-center bg-transparent border-1 border-zinc-400 rounded-xs font-medium">
-                                    1
-                                </div>
-                                <CirclePlus size={20} className=""/>
-                            </div>
-                        </div>
-
-                        {/* Product Details */}
-                        <div className="flex flex-col max-w-sm justify-between items-start lg:h-50">
-                            <p className="text-zinc-950 font-normal truncate max-w-xs md:max-w-sm">The Lenovo IdeaPad 3 is a reliable and lightweight laptop perfect for work, study, and entertainment. It offers a Full HD display, decent processing power, and a comfortable keyboard for daily tasks. </p>
-                            <p className="text-zinc-500 text-sm">Seller: SRS Enterprises</p>
-                            <p className="flex gap-2 items-end">
-                                <span className="text-sm text-zinc-500 font-medium">$5000</span> 
-                                <span className="text-md font-medium">$3500</span>
-                            </p>
-                            <span className="flex items-center gap-1 text-sm font-medium text-green-700"><span>Offer valid till today</span> <CircleAlert size="18"/></span>
-                            <button className="font-medium text-md hover:cursor-pointer">REMOVE</button>
-                        </div>
-
-                        <div className="hidden lg:block self-start">
-                            Delivery in 2-3 business days
-                        </div>
-
-                    </div>
-
-                </div>
 
 
                 {/* Fourth pair of container - Payment Page */}

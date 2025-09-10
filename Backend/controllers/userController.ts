@@ -85,3 +85,55 @@ export const login = async (req:any,res:any) => {
         
     }
 }
+
+export const addAddress = async (req:any,res:any) =>{
+    try{
+        const userId = req.id;
+        const {name,phone,line1,line2,city,state,pincode,type} = req.body;
+        const newAddress = await prisma.address.create({
+            data:{
+                user_id:Number(userId),
+                name,
+                phone,
+                line1,
+                line2,
+                city,
+                state,
+                pincode,
+                type
+            }
+        })
+
+        return res.status(201).json({message:"New Address Created",address:newAddress})
+
+    }
+    catch(error){
+        console.log(error.message)
+        return res.status(500).json({message:"Internal Server Error"});
+    }
+}
+
+export const getAllAddresses = async (req:any,res:any)=>{
+    try{
+        const userId = req.id
+
+        if (!userId) {
+        return res.status(400).json({ message: "User ID missing in request" ,addresses:[]});
+        }
+
+        const allAddresses = await prisma.address.findMany({
+            where:{
+                user_id:userId
+            }
+        })
+
+        return res.status(200).json({message:"Fetched all addresses of the user",addresses:allAddresses})
+        
+        
+    }
+    catch(error){
+        console.log(error)
+        console.log("Error occured while fetching all addresses");
+        return res.status(500).json({message:"Internal Server Error",addresses:[]})
+    }
+}
