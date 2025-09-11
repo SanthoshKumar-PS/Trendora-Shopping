@@ -1,6 +1,6 @@
 import { BadgeCheck, MapPinned, Plus } from "lucide-react";
 import type React from "react";
-import type { Address } from "../Types";
+import type { Address } from "../../types/Types";
 import { useEffect, useState } from "react";
 import type { GetAllAddressesType } from "../ResponseTypes";
 import axios from "axios";

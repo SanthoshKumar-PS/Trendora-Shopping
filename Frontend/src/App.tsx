@@ -9,30 +9,33 @@ import { BrowserRouter,Routes, Route } from "react-router-dom"
 import Product from "./pages/seller/Product"
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query'
 import CheckOut from "./pages/CheckOut"
+import { CartProvider } from "./context/CartContext"  
 
 const queryClient = new QueryClient()
 function App() {
 
   return (
     <QueryClientProvider client={queryClient}> 
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CheckOut/>}/>
-          <Route path="/home" element={<Home/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/signup" element={<SignUp/>}/>
-          <Route path="/checkout" element={<CheckOut/>}/>
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<CheckOut/>}/>
+            <Route path="/home" element={<Home/>}/>
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/signup" element={<SignUp/>}/>
+            <Route path="/checkout" element={<CheckOut/>}/>
 
-          {/* Seller */}
-          <Route path="/dashboard" element={<Dashboard/>}/>
-          <Route path="/orders" element={<Orders/>}/>
-          <Route path="/products" element={<Products/>}/>
-          <Route path="/addproduct" element={<AddProduct/>}/>
-          <Route path="/product/:id" element={<Product/>}/>
-        </Routes>
+            {/* Seller */}
+            <Route path="/dashboard" element={<Dashboard/>}/>
+            <Route path="/orders" element={<Orders/>}/>
+            <Route path="/products" element={<Products/>}/>
+            <Route path="/addproduct" element={<AddProduct/>}/>
+            <Route path="/product/:id" element={<Product/>}/>
+          </Routes>
 
-      
-      </BrowserRouter>
+        
+        </BrowserRouter>
+      </CartProvider>
     </QueryClientProvider>
   )
 }

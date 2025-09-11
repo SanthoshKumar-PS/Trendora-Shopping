@@ -1,6 +1,7 @@
 import { ChevronRight, CircleArrowLeft, CircleArrowRight, Eye, Heart } from "lucide-react"
 import Navbar from "../components/Navbar"
 import OfferBar from "../components/OfferBar"
+import { useCart } from "../context/CartContext"
 
 const Home = () => {
     const categoryOptions=[
@@ -33,6 +34,7 @@ const Home = () => {
             name:"Health & Beauty"
         },
     ]
+
   return (
     <div>
         <OfferBar/>
