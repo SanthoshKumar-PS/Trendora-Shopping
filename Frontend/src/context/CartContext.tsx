@@ -7,16 +7,38 @@ import { useQuery } from "@tanstack/react-query";
 //API Calls
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
 
-type FetchCartProductsType = {
-    message:string;
+type FetchProductsCartType = {
+    message : string;
     cartProducts : Product[]
-
 }
 
-const fetchCartProducts = async ():Promise<Product[]> =>{
-    const res = await axios.get<FetchCartProductsType>(`${BACKEND_URL}/user/getCartProducts`,{withCredentials:true})
+const fetchProductsFromCart = async ():Promise<Product[]> =>{
+    const res = await axios.get<FetchProductsCartType>(`${BACKEND_URL}/user/getCartProducts`,{withCredentials:true})
     return res.data.cartProducts
 }
+
+type AddProductToCart = {
+    message : string;
+    products : Product[];
+}
+const addProductToCart = async (cartId:number,productId:number):Promise<Product[]> => {
+    const res = await axios.post<AddProductToCart>(`${BACKEND_URL}/user/addProductToCart`,{cartId, productId},{withCredentials:true})
+    console.log(res.data.message)
+    return res.data.products
+}
+
+type DeleteProductFromCart = {
+    message: string;
+    products:Product[]
+}
+const deleteProductFromCart = async (cartId:number, productId:number):Promise<Product[]> => {
+    const res = await axios.delete<DeleteProductFromCart>(`${BACKEND_URL}/user/deleteCartProduct`,{
+        data:{cartId, productId} as { cartId: number; productId: number },
+        withCredentials:true
+    } as any)
+    return res.data.products
+}
+
 
 // Actual Card Context Starts here 
 type CartContextType = {
@@ -32,7 +54,7 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
 
     const {data: newCartProducts, refetch, isFetching } = useQuery<Product[]>({
         queryKey: ["newProducts"],
-        queryFn: fetchCartProducts,
+        queryFn: fetchProductsFromCart,
         enabled: false
     })
     
