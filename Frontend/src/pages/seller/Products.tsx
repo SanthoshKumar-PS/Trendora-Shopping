@@ -1,4 +1,4 @@
-import { Eye, Heart, Pencil } from "lucide-react"
+import { Eye, Pencil } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import { useNavigate } from "react-router-dom"
 import RatingStars from "../../components/RatingStars"
@@ -11,7 +11,7 @@ const Products = () => {
   const navigate=useNavigate()
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [loading,setLoading] = useState(false);
-  const [products,setProducts] = useState<ProductType[]>([])
+  const [products,setProducts] = useState<ProductType[]>([])  
 
   const getSellerProducts = async () => {
     interface ViewProductResponse {
@@ -23,6 +23,7 @@ const Products = () => {
       setLoading(true)
       const response = await axios.get<ViewProductResponse>(`${BACKEND_URL}/seller/viewproducts`,{withCredentials:true})
       setProducts(response.data.products||[])
+      console.log(response.data.products)
       //console.log(response.data.products||[])
 
     }

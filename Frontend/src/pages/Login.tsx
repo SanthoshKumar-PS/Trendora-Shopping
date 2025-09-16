@@ -4,13 +4,18 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { CircleAlert } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 const Login = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
   const navigate=useNavigate()
-  const [email,setEmail]=useState<string|null>(null)
-  const [password,setPassword]=useState<string|null>(null)
+  // const [email,setEmail]=useState<string|null>(null)
+  const [email,setEmail]=useState<string|null>("srs@gmail.com")
+  // const [password,setPassword]=useState<string|null>(null)
+  const [password,setPassword]=useState<string|null>("srs123")
   const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
   const [error,setError]=useState<string|null>(null)
+
+  const { setCartId } = useCart();
 
   async function validateAndLogin(e: React.FormEvent){
     e.preventDefault(); 
@@ -42,13 +47,19 @@ const Login = () => {
 
       if(response.status===200){
         const data=response.data as any
-        console.log("User has been registered")
+        console.log("User has been registered",data)
         localStorage.setItem('username',data.name)
+        console.log(data.cartId)
+        console.log(data.role)
         if(data.role ==='USER'){
+          console.log("Cart ID of user - ",data.cartId)
+          setCartId(Number(data.cartId))
           navigate('/home')
         }
         if(data.role ==='SELLER'){
-          navigate('/dashboard')
+          setCartId(Number(data.cartId))
+          // navigate('/dashboard')
+          navigate('/cart')
         }
       }
 

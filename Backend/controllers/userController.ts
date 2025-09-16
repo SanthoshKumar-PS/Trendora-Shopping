@@ -17,7 +17,7 @@ export const register= async (req:any,res:any)=>{
         })
 
         if(user){
-            return res.status(409).json({message:"User with same email already exists"})
+            return res.status(409).json({message:"User with same email already exists",cartId:null})
         }
         
         const createdUser=await prisma.user.create({
@@ -25,8 +25,10 @@ export const register= async (req:any,res:any)=>{
                 email:email,
                 name:name,
                 password:password,
-                role: role
-            }
+                role: role,
+                cart:{create:{}}
+            },
+            include:{cart:true}
         })
 
         if(role==='SELLER'){
@@ -46,26 +48,36 @@ export const register= async (req:any,res:any)=>{
             maxAge: 7*24* 60 * 60 * 1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
-        return res.status(201).json({message:"Account created succesfully"})
+        return res.status(201).json({message:"Account created succesfully",cartId:createdUser.cart.id})
 
     }
     catch(error){
         console.log("Error occured while registering user ",error.message)
-        return res.status(500).json({message:"Internal Server Error"})
+        return res.status(500).json({message:"Internal Server Error",cartId:null})
     }
 }
 
 export const login = async (req:any,res:any) => {
     try {
         const {email,password} = req.body;
-        const loggingUser = await prisma.user.findUnique({where:{email:email}})
+        let loggingUser = await prisma.user.findUnique({
+            where:{email:email},
+            include:{cart:true}
+        })
 
         if(!loggingUser){
-            return res.status(404).json({message:"User not found"})
+            return res.status(404).json({message:"User not found",cartId:null})
         }
 
         if(loggingUser.password!==password){
-            return res.status(401).json({message:"Wrong Password. Please Enter Again"})
+            return res.status(401).json({message:"Wrong Password. Please Enter Again",cartId:null})
+        }
+        
+        if (!loggingUser.cart) {
+        const newCart = await prisma.cart.create({
+            data: { userId: loggingUser.id },
+        });
+        loggingUser = { ...loggingUser, cart: newCart };
         }
 
         const token=generateToken(loggingUser.id,loggingUser.email)
@@ -76,12 +88,12 @@ export const login = async (req:any,res:any) => {
             maxAge: 7*24*60 * 60 * 1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
-        return res.status(200).json({message:"Login Successful",role:loggingUser.role, name:loggingUser.name})
+        return res.status(200).json({message:"Login Successful",role:loggingUser.role, name:loggingUser.name,cartId:loggingUser.cart.id})
         
     } 
     catch (error) {
         console.log("Error occured while logging in ",error.message)
-        return res.status(500).json({message:"Internal Server Error"})
+        return res.status(500).json({message:"Internal Server Error",cartId:null})
         
     }
 }

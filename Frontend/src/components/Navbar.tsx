@@ -82,7 +82,7 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
                 <Search size={24} className='absolute right-2 top-2 text-heading'/>
             </div>
             <Heart size={24} className='text-heading hover:scale-105 '/>
-            <ShoppingCart size={24} className='text-heading hover:scale-105'/>
+            <ShoppingCart size={24} onClick={()=>navigate('/cart')} className='text-heading hover:scale-105'/>
             {/* Navbar Small Screen */}
             <div className='md:hidden mx-2' onClick={()=>setSidebarOpen(!sidebarOpen)}>
                 {sidebarOpen ? <X size={24}/>:<Menu size={24}/>}                

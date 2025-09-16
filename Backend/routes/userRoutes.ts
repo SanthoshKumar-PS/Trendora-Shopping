@@ -1,7 +1,7 @@
 import express from 'express'
 import { login, register, addAddress,getAllAddresses} from '../controllers/userController'
 import { authenticateUser } from '../middleware/authenticateUser'
-import { getUserCartProducts, addProductToCart, deleteProductFromCart } from '../controllers/cartController'
+import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
 
 export const userRouter=express.Router()
 
@@ -13,3 +13,4 @@ userRouter.get("/getAllAddresses",authenticateUser,getAllAddresses)
 userRouter.get("/getCartProducts",authenticateUser,getUserCartProducts)
 userRouter.post("/addProductToCart",authenticateUser,addProductToCart)
 userRouter.delete("/deleteCartProduct",authenticateUser,deleteProductFromCart)
+userRouter.delete("/clearCart",authenticateUser,clearCart)
