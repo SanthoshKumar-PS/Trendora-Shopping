@@ -3,7 +3,7 @@ const prisma=new PrismaClient()
 import jwt from"jsonwebtoken"
 
 const generateToken=(id:number,email:string)=>{
-    return jwt.sign({id,email},"_secret",{expiresIn:'1h'})
+    return jwt.sign({id,email},"_secret",{expiresIn:'7d'})
 }
 
 export const register= async (req:any,res:any)=>{
@@ -48,7 +48,7 @@ export const register= async (req:any,res:any)=>{
             maxAge: 7*24* 60 * 60 * 1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
-        return res.status(201).json({message:"Account created succesfully",cartId:createdUser.cart.id})
+        return res.status(201).json({message:"Account created succesfully",role:createdUser.role , name:createdUser.name,cartId:createdUser.cart.id})
 
     }
     catch(error){
@@ -85,7 +85,7 @@ export const login = async (req:any,res:any) => {
             httpOnly:true,
             secure:false,
             // secure:process.env.NODE_ENV==="production",
-            maxAge: 7*24*60 * 60 * 1000,
+            maxAge: 7*24*60*60*1000,
             sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
         })
         return res.status(200).json({message:"Login Successful",role:loggingUser.role, name:loggingUser.name,cartId:loggingUser.cart.id})
@@ -147,5 +147,29 @@ export const getAllAddresses = async (req:any,res:any)=>{
         console.log(error)
         console.log("Error occured while fetching all addresses");
         return res.status(500).json({message:"Internal Server Error",addresses:[]})
+    }
+}
+
+export const getHomeProducts = async (req:any,res:any)=>{
+    try{
+        //24 products send
+        const response = await prisma.product.findMany({
+            take:24,
+            include :{
+                category:true,
+                stock:true
+            },
+            orderBy:{
+                createdAt:'desc'
+            }
+        })
+
+        return res.status(200).json({message:"Returing 24 products to home page", products :response})
+
+
+    }
+    catch(error){
+        console.log("Internal Server Error while getting home products")
+        return res.status(500).json({message : "Internal Server Error"})
     }
 }

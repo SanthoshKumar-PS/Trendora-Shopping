@@ -36,19 +36,27 @@ export type Address = {
 export type Product = {
   id: number;
   name: string;
-  description: string | null;
-  features: any | null; // JSON type
-  discountPercentage: number | null;
+  description?: string | null;
+  features?: Record<string, any> | null; // JSON field
+  discountPercentage?: number;           // default 0.0
   discountedPrice: number;
   actualPrice: number;
+
   categoryId: number;
-  images: string[];
-  avgRating: number;
-  numRating: number;
+  images: string[];                      // Prisma String[]
+  avgRating: number;                     // default 0.0
+  numRating: number;                     // default 0
   stockId: number;
-  createdAt: Date;
-  updatedAt: Date;
+
+  category?: Category;
+  stock?: Stock;
+  ratings?: Rating[];
+  orderItems?: OrderItem[];
+
+  createdAt: string; // Dates come as ISO strings
+  updatedAt: string;
 };
+
 
 export type Category = {
   id: number;

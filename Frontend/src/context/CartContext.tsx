@@ -15,6 +15,8 @@ type FetchProductsCartType = {
 
 const fetchProductsFromCart = async ():Promise<Product[]> =>{
     const res = await axios.get<FetchProductsCartType>(`${BACKEND_URL}/user/getCartProducts`,{withCredentials:true})
+    console.log("Fetch Products from Cart")
+    console.log(res.data)
     return res.data.cartProducts
 }
 
@@ -74,7 +76,9 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
     const {data: cartProducts=[], refetch, isFetching } = useQuery<Product[]>({
         queryKey: ["cart",cartId],
         queryFn: fetchProductsFromCart,
-        enabled: false
+        enabled: !!cartId,
+        // enabled: false,
+        refetchOnWindowFocus:true
     })
     
 
@@ -100,8 +104,11 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
     });
 
     // const addToCart = (p:Product)=> setCartProducts(prev=>(prev.some(x=> x.id===p.id)?prev:[...prev,p]));
-    const addToCart = (cartId: number, productId: number) =>
-            addMutation.mutate({ cartId, productId });
+    const addToCart = (cartId: number, productId: number) =>{
+                    addMutation.mutate({ cartId, productId });
+    console.log("Adding Product : ",productId)
+}
+
 
     //const removeFromCart = (id: number) =>setCartProducts(prev=>prev.filter(x => x.id !==id))
     const removeFromCart = (cartId: number, productId: number) =>

@@ -15,7 +15,7 @@ const Login = () => {
   const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
   const [error,setError]=useState<string|null>(null)
 
-  const { setCartId } = useCart();
+  const { cartId,setCartId } = useCart();
 
   async function validateAndLogin(e: React.FormEvent){
     e.preventDefault(); 
@@ -49,8 +49,7 @@ const Login = () => {
         const data=response.data as any
         console.log("User has been registered",data)
         localStorage.setItem('username',data.name)
-        console.log(data.cartId)
-        console.log(data.role)
+        // localStorage.setItem('cartId',(cartId??0).toString())
         if(data.role ==='USER'){
           console.log("Cart ID of user - ",data.cartId)
           setCartId(Number(data.cartId))

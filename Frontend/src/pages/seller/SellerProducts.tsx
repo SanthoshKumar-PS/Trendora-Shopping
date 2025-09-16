@@ -1,22 +1,25 @@
-import { Eye, Pencil } from "lucide-react"
+import { Eye, Pencil, ShoppingCart, ShoppingCartIcon } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import { useNavigate } from "react-router-dom"
 import RatingStars from "../../components/RatingStars"
 import { useEffect, useState } from "react"
-import type { ProductType } from "../../types"
 import axios from "axios"
 import LoadingScreen from "../../components/LoadingScreen"
+import { useCart } from "../../context/CartContext"
+import type { Product } from "../../types/Types"
 
-const Products = () => {
+const SellerProducts = () => {
   const navigate=useNavigate()
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [loading,setLoading] = useState(false);
-  const [products,setProducts] = useState<ProductType[]>([])  
+  const [products,setProducts] = useState<Product[]>([])  
+  const {cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching} = useCart();
+  
 
   const getSellerProducts = async () => {
     interface ViewProductResponse {
       message : string
-      products? : ProductType[]
+      products? : Product[]
 
     }
     try{
@@ -87,6 +90,14 @@ const Products = () => {
                   <p className="absolute top-4 left-4 px-2 py-1 bg-red text-white font-light text-xs rounded-sm">-{product.discountPercentage}%</p>
                   <div className="absolute top-4 right-4 flex flex-col gap-2 ">
                       <div className="bg-white text-heading p-2 rounded-full hover:scale-115">
+                          <ShoppingCart size={18} 
+                            onClick={(e)=>{
+                              e.stopPropagation();
+                              addToCart(cartId??0,product.id)
+                            }}/>
+                          
+                      </div>
+                      <div className="bg-white text-heading p-2 rounded-full hover:scale-115">
                           <Pencil size={18}/>
                           
                       </div>
@@ -108,4 +119,4 @@ const Products = () => {
   )
 }
 
-export default Products
+export default SellerProducts

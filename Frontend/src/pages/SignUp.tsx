@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import axios, {AxiosError } from "axios"
 import { useState } from 'react'
 import { CircleAlert } from 'lucide-react'
+import { useCart } from '../context/CartContext'
 
 
 const SignUp = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
   const navigate=useNavigate()
+  const {cartId, setCartId} = useCart()
 
   const [name,setName]=useState<string|null>(null)
   const [email,setEmail]=useState<string|null>(null)
@@ -53,10 +55,12 @@ const SignUp = () => {
       const response = await axios.post(`${BACKEND_URL}/user/register`,payload , {withCredentials:true})
 
       if(response.status===201){
-        console.log("User has been registered")
         const data=response.data as any
+        console.log(data)
         console.log("User has been registered")
         localStorage.setItem('username',data.name)
+        setCartId(data.cartId)
+        // localStorage.setItem("CartId",(cartId??0).toString())
         if(data.role ==='USER'){
           navigate('/home')
         }
