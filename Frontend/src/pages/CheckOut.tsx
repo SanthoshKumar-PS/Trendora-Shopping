@@ -5,8 +5,11 @@ import { Input } from "../components/ui/input"
 import AddAddress from "../components/AddAddress"
 import Addresses from "./CheckOut/Addresses"
 import OrderSummary from "./CheckOut/OrderSummary"
+import { useLocation } from "react-router-dom"
 
 const CheckOut = () => {
+    const {state} = useLocation();
+    console.log(state) 
     
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
 
@@ -64,13 +67,21 @@ const CheckOut = () => {
                     <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
                         {/* Login Signup */}
                         <div className="max-w-sm my-3 mx-3 md:mx-5 flex flex-col gap-3">
-                            <Input placeholder="Enter Email/Mobile Number"
-                                className="w-full border-0 border-b border-gray-400 rounded-none 
-                                focus:outline-none focus-visible:outline-none 
-                                focus:ring-0 focus-visible:ring-0 
-                                focus:border-blue-500 shadow-none" />
-                            <p className="text-sm text-zinc-400 font-mono">By continuing, you agree to Trendora's <span className="text-blue-600">Terms Of Use </span>and <span className="text-blue-600">Privacy Policy</span></p>
-                            <button className="text-sm md:text-md text-white font-semibold bg-orange-500     flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">CONTINUE</button> 
+                            <form onSubmit={(e:React.FormEvent)=>{e.preventDefault(); handleLoginOrSignup()}}>
+                                <Input required placeholder="Enter Email/Mobile Number"
+                                    className="w-full border-0 border-b border-gray-400 rounded-none 
+                                    focus:outline-none focus-visible:outline-none 
+                                    focus:ring-0 focus-visible:ring-0 
+                                    focus:border-blue-500 shadow-none" />
+                                <Input type="password" required placeholder="Enter Your Password"
+                                    className="w-full border-0 border-b border-gray-400 rounded-none 
+                                    focus:outline-none focus-visible:outline-none 
+                                    focus:ring-0 focus-visible:ring-0 
+                                    focus:border-blue-500 shadow-none" />
+                                <p className="text-sm text-zinc-400 font-mono">By continuing, you agree to Trendora's <span className="text-blue-600">Terms Of Use </span>and <span className="text-blue-600">Privacy Policy</span></p>
+                                <button type="submit" className="text-sm md:text-md text-white font-semibold bg-orange-500     flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">CONTINUE</button> 
+                            </form>
+
                         </div>
                         {/* Advantages ofour secure login */}
                         <div className="my-3 flex flex-col gap-3 justify-center items-start ">

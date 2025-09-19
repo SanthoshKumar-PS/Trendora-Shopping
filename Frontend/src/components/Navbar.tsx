@@ -1,4 +1,4 @@
-import { Search,Heart, ShoppingCart,Menu,X  } from 'lucide-react';
+import { Search,Heart, ShoppingCart,Menu,X, LogOut  } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,8 +23,8 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
             },
             {
                 id:3,
-                name:"About",
-                destination:"/about"
+                name:"Products",
+                destination:"/products"
             },
             {
                 id:4,
@@ -47,7 +47,7 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
             {
                 id:3,
                 name:"Products",
-                destination:"/products"
+                destination:"/sellerproducts"
             },
             {
                 id:4,
@@ -81,8 +81,9 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
                 <input type="text" placeholder="Search Products... " className="outline-none rounded-md shadow-md bg-bg-grey px-4 py-2 min-w-[200px] lg:min-w-[300px]" />
                 <Search size={24} className='absolute right-2 top-2 text-heading'/>
             </div>
-            <Heart size={24} className='text-heading hover:scale-105 '/>
             <ShoppingCart size={24} onClick={()=>navigate('/cart')} className='text-heading hover:scale-105'/>
+            <LogOut size={24} onClick={()=>navigate('/login')} className='text-heading hover:scale-105'/>
+
             {/* Navbar Small Screen */}
             <div className='md:hidden mx-2' onClick={()=>setSidebarOpen(!sidebarOpen)}>
                 {sidebarOpen ? <X size={24}/>:<Menu size={24}/>}                

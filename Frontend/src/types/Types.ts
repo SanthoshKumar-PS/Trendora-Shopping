@@ -37,10 +37,11 @@ export type Product = {
   id: number;
   name: string;
   description?: string | null;
-  features?: Record<string, any> | null; // JSON field
+  features?: Feature[]; // JSON field
   discountPercentage?: number;           // default 0.0
   discountedPrice: number;
   actualPrice: number;
+  
 
   categoryId: number;
   images: string[];                      // Prisma String[]
@@ -55,6 +56,14 @@ export type Product = {
 
   createdAt: string; // Dates come as ISO strings
   updatedAt: string;
+};
+
+export type ProductWithCart = Product & {
+  isInCart?: boolean;
+};
+export type Feature = {
+  label: string;
+  value: string | number;  // use number if you expect numeric values
 };
 
 

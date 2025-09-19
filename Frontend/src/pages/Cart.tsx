@@ -9,14 +9,25 @@ import { useEffect } from "react"
 const Cart = () => {
     const navigate=useNavigate()
     const {cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching} = useCart();
-    console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
+    // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
-    useEffect(()=>{
-      refetchCart()
-      console.log("Refetch evertime it renders")
-    },[]);
+useEffect(() => {
+  refetchCart();
 
-    console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
+  const handleFocus = () => {
+    refetchCart();
+    console.log("Refetched on window focus");
+  };
+
+  window.addEventListener("focus", handleFocus);
+
+  return () => {
+    window.removeEventListener("focus", handleFocus);
+  };
+}, [refetchCart]);
+
+
+    // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
 
 return (
@@ -27,13 +38,13 @@ return (
 
         <div className="max-w-7xl mx-auto mt-6">
           {/* Heading */}
-          <div className="flex items-center justify-between px-3 gap-6 mx-6">
+          {/* <div className="flex items-center justify-between px-3 gap-6 mx-6">
             <h1 className="text-xl text-heading font-medium font-serif  ">All Products</h1>
             <button className="bg-zinc-800 px-3 py-2 rounded-md text-white font-serif hover:cursor-pointer hover:scale-105"
               onClick={()=>navigate("/addproduct")}>
               Add Product
             </button>
-          </div>
+          </div> */}
 
           {/* Products */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">

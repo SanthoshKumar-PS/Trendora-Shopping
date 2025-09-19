@@ -32,7 +32,6 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-
 model Address{
   id Int @id @default(autoincrement())
   user_id Int

@@ -17,16 +17,21 @@ type UserContextType = {
 const UserContext = createContext<UserContextType|undefined>(undefined)
 
 export const UserProvider = ({children} : {children : React.ReactNode}) => {
-    const [user, setUser] = useState<User>({
-        loggedIn: false,
-        email: "",
-        name: "",
-        role:"USER",
-        image: "",
-        phone: "",
-        cartId: undefined
-    });
+    const [user, setUser] = useState<User>(()=>{
+        const stored = localStorage.getItem('UserInfo')
+        return stored
+            ? JSON.parse(stored)
+            : {
+                loggedIn: false,
+                email: "",
+                name: "",
+                role:"USER",
+                image: "",
+                phone: "",
+                cartId: undefined
+            }
 
+    });
     const value = useMemo(()=>({user,setUser}),[user,setUser])
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>

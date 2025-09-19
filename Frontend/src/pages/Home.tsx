@@ -2,6 +2,8 @@ import { ChevronRight, CircleArrowLeft, CircleArrowRight, Eye, Heart } from "luc
 import Navbar from "../components/Navbar"
 import OfferBar from "../components/OfferBar"
 import { useCart } from "../context/CartContext"
+import { useUser } from "../context/UserContext"
+import Products from "./Products"
 
 const Home = () => {
     const categoryOptions=[
@@ -35,6 +37,9 @@ const Home = () => {
         },
     ]
 
+    const {user} = useUser()
+    console.log("user details", user)
+
   return (
     <div>
         <OfferBar/>
@@ -56,7 +61,7 @@ const Home = () => {
                 </ul>
                
             </div>
-            <div className="w-full mx-4 md:mx-0 md:mr-20 mt-5 ">
+            <div className="w-full mx-4 md:mx-16 lg:mx-0 lg:mr-20 mt-5">
                 <img src="/iphoneOffer.png" alt="Iphone Offer Image" className="hover:cursor-pointer object-cover w-full" />
             </div>
 
@@ -64,8 +69,8 @@ const Home = () => {
         </div>
 
         {/* Today's */}
-        <div className="w-full flex justify-between items-center  mt-20 ">
-            <div className="w-full pl-4 pr-4 md:pl-20 md:pr-20flex flex-col gap-4 justify-start items-center">
+        <div className="w-full flex justify-between items-center  mt-10 ">
+            <div className="w-full pl-4 pr-4 md:pl-12 md:pr-12 flex flex-col gap-4 justify-start items-center">
                 <div className="w-full flex gap-4 justify-start items-center">
                     <div className="w-3 h-6 rounded-sm bg-red">
                     </div>
@@ -76,7 +81,7 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="hidden mr-20 md:flex justify-center items-center">
+            <div className="hidden mr-12 md:flex justify-center items-center">
                 <div className="flex gap-4">
                     <CircleArrowLeft className="text-red"/>
                     <CircleArrowRight className="text-red"/>
@@ -84,9 +89,11 @@ const Home = () => {
             </div>
         </div>
 
+        <Products showNavbar={false}/>
 
-        {/* Products */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
+
+        {/* Sample Products - Fake */}
+        {/* <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
             {Array.from({ length: 10 }).map((_, i) =>(
             <div key={i} className="relative flex flex-col gap-2  items-start justify-start mx-1">
                 <div key={i} className="bg-[#F5F5F5] h-50 w-50 md:h-60 md:w-60  rounded-md overflow-hidden">
@@ -111,7 +118,7 @@ const Home = () => {
 
             </div>
                 ))}
-        </div>
+        </div> */}
 
 
 

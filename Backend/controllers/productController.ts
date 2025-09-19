@@ -6,12 +6,25 @@ const prisma = new PrismaClient()
 export const getProductDetailsById = async (req:any,res:any)=>{
     try {
         const {productId} = req.query;
+        const currentUserId = req.id??0;
         const productDetail = await prisma.product.findUnique({
-            where : { id:Number(productId) }
+            where : { id:Number(productId) },
+            include :{
+                    carts: {
+                    where: { userId: currentUserId }, // check only this user’s cart
+                    select: { id: true },
+                },
+            },
         })
+        const productDetailWithCart = ({
+            ...productDetail,
+            isInCart : productDetail.carts.length>0
+        })
+        console.log("Below is the product details and with isin cart")
         console.log(productDetail)
+        console.log(productDetailWithCart)
 
-        return res.status(200).json({message:"Data fetched successfully", product:productDetail})
+        return res.status(200).json({message:"Data fetched successfully", product:productDetailWithCart})
     } 
     catch (error) {
         console.log(error.message)

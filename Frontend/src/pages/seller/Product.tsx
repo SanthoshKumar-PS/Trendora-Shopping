@@ -2,22 +2,27 @@ import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import RatingStars from '../../components/RatingStars'
 import { BadgeCheck, ShoppingCart, Zap } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import LoadingScreen from '../../components/LoadingScreen'
 import axios from 'axios'
-import type { Feature, ProductType } from '../../types'
+import type { Feature, Product, ProductWithCart } from '../../types/Types'
 import GetProducts from '../GetProducts'
-const Product = () => {
+import { useCart } from '../../context/CartContext'
+const ProductPage = () => {
     const {id}=useParams<{id:string}>()
     const productId = Number(id)
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    const navigate = useNavigate()
     const [loading,setLoading] = useState<boolean>(true );
-    const [currentProduct,setCurrentProduct] = useState<ProductType|null>(null)
+    const [currentProduct,setCurrentProduct] = useState<ProductWithCart|null>(null)
     const [productCategory,setProductCategory] = useState<number|undefined>(undefined);
     const [selectedImageIndex,setSelectedImageIndex] = useState<number>(0);
 
+    // useCart context
+    const {cartId, addToCart, removeFromCart} = useCart()
+
     // Recommedatation Products
-    const [products, setProducts] = useState<ProductType[]>([])
+    const [products, setProducts] = useState<Product[]>([])
     const [error, setError] = useState<string | null>(null)
     
     // Pagination
@@ -30,7 +35,7 @@ const Product = () => {
     async function getProductDetails(){
         interface ProductDetailRespone{
             message : string
-            product : ProductType | null
+            product : ProductWithCart | null
         }
         try{
             setLoading(true)
@@ -68,7 +73,7 @@ const Product = () => {
     async function getProductRecommendation(categoryProduct:number,pageNum:number){
         type ProductsRecommendType = {
             message : string
-            products : ProductType[],
+            products : Product[],
             currentPage : number,
             totalPages : number
         }
@@ -136,6 +141,35 @@ const Product = () => {
         return () => window.removeEventListener("scroll",handleScroll)
     },[productCategory, hasMore, infiniteLoading])
 
+    const toggleCart = () =>{
+        if(!currentProduct) return ;
+        if(currentProduct.isInCart){
+            setCurrentProduct(prev=>prev?{...prev,isInCart:false}:prev)
+            
+            removeFromCart(
+                { cartId: cartId ?? 0, productId: currentProduct.id },
+                {
+                    onError:() =>{
+                    setCurrentProduct(prev=>prev?{...prev,isInCart:true}:prev)
+                    console.log("Rolled back as occur occured");
+                    }
+                });
+        }
+        else{
+            setCurrentProduct(prev=>prev?{...prev,isInCart:true}:prev)
+            addToCart(
+                { cartId:cartId??0, productId:currentProduct.id},
+                {
+                    onError: ()=>{
+                        setCurrentProduct(prev=>prev?{...prev,isInCart:false}:prev)
+                        console.log("Rolled back as occur occured");
+                    }
+                }
+            )
+        }
+
+    }
+
 
     if(loading){
         return <LoadingScreen/>
@@ -154,7 +188,9 @@ const Product = () => {
                 <RatingStars rating={currentProduct?.avgRating??0}/>
             </div>
             <h1>${currentProduct?.discountedPrice}</h1>
-            <button className='px-3 py-2 text-white font-medium bg-yellow-400 rounded-lg hover:cursor-pointer hover:scale-95'>Buy Now</button>
+            <button className='px-3 py-2 text-white font-medium bg-yellow-400 rounded-lg hover:cursor-pointer hover:scale-95'
+                onClick={()=>navigate('/checkout', { state: { currentProduct } })}
+                >Buy Now</button>
 
         </div>
 
@@ -180,11 +216,13 @@ const Product = () => {
                     </div>
                     {/* Add to cart & Buy Now */}
                     <div className='mt-2 flex items-center w-full gap-4 '>
-                        <button className='text-sm md:text-md text-white font-semibold bg-yellow-500 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer'>
+                        <button className='text-sm md:text-md text-white font-semibold bg-yellow-500 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer'
+                            onClick={()=>toggleCart()}>
                             <ShoppingCart/>
-                            <span>Add To Cart</span>
+                            <span>{currentProduct?.isInCart?"Already In Cart":"Add To Cart"}</span>
                         </button>
-                        <button className='text-sm md:text-md text-white font-semibold bg-orange-500 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer'>
+                        <button className='text-sm md:text-md text-white font-semibold bg-orange-500 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer'
+                        onClick={()=>navigate('/checkout', { state: { currentProduct } })}>
                             <Zap/>
                             <span>Buy Now</span>
                         </button>
@@ -269,4 +307,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default ProductPage

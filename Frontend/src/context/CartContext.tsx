@@ -59,8 +59,8 @@ type CartContextType = {
     cartId:number|null;
     setCartId:React.Dispatch<React.SetStateAction<number | null>>;
     cartProducts : Product[];
-    addToCart:(cartId:number,productId:number)=>void;
-    removeFromCart :(cartId:number, productId:number)=>void
+    addToCart:(variables: { cartId: number; productId: number }, options?: any) => void;
+    removeFromCart :(variables: { cartId: number; productId: number }, options?: any) => void;
     clearCart : (cartId:number)=>void;
     refetchCart : ()=>void;
     isCartFetching:boolean;
@@ -78,41 +78,47 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
         queryFn: fetchProductsFromCart,
         enabled: !!cartId,
         // enabled: false,
-        refetchOnWindowFocus:true
+        refetchOnWindowFocus:true,
+        refetchOnMount: "always",
+        staleTime: 0,
     })
     
 
     const addMutation = useMutation({
         mutationFn: addProductToCart,
         onSuccess: (data)=>{
-            queryClient.setQueryData(["cart"],data)
+            queryClient.setQueryData(["cart",cartId],data)
         }
     });
+    
 
     const deleteMutation = useMutation({
         mutationFn:deleteProductFromCart,
         onSuccess:(data)=>{
-            queryClient.setQueryData(["cart"],data);
+            queryClient.setQueryData(["cart",cartId],data);
         }
     })
 
     const clearCartMutation = useMutation({
     mutationFn: clearCartAPI,
     onSuccess: (data) => {
-        queryClient.setQueryData(["cart"], data); 
+        queryClient.setQueryData(["cart",cartId], data); 
     },
     });
 
     // const addToCart = (p:Product)=> setCartProducts(prev=>(prev.some(x=> x.id===p.id)?prev:[...prev,p]));
-    const addToCart = (cartId: number, productId: number) =>{
-                    addMutation.mutate({ cartId, productId });
-    console.log("Adding Product : ",productId)
+    const addToCart = (variables: { cartId: number; productId: number },options?:any) =>{
+                    addMutation.mutate(variables,options);
+    console.log("Adding Product : ",variables.productId)
 }
 
 
     //const removeFromCart = (id: number) =>setCartProducts(prev=>prev.filter(x => x.id !==id))
-    const removeFromCart = (cartId: number, productId: number) =>
-            deleteMutation.mutate({ cartId, productId });
+    const removeFromCart = (variables:{cartId: number, productId: number},options?:any) =>{
+            const { cartId, productId } = variables;
+            deleteMutation.mutate({cartId,productId},options);
+            console.log("Removing Product : ",variables.productId)
+    }
 
     // const clearCart = () => setCartProducts([])
     const clearCart = (cartId: number) => {

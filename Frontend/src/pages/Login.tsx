@@ -5,6 +5,7 @@ import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { CircleAlert } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 const Login = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
   const navigate=useNavigate()
@@ -15,7 +16,9 @@ const Login = () => {
   const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
   const [error,setError]=useState<string|null>(null)
 
+  // UserContext, CartContext
   const { cartId,setCartId } = useCart();
+  const {user,setUser} = useUser()
 
   async function validateAndLogin(e: React.FormEvent){
     e.preventDefault(); 
@@ -48,8 +51,25 @@ const Login = () => {
       if(response.status===200){
         const data=response.data as any
         console.log("User has been registered",data)
-        localStorage.setItem('username',data.name)
-        // localStorage.setItem('cartId',(cartId??0).toString())
+        setUser({
+          loggedIn: true,
+          email: data.email,
+          name: data.name,
+          role:data.role,
+          image: data.image,
+          phone: data.phone,
+          cartId: data.cartId
+        })
+        localStorage.setItem('UserInfo',JSON.stringify({
+          loggedIn: true,
+          email: data.email,
+          name: data.name,
+          role:data.role,
+          image: data.image,
+          phone: data.phone,
+          cartId: data.cartId
+        }))
+
         if(data.role ==='USER'){
           console.log("Cart ID of user - ",data.cartId)
           setCartId(Number(data.cartId))
