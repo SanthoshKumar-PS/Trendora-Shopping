@@ -4,6 +4,7 @@ import type { Address } from "../../types/Types";
 import { useEffect, useState } from "react";
 import type { GetAllAddressesType } from "../ResponseTypes";
 import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 type AddressesProps = {
   selectedAddressId: number | null;
@@ -22,6 +23,7 @@ const Addresses = ({
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;      
     const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);
     const [addresses,setAddresses] = useState<Address[]>([]);
+    const {user} = useUser()
     
     const getAllAddresses = async () =>{
         try{
@@ -39,8 +41,14 @@ const Addresses = ({
     }
 
     useEffect(()=>{
-        getAllAddresses()
-    },[])
+        if(user.loggedIn){
+          getAllAddresses()
+        }
+        else{
+          setAddresses([])
+        }
+        console.log(localStorage.getItem("UserInfo"))
+    },[user.loggedIn,user.email])
 
 
   return (

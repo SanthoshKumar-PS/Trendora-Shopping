@@ -1,16 +1,38 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
-import { Badge, BadgeCheck, Bell, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
+import { Badge, BadgeCheck, Bell, Check, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
 import AddAddress from "../components/AddAddress"
 import Addresses from "./CheckOut/Addresses"
 import OrderSummary from "./CheckOut/OrderSummary"
 import { useLocation } from "react-router-dom"
+import handleLoginOrSignup from "./CheckOut/ApiLoginSignup"
+import { useUser } from "../context/UserContext"
+import { useCart } from "../context/CartContext"
+import type { ProductWithCart } from "../types/Types"
+
 
 const CheckOut = () => {
-    const {state} = useLocation();
-    console.log(state) 
-    
+    const location = useLocation();
+    const {user,setUser} = useUser()
+    const {checkoutProducts, setCheckoutProducts} = useCart()
+    console.log("checkoutProducts: ",checkoutProducts)
+    let products : ProductWithCart[] = [] 
+
+  useEffect(() => {
+    if (location.state?.products) {
+      // ✅ Products passed via navigation
+      setCheckoutProducts(location.state.products);
+      localStorage.setItem("checkoutProducts", JSON.stringify(location.state.products));
+    } else {
+      // ✅ Load from localStorage if directly refreshing/opening checkout page
+      console.log("This is from local Storage")
+      const stored = localStorage.getItem("checkoutProducts");
+      const parsed: ProductWithCart[] = stored && stored !== "undefined" ? JSON.parse(stored) : [];
+      setCheckoutProducts(parsed);
+    }
+  }, [location.state?.products]);
+
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
 
     const [checkOutActive,seCheckOutActive] = useState<number>(1); //1-Login 2-Address 3-Order Summary 4-payment
@@ -18,6 +40,42 @@ const CheckOut = () => {
 
     const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)    
     const [showAddAddress, setShowAddAddress] = useState<boolean>(false);
+
+    // 1: Login or Signup
+    const [email, setEmail] = useState<string|null>(null);
+    const [password, setPassword] = useState<string|null>(null);
+    const [loginError,setLoginError] = useState<string|null>(null);
+    const [changeLogin,setChangeLogin] = useState<boolean>(false);
+    const handleFormSubmit = async (e:React.FormEvent)=>{
+        e.preventDefault();
+        setLoginError(null);
+        try{
+            const data = await handleLoginOrSignup({email:email??"",password:password??""})
+            setUser({
+                loggedIn:true,
+                email: data.email,
+                name: data.name??"",
+                role:data.role,
+                image: data.image??"",
+                phone: data.phone??"",
+                cartId: data.cartId})
+            localStorage.setItem('UserInfo',JSON.stringify({
+                loggedIn: true,
+                email: data.email,
+                name: data.name,
+                role:data.role,
+                image: data.image,
+                phone: data.phone,
+                cartId: data.cartId
+            }))
+            console.log("Login Success for ",data.email)
+        }
+        catch(error:any){
+            setLoginError(error.response?.data?.message || "Something went wrong, please try again.");
+        }
+
+
+    }
 
 
 
@@ -48,6 +106,9 @@ const CheckOut = () => {
 
 
 
+
+
+
   return (
     <div className="bg-zinc-100 min-h-screen">
         <Navbar/>
@@ -60,25 +121,26 @@ const CheckOut = () => {
                 <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden">
                     {/* Blue Login Signup */}
                     <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600  text-white">
-                        <Fingerprint size={20} />
+                        <Fingerprint size={18} />
                         <p className="font-medium text-white ">LOGIN OR SIGNUP</p>
                     </div>
                     {/* Email/Mobile Number */}
                     <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
                         {/* Login Signup */}
                         <div className="max-w-sm my-3 mx-3 md:mx-5 flex flex-col gap-3">
-                            <form onSubmit={(e:React.FormEvent)=>{e.preventDefault(); handleLoginOrSignup()}}>
-                                <Input required placeholder="Enter Email/Mobile Number"
+                            <form onSubmit={handleFormSubmit}>
+                                <Input required value={email??""} onChange={(e)=>setEmail(e.target.value)} placeholder="Enter Email Number"
                                     className="w-full border-0 border-b border-gray-400 rounded-none 
                                     focus:outline-none focus-visible:outline-none 
                                     focus:ring-0 focus-visible:ring-0 
                                     focus:border-blue-500 shadow-none" />
-                                <Input type="password" required placeholder="Enter Your Password"
+                                <Input type="password" required value={password??""} onChange={(e)=>setPassword(e.target.value)} placeholder="Enter Your Password"
                                     className="w-full border-0 border-b border-gray-400 rounded-none 
                                     focus:outline-none focus-visible:outline-none 
                                     focus:ring-0 focus-visible:ring-0 
                                     focus:border-blue-500 shadow-none" />
                                 <p className="text-sm text-zinc-400 font-mono">By continuing, you agree to Trendora's <span className="text-blue-600">Terms Of Use </span>and <span className="text-blue-600">Privacy Policy</span></p>
+                                {loginError && <p className="text-red-500">{loginError}</p>}
                                 <button type="submit" className="text-sm md:text-md text-white font-semibold bg-orange-500     flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">CONTINUE</button> 
                             </form>
 
@@ -87,18 +149,76 @@ const CheckOut = () => {
                         <div className="my-3 flex flex-col gap-3 justify-center items-start ">
                             <p className="text-gray-500 font-medium">Advantages of our secure login</p>
                             <div className="flex items-center justify-start gap-2 text-blue-600">
-                                <Truck size={20}/>
+                                <Truck size={18}/>
                                 <p className="text-sm text-black ">Easily Track Orders, Hassle free Returns</p>
                             </div>
                             <div className="flex items-center justify-start gap-2 text-blue-600">
-                                <Bell size={20}/>
+                                <Bell size={18}/>
                                 <p className="text-sm text-black ">Get Relevant Alerts and Recommendation</p>
                             </div>
                             <div className="flex items-center justify-start gap-2 text-blue-600">
-                                <Star size={20}/>
+                                <Star size={18}/>
                                 <p className="text-sm text-black ">Wishlist, Reviews, Ratings and more.</p>
                             </div>
                         </div>
+       
+                    </div>
+                </div>
+
+                {/* Success for First pair of container - Login Or Signup */}
+                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden shadow-sm shadow-purple-500">
+                    {/* Blue Login Signup */}
+                    {/* To be deleted - logic applied - for change 1 line */}
+                    <div className={`px-4 py-2 w-full flex justify-start items-center gap-2 ${(user.loggedIn && !changeLogin)?'bg-white text-zinc-700':'bg-blue-600  text-white'} `}>
+                        <Fingerprint size={18} />
+                        <p className="font-medium flex items-center gap-2">{(user.loggedIn && !changeLogin)?"LOGIN":"LOGIN OR SIGNUP"} <span>{user.loggedIn && <Check size={18} className="text-blue-600"/>}</span></p>
+                    </div>
+                    {/* Email/Mobile Number */}
+                    <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
+                        {/* Login Signup - when login false*/}
+                        {(!user.loggedIn||changeLogin) && (<div className="max-w-sm my-3 mx-3 md:mx-5 flex flex-col gap-3">
+                            <form onSubmit={handleFormSubmit}>
+                                <Input required value={email??""} onChange={(e)=>setEmail(e.target.value)} placeholder="Enter Email Number"
+                                    className="w-full border-0 border-b border-gray-400 rounded-none 
+                                    focus:outline-none focus-visible:outline-none 
+                                    focus:ring-0 focus-visible:ring-0 
+                                    focus:border-blue-500 shadow-none" />
+                                <Input type="password" required value={password??""} onChange={(e)=>setPassword(e.target.value)} placeholder="Enter Your Password"
+                                    className="w-full border-0 border-b border-gray-400 rounded-none 
+                                    focus:outline-none focus-visible:outline-none 
+                                    focus:ring-0 focus-visible:ring-0 
+                                    focus:border-blue-500 shadow-none" />
+                                <p className="text-sm text-zinc-400 font-mono">By continuing, you agree to Trendora's <span className="text-blue-600">Terms Of Use </span>and <span className="text-blue-600">Privacy Policy</span></p>
+                                {loginError && <p className="text-red-500">{loginError}</p>}
+                                <button type="submit" className="text-sm md:text-md text-white font-semibold bg-orange-500     flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">CONTINUE</button> 
+                            </form>
+
+                        </div>)}
+                        {/* Advantages ofour secure login - when login false */}
+                        {(!user.loggedIn || changeLogin) && (<div className="my-3 flex flex-col gap-3 justify-center items-start ">
+                            <p className="text-gray-500 font-medium">Advantages of our secure login</p>
+                            <div className="flex items-center justify-start gap-2 text-blue-600">
+                                <Truck size={18}/>
+                                <p className="text-sm text-black ">Easily Track Orders, Hassle free Returns</p>
+                            </div>
+                            <div className="flex items-center justify-start gap-2 text-blue-600">
+                                <Bell size={18}/>
+                                <p className="text-sm text-black ">Get Relevant Alerts and Recommendation</p>
+                            </div>
+                            <div className="flex items-center justify-start gap-2 text-blue-600">
+                                <Star size={18}/>
+                                <p className="text-sm text-black ">Wishlist, Reviews, Ratings and more.</p>
+                            </div>
+                        </div>)}
+                        {(user.loggedIn && !changeLogin) && (<div className="">
+                            <span className="font-bold text-gray-700 text-sm  ">Trendora customer - </span> 
+                            <span className="font-medium text-gray-800 text-sm ">{user.email}</span>                        
+                        </div>)}
+                        {(user.loggedIn || !changeLogin) && (
+                            <button className="px-3 py-1 text-sm font-medium text-blue-600 border border-gray-300 rounded-xs my-2 hover:cursor-pointer hover:scale-95" onClick={()=>setChangeLogin(prev=>!prev)}>
+                                {changeLogin?`Continue with ${user.email}`:"CHANGE"}
+                            </button>
+                        )}
        
                     </div>
                 </div>
@@ -121,15 +241,20 @@ const CheckOut = () => {
 
 
                 {/* Third pair of container - Order Summary */}
-                <OrderSummary/>
+                {/* <OrderSummary products={checkoutProducts}/> */}
 
+      {checkoutProducts.length > 0 ? (
+        <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
+      ) : (
+        <p>No products in checkout</p>
+      )}
 
 
                 {/* Fourth pair of container - Payment Page */}
                 <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
                     {/* Payment Header */}
                     <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-t-sm text-white">
-                        <CreditCard size={20} />
+                        <CreditCard size={18} />
                         <p className="font-medium text-white ">PAYMENT</p>
                     </div>
 

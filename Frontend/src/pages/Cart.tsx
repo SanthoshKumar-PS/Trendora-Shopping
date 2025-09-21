@@ -8,7 +8,7 @@ import { useEffect } from "react"
 
 const Cart = () => {
     const navigate=useNavigate()
-    const {cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching} = useCart();
+    const {cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching,setCheckoutProducts} = useCart();
     // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
 useEffect(() => {
@@ -25,9 +25,6 @@ useEffect(() => {
     window.removeEventListener("focus", handleFocus);
   };
 }, [refetchCart]);
-
-
-    // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
 
 return (
@@ -84,6 +81,18 @@ return (
 
               </div>
                   ))}
+          </div>
+
+          {/* Testing Purpose */}
+          <div className="w-full flex justify-center ">
+            <button className="px-3 py-2  text-sm font-medium text-white bg-blue-600 rounded-xs"
+              onClick={()=>{
+                setCheckoutProducts(cartProducts)
+                navigate('/checkout',{state : {products: cartProducts}})
+                // navigate('/test',{state : {products: cartProducts}})
+              }}>
+              Checkout all Products
+            </button>
           </div>
 
 

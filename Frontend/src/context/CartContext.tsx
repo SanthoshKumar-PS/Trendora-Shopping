@@ -1,6 +1,6 @@
 import axios from "axios";
-import type { Product } from "../types/Types"
-import { createContext, useContext, useMemo, useState} from "react";
+import type { Product, ProductWithCart } from "../types/Types"
+import { createContext, useContext, useEffect, useMemo, useState} from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
@@ -10,7 +10,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 type FetchProductsCartType = {
     message : string;
     cartId:number;
-    cartProducts : Product[]
+    cartProducts : ProductWithCart[]
 }
 
 const fetchProductsFromCart = async ():Promise<Product[]> =>{
@@ -64,6 +64,8 @@ type CartContextType = {
     clearCart : (cartId:number)=>void;
     refetchCart : ()=>void;
     isCartFetching:boolean;
+    checkoutProducts:Product[]
+    setCheckoutProducts:(products: Product[]) => void;
 }
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
@@ -71,7 +73,16 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
     const queryClient = useQueryClient();
     
     const [cartId, setCartId] = useState<number|null>(null);
-    // const [cartProducts, setCartProducts] = useState<Product[]>([]);
+    const [checkoutProducts,_setCheckoutProducts] = useState<ProductWithCart[]>(()=>{
+        const saved = localStorage.getItem('checkoutProducts');
+        return saved && saved !== "undefined" ? JSON.parse(saved) : []
+    });
+    const setCheckoutProducts = (products: ProductWithCart[]) => {
+        console.log("Data started to set")
+        _setCheckoutProducts(products);
+        localStorage.setItem("checkoutProducts", JSON.stringify(products));
+        console.log("Data set completed")
+    }
 
     const {data: cartProducts=[], refetch, isFetching } = useQuery<Product[]>({
         queryKey: ["cart",cartId],
@@ -106,21 +117,18 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
     },
     });
 
-    // const addToCart = (p:Product)=> setCartProducts(prev=>(prev.some(x=> x.id===p.id)?prev:[...prev,p]));
     const addToCart = (variables: { cartId: number; productId: number },options?:any) =>{
                     addMutation.mutate(variables,options);
     console.log("Adding Product : ",variables.productId)
 }
 
 
-    //const removeFromCart = (id: number) =>setCartProducts(prev=>prev.filter(x => x.id !==id))
     const removeFromCart = (variables:{cartId: number, productId: number},options?:any) =>{
             const { cartId, productId } = variables;
             deleteMutation.mutate({cartId,productId},options);
             console.log("Removing Product : ",variables.productId)
     }
 
-    // const clearCart = () => setCartProducts([])
     const clearCart = (cartId: number) => {
             clearCartMutation.mutate({cartId});
     };
@@ -128,7 +136,8 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
 
 
     const value = useMemo(()=>({
-        cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart: refetch, isCartFetching: isFetching
+        cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart: refetch, isCartFetching: isFetching,
+        checkoutProducts,setCheckoutProducts
     }),[cartProducts]);
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>

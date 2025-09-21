@@ -58,9 +58,7 @@ const SignUp = () => {
         const data=response.data as any
         console.log(data)
         console.log("User has been registered")
-        localStorage.setItem('username',data.name)
         setCartId(data.cartId)
-        // localStorage.setItem("CartId",(cartId??0).toString())
         if(data.role ==='USER'){
           navigate('/home')
         }

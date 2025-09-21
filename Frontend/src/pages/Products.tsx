@@ -147,7 +147,7 @@ const Products = ({showNavbar=true}:{showNavbar?:boolean}) => {
                           <SquareCheckBig size={18} 
                             onClick={(e)=>{
                               e.stopPropagation();
-                              removeFromCart(cartId??0,product.id)
+                              removeFromCart({cartId: cartId??0,productId: product.id})
                               updateOptimistic(product!,false)
 
                             }}/>
@@ -155,7 +155,7 @@ const Products = ({showNavbar=true}:{showNavbar?:boolean}) => {
                           <ShoppingCart size={18} 
                             onClick={(e)=>{
                               e.stopPropagation();
-                              addToCart(cartId??0,product?.id??0)
+                              addToCart({cartId:cartId??0,productId:product?.id??0})
                               updateOptimistic(product!,true)
 
 

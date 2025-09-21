@@ -19,7 +19,7 @@ const ProductPage = () => {
     const [selectedImageIndex,setSelectedImageIndex] = useState<number>(0);
 
     // useCart context
-    const {cartId, addToCart, removeFromCart} = useCart()
+    const {cartId, addToCart, removeFromCart, setCheckoutProducts} = useCart()
 
     // Recommedatation Products
     const [products, setProducts] = useState<Product[]>([])
@@ -189,7 +189,7 @@ const ProductPage = () => {
             </div>
             <h1>${currentProduct?.discountedPrice}</h1>
             <button className='px-3 py-2 text-white font-medium bg-yellow-400 rounded-lg hover:cursor-pointer hover:scale-95'
-                onClick={()=>navigate('/checkout', { state: { currentProduct } })}
+                onClick={()=>navigate('/checkout', { state: { products:[currentProduct] } })}
                 >Buy Now</button>
 
         </div>
@@ -222,7 +222,13 @@ const ProductPage = () => {
                             <span>{currentProduct?.isInCart?"Already In Cart":"Add To Cart"}</span>
                         </button>
                         <button className='text-sm md:text-md text-white font-semibold bg-orange-500 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xs hover:scale-95 hover:cursor-pointer'
-                        onClick={()=>navigate('/checkout', { state: { currentProduct } })}>
+                        onClick={()=>{
+                            if(currentProduct){
+                                setCheckoutProducts([currentProduct]);
+                                navigate('/checkout',{state: {products: [currentProduct]}})
+                                // navigate('/test',{state: {products: [currentProduct]}})
+                            }
+                        }}>
                             <Zap/>
                             <span>Buy Now</span>
                         </button>

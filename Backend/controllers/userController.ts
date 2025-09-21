@@ -104,6 +104,99 @@ export const login = async (req:any,res:any) => {
     }
 }
 
+export const logout = async (req:any,res:any) => {
+    try{
+        console.log("Reached controller machi")
+        res.clearCookie("token", {
+            httpOnly:true,
+            secure:false,
+            // secure:process.env.NODE_ENV==="production",
+            maxAge: 7*24*60*60*1000,
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+        });
+        res.status(200).json({message:"Logged out successfully"})
+
+
+    }
+    catch(error){
+        console.log("Error occured while logging out");
+        res.status(500).json({message:"Internal Server Error while Logging out"})
+    }
+}
+
+export const registerOrLogin = async (req:any,res:any) => {
+    try {
+        const {email,password} = req.body;
+        let loggingUser = await prisma.user.findUnique({
+            where:{email:email},
+            include:{cart:true}
+        })
+
+        if(!loggingUser){
+            loggingUser= await prisma.user.create({
+                data: {
+                    email,password,role:"USER",
+                    cart:{
+                        create:{}
+                    }
+                },
+                include:{cart:true}
+            })
+            const token=generateToken(loggingUser.id,loggingUser.email)
+            res.cookie("token",token,{
+                httpOnly:true,
+                secure:false,
+                // secure:process.env.NODE_ENV==="production",
+                maxAge: 7*24*60*60*1000,
+                sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+            })
+            return res.status(201).json({message:"Signin Successful",
+                email:loggingUser.email, 
+                name:loggingUser.name, 
+                role:loggingUser.role, 
+                image:loggingUser.image,
+                phone:loggingUser.phone,
+                cartId:loggingUser.cart.id
+            })        
+        }
+
+        if(loggingUser.password!==password){
+            return res.status(401).json({message:"Wrong Password. Please Enter Again",cartId:null})
+        }
+        
+        if (!loggingUser.cart) {
+        const newCart = await prisma.cart.create({
+            data: { userId: loggingUser.id },
+        });
+        loggingUser = { ...loggingUser, cart: newCart };
+        }
+
+        const token=generateToken(loggingUser.id,loggingUser.email)
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:false,
+            // secure:process.env.NODE_ENV==="production",
+            maxAge: 7*24*60*60*1000,
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+        })
+        return res.status(200).json({message:"Login Successful",
+            email:loggingUser.email, 
+            name:loggingUser.name, 
+            role:loggingUser.role, 
+            image:loggingUser.image,
+            phone:loggingUser.phone,
+            cartId:loggingUser.cart.id
+        })
+    } 
+    catch (error) {
+        console.log("Error occured while logging in ",error.message)
+        return res.status(500).json({message:"Internal Server Error",cartId:null})
+        
+    }
+}
+
+
+
 export const addAddress = async (req:any,res:any) =>{
     try{
         const userId = req.id;

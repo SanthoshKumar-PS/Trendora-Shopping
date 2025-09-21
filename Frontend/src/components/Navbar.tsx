@@ -1,6 +1,10 @@
 import { Search,Heart, ShoppingCart,Menu,X, LogOut  } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useUser } from '../context/UserContext';
+
+
 
 type NavbarProps={
     loggedin?:boolean;
@@ -8,8 +12,35 @@ type NavbarProps={
 }
 
 
-
 const Navbar = ({loggedin,seller=false}: NavbarProps) => {
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    const navigate = useNavigate();  
+    const {setUser} = useUser();
+
+    const handleLogout = async () => {
+        try{
+            const response = await axios.post(`${BACKEND_URL}/user/logout`,{},{withCredentials:true})
+            console.log(response)
+            if(response.status===200){
+                setUser({loggedIn: false,
+                email: "",
+                name: "",
+                role:"USER",
+                image: "",
+                phone: "",
+                cartId: undefined})
+                localStorage.removeItem("UserInfo"); 
+                localStorage.removeItem("checkoutProducts"); 
+                
+                navigate('/login')
+                console.log("navigation to login page after logout")
+            }
+        }
+        catch(error){
+            console.log("Error while logging out");
+        }
+    }
+    
     const userSidebarOptions=[
             {
                 id:1,
@@ -60,7 +91,6 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
 
     const sidebarOptions= seller? sellerSidebarOptions: userSidebarOptions
     const [sidebarOpen,setSidebarOpen]=useState<boolean>(false)
-    const navigate=useNavigate()
   return (
     <div className="flex w-full max-w-6xl bg-grey-400 mx-auto my-2 items-center justify-between ">
         <h1 className=" font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">Trendora</h1>
@@ -82,7 +112,7 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
                 <Search size={24} className='absolute right-2 top-2 text-heading'/>
             </div>
             <ShoppingCart size={24} onClick={()=>navigate('/cart')} className='text-heading hover:scale-105'/>
-            <LogOut size={24} onClick={()=>navigate('/login')} className='text-heading hover:scale-105'/>
+            <LogOut size={24} onClick={()=>handleLogout()} className='text-heading hover:scale-105'/>
 
             {/* Navbar Small Screen */}
             <div className='md:hidden mx-2' onClick={()=>setSidebarOpen(!sidebarOpen)}>
@@ -114,5 +144,6 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
     </div>
   )
 }
+export default handleLogout;
 
 export default Navbar

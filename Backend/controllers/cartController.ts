@@ -46,6 +46,7 @@ export const addProductToCart = async (req:any,res:any) =>{
         const userId = req.id;
         const {cartId, productId} = req.body;
         if(!cartId &&!productId){
+            console.log(cartId,productId)
             return res.status(400).json({message:"Bad request - CartId and ProductId required",cartId:null,products:[]})
         }
 

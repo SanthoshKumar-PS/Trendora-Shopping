@@ -1,5 +1,5 @@
 import express from 'express'
-import { login, register, addAddress,getAllAddresses, getHomeProducts} from '../controllers/userController'
+import { login, logout, register,registerOrLogin, addAddress,getAllAddresses, getHomeProducts} from '../controllers/userController'
 import { authenticateUser } from '../middleware/authenticateUser'
 import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
 
@@ -7,6 +7,8 @@ export const userRouter=express.Router()
 
 userRouter.post("/register",register)
 userRouter.post("/login",login)
+userRouter.post("/logout",authenticateUser ,logout)
+userRouter.post("/checkout/signing",registerOrLogin)
 userRouter.post("/addAddress",authenticateUser,addAddress)
 userRouter.get("/getAllAddresses",authenticateUser,getAllAddresses)
 userRouter.get("/getHomeProducts",authenticateUser,getHomeProducts)
