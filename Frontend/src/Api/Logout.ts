@@ -7,13 +7,14 @@ type HandleLogoutParams = {
   BACKEND_URL: string;
   setUser: Dispatch<SetStateAction<UserLog>>;
   navigate?: NavigateFunction;
+  clearPreviousToken?: boolean;
 };
 
-export const handleLogout = async ({ BACKEND_URL, setUser, navigate }: HandleLogoutParams) => {
+export const handleLogout = async ({ BACKEND_URL, setUser, navigate, clearPreviousToken=true }: HandleLogoutParams) => {
   try {
     const response = await axios.post(
       `${BACKEND_URL}/user/logout`,
-      {},
+      {clearPreviousToken},
       { withCredentials: true }
     );
 
@@ -38,7 +39,6 @@ export const handleLogout = async ({ BACKEND_URL, setUser, navigate }: HandleLog
         console.log("User logged out, no navigation needed");
       }
 
-      console.log("User logged out and navigated to login page");
     }
   } catch (error) {
     console.error("Error while logging out", error);

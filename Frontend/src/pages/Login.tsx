@@ -78,7 +78,7 @@ const Login = () => {
         if(data.role ==='SELLER'){
           setCartId(Number(data.cartId))
           // navigate('/dashboard')
-          navigate('/cart')
+          navigate('/dashboard')
         }
       }
 

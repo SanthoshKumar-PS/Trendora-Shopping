@@ -46,7 +46,8 @@ export const register= async (req:any,res:any)=>{
             secure:false,
             // secure:process.env.NODE_ENV==="production",
             maxAge: 7*24* 60 * 60 * 1000,
-            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax",
+            path: "/"
         })
         return res.status(201).json({message:"Account created succesfully",role:createdUser.role , name:createdUser.name,cartId:createdUser.cart.id})
 
@@ -86,7 +87,8 @@ export const login = async (req:any,res:any) => {
             secure:false,
             // secure:process.env.NODE_ENV==="production",
             maxAge: 7*24*60*60*1000,
-            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax",
+            path: "/"
         })
         return res.status(200).json({message:"Login Successful",
             email:loggingUser.email, 
@@ -106,14 +108,19 @@ export const login = async (req:any,res:any) => {
 
 export const logout = async (req:any,res:any) => {
     try{
-        console.log("Reached controller machi")
-        res.clearCookie("token", {
-            httpOnly:true,
-            secure:false,
-            // secure:process.env.NODE_ENV==="production",
-            maxAge: 7*24*60*60*1000,
-            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
-        });
+        const {clearPreviousToken} = req.body
+        console.log("Clear old token : ",clearPreviousToken)
+        if(clearPreviousToken){
+            res.clearCookie("token", {
+                httpOnly:true,
+                secure:false,
+                // secure:process.env.NODE_ENV==="production",
+                // maxAge: 7*24*60*60*1000,
+                sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax",
+                path: "/"
+            });
+        }
+
         res.status(200).json({message:"Logged out successfully"})
 
 
@@ -148,7 +155,8 @@ export const registerOrLogin = async (req:any,res:any) => {
                 secure:false,
                 // secure:process.env.NODE_ENV==="production",
                 maxAge: 7*24*60*60*1000,
-                sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+                sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax",
+                path: "/"
             })
             return res.status(201).json({message:"Signin Successful",
                 email:loggingUser.email, 
@@ -172,12 +180,14 @@ export const registerOrLogin = async (req:any,res:any) => {
         }
 
         const token=generateToken(loggingUser.id,loggingUser.email)
+
         res.cookie("token",token,{
             httpOnly:true,
             secure:false,
             // secure:process.env.NODE_ENV==="production",
             maxAge: 7*24*60*60*1000,
-            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax"
+            sameSite:process.env.NODE_ENV === "production" ? "strict" : "lax",
+            path: "/"
         })
         return res.status(200).json({message:"Login Successful",
             email:loggingUser.email, 
@@ -214,16 +224,39 @@ export const addAddress = async (req:any,res:any) =>{
                 type
             }
         })
+        console.log("New Address created is: ",newAddress)
 
         return res.status(201).json({message:"New Address Created",address:newAddress})
 
     }
     catch(error){
         console.log(error.message)
-        return res.status(500).json({message:"Internal Server Error"});
+        return res.status(500).json({message:"Internal Server Error",address:null});
     }
 }
 
+export const updateAddress = async (req:any,res:any) => {
+    try{
+        console.log("im here macha fix paniduu")
+        const userId = req.id;
+        const {id,name,phone,line1,line2,city,state,pincode,type} = req.body;
+        const updatedAddress = await prisma.address.update({
+            where:{
+                id:Number(id)
+            },
+            data:{
+                name,phone,line1,line2,city,state,pincode,type
+            }
+        })
+        console.log("Updated address is: ",updatedAddress)
+        return res.status(200).json({message:"Address updated Successfully",address:updatedAddress})
+
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({message:"Inernal Server Error",address:null});
+    }
+}
 export const getAllAddresses = async (req:any,res:any)=>{
     try{
         const userId = req.id

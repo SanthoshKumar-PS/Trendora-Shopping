@@ -22,7 +22,7 @@ export default async function handleLoginOrSignup ({email,password}:{email:strin
             password:password
         }
 
-        const response = await axios.post<AuthResponse>(`${BACKEND_URL}/user/checkout/signing`,payload);
+        const response = await axios.post<AuthResponse>(`${BACKEND_URL}/user/checkout/signing`,payload,{withCredentials:true});
         if(response.status===200||response.status===201) {
             console.log("Login or Signup successful");
             return response.data

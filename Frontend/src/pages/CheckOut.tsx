@@ -2,22 +2,23 @@ import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import { Badge, BadgeCheck, Bell, Check, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
-import AddAddress from "../components/AddAddress"
+import AddressForm from "../components/AddressForm"
 import Addresses from "./CheckOut/Addresses"
 import OrderSummary from "./CheckOut/OrderSummary"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import handleLoginOrSignup from "./CheckOut/ApiLoginSignup"
 import { useUser } from "../context/UserContext"
 import { useCart } from "../context/CartContext"
-import type { ProductWithCart } from "../types/Types"
+import type { Address, ProductWithCart } from "../types/Types"
+import { handleLogout } from "../Api/Logout"
 
 
 const CheckOut = () => {
     const location = useLocation();
+    const navigate = useNavigate()
     const {user,setUser} = useUser()
     const {checkoutProducts, setCheckoutProducts} = useCart()
     console.log("checkoutProducts: ",checkoutProducts)
-    let products : ProductWithCart[] = [] 
 
   useEffect(() => {
     if (location.state?.products) {
@@ -38,8 +39,11 @@ const CheckOut = () => {
     const [checkOutActive,seCheckOutActive] = useState<number>(1); //1-Login 2-Address 3-Order Summary 4-payment
     const [activeTab,setActiveTab] = useState<number>(0)
 
-    const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)    
-    const [showAddAddress, setShowAddAddress] = useState<boolean>(false);
+    const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)
+    const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);    
+    const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
+    const [addresses,setAddresses] = useState<Address[]>([]);
+    
 
     // 1: Login or Signup
     const [email, setEmail] = useState<string|null>(null);
@@ -48,6 +52,14 @@ const CheckOut = () => {
     const [changeLogin,setChangeLogin] = useState<boolean>(false);
     const handleFormSubmit = async (e:React.FormEvent)=>{
         e.preventDefault();
+        if(user.loggedIn) {
+            try {
+                await handleLogout({ BACKEND_URL, setUser, clearPreviousToken: false });
+                console.log("Logged out successfully");
+            } catch (err) {
+                console.warn("Logout failed before login, continuing...", err);
+            }
+        }
         setLoginError(null);
         try{
             const data = await handleLoginOrSignup({email:email??"",password:password??""})
@@ -69,6 +81,7 @@ const CheckOut = () => {
                 cartId: data.cartId
             }))
             console.log("Login Success for ",data.email)
+            setChangeLogin(false)
         }
         catch(error:any){
             setLoginError(error.response?.data?.message || "Something went wrong, please try again.");
@@ -118,7 +131,7 @@ const CheckOut = () => {
             <div className="flex flex-col justify-start items-start w-full space-y-6 ">
 
                 {/* First pair of container - Login Or Signup */}
-                <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden">
+                {false && <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden">
                     {/* Blue Login Signup */}
                     <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600  text-white">
                         <Fingerprint size={18} />
@@ -163,12 +176,11 @@ const CheckOut = () => {
                         </div>
        
                     </div>
-                </div>
+                </div>}
 
                 {/* Success for First pair of container - Login Or Signup */}
                 <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden shadow-sm shadow-purple-500">
                     {/* Blue Login Signup */}
-                    {/* To be deleted - logic applied - for change 1 line */}
                     <div className={`px-4 py-2 w-full flex justify-start items-center gap-2 ${(user.loggedIn && !changeLogin)?'bg-white text-zinc-700':'bg-blue-600  text-white'} `}>
                         <Fingerprint size={18} />
                         <p className="font-medium flex items-center gap-2">{(user.loggedIn && !changeLogin)?"LOGIN":"LOGIN OR SIGNUP"} <span>{user.loggedIn && <Check size={18} className="text-blue-600"/>}</span></p>
@@ -226,17 +238,26 @@ const CheckOut = () => {
                 {/* Second pair of container - Delivery Address */}
                 <Addresses 
                     selectedAddressId={selectedAddressId} 
-                    setSelectedAddressId={setSelectedAddressId} 
-                    showAddAddress={showAddAddress}
-                    setShowAddAddress={setShowAddAddress}
+                    setSelectedAddressId={setSelectedAddressId}
+                    selectedAddress={selectedAddress}
+                    setSelectedAddress={setSelectedAddress} 
+                    addresses={addresses}
+                    setAddresses={setAddresses}
+                    showAddAddress={showAddressForm}
+                    setShowAddAddress={setShowAddressForm}
                 />
 
 
                 {/* Add New Address */}
-                {showAddAddress && (
-                    <AddAddress 
-                        showAddAddress={showAddAddress}
-                        setShowAddAddress={setShowAddAddress}/>
+                {showAddressForm && (
+                    <AddressForm 
+                        showAddressForm={showAddressForm}
+                        setShowAddressForm={setShowAddressForm}
+                        setAddresses={setAddresses}
+                        setSelectedAddress={setSelectedAddress}
+                        initialData={selectedAddress||undefined}
+                        mode={selectedAddress ? "update" : "create"}
+                        />
                 )}
 
 

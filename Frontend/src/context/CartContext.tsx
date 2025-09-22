@@ -14,6 +14,7 @@ type FetchProductsCartType = {
 }
 
 const fetchProductsFromCart = async ():Promise<Product[]> =>{
+    console.log("Fetching cart for user again ")
     const res = await axios.get<FetchProductsCartType>(`${BACKEND_URL}/user/getCartProducts`,{withCredentials:true})
     console.log("Fetch Products from Cart")
     console.log(res.data)
@@ -78,10 +79,8 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
         return saved && saved !== "undefined" ? JSON.parse(saved) : []
     });
     const setCheckoutProducts = (products: ProductWithCart[]) => {
-        console.log("Data started to set")
         _setCheckoutProducts(products);
         localStorage.setItem("checkoutProducts", JSON.stringify(products));
-        console.log("Data set completed")
     }
 
     const {data: cartProducts=[], refetch, isFetching } = useQuery<Product[]>({

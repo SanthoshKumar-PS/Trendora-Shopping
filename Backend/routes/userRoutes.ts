@@ -1,5 +1,5 @@
 import express from 'express'
-import { login, logout, register,registerOrLogin, addAddress,getAllAddresses, getHomeProducts} from '../controllers/userController'
+import { login, logout, register,registerOrLogin, addAddress, updateAddress, getAllAddresses, getHomeProducts} from '../controllers/userController'
 import { authenticateUser } from '../middleware/authenticateUser'
 import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
 
@@ -10,6 +10,7 @@ userRouter.post("/login",login)
 userRouter.post("/logout",authenticateUser ,logout)
 userRouter.post("/checkout/signing",registerOrLogin)
 userRouter.post("/addAddress",authenticateUser,addAddress)
+userRouter.patch("/updateAddress",authenticateUser,updateAddress)
 userRouter.get("/getAllAddresses",authenticateUser,getAllAddresses)
 userRouter.get("/getHomeProducts",authenticateUser,getHomeProducts)
 

@@ -4,7 +4,7 @@ import { formatCurrency } from "../../lib/formatCurrency";
 import type { ProductWithCart } from "../../types/Types";
 
 const OrderSummary = ({products=[]}:{products:ProductWithCart[]}) => {
-  console.log(products)
+  console.log(products) 
   return (
     <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
       {/* Order Summary Header */}

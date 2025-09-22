@@ -20,9 +20,9 @@ export const getProductDetailsById = async (req:any,res:any)=>{
             ...productDetail,
             isInCart : productDetail.carts.length>0
         })
-        console.log("Below is the product details and with isin cart")
-        console.log(productDetail)
-        console.log(productDetailWithCart)
+        // console.log("Below is the product details and with isin cart")
+        // console.log(productDetail)
+        // console.log(productDetailWithCart)
 
         return res.status(200).json({message:"Data fetched successfully", product:productDetailWithCart})
     } 
@@ -40,7 +40,7 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
 
         const productIdNum=Number(productId)
         const categoryId = Number(productCategory)
-        console.log(productCategory)
+        // console.log(productCategory)
 
         const category = await prisma.category.findUnique({
             where: { id: categoryId },

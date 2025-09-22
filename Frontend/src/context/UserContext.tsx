@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useCart } from "./CartContext";
 
 export type UserLog = {
     loggedIn : boolean;
@@ -33,6 +34,17 @@ export const UserProvider = ({children} : {children : React.ReactNode}) => {
 
     });
 
+    const { setCartId } = useCart();
+    useEffect(() => {
+      if (user?.cartId !== null) {
+        console.log("Cart if reset to ",user.cartId)
+        setCartId(user.cartId??null);
+      } else {
+        setCartId(null); // clear cart on logout
+      }
+    }, [user?.cartId, setCartId]);
+
+
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "UserInfo") {
@@ -49,7 +61,7 @@ export const UserProvider = ({children} : {children : React.ReactNode}) => {
             role: "USER",
             image: "",
             phone: "",
-            cartId: undefined,
+            cartId: null,
           });
         }
       }

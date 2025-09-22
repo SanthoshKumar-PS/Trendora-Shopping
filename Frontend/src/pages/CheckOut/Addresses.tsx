@@ -2,13 +2,16 @@ import { BadgeCheck, MapPinned, Plus } from "lucide-react";
 import type React from "react";
 import type { Address } from "../../types/Types";
 import { useEffect, useState } from "react";
-import type { GetAllAddressesType } from "../ResponseTypes";
-import axios from "axios";
 import { useUser } from "../../context/UserContext";
+import { getAllAddresses } from "../../Api/GetAddresses";
 
 type AddressesProps = {
   selectedAddressId: number | null;
   setSelectedAddressId: React.Dispatch<React.SetStateAction<number | null>>;
+  selectedAddress : Address |null,
+  setSelectedAddress : React.Dispatch<React.SetStateAction<Address|null>>;
+  addresses : Address[];
+  setAddresses : React.Dispatch<React.SetStateAction<Address[]>>;
   showAddAddress : boolean;
   setShowAddAddress : React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -16,33 +19,20 @@ type AddressesProps = {
 const Addresses = ({
   selectedAddressId,
   setSelectedAddressId,
+  selectedAddress,
+  setSelectedAddress,
+  addresses,
+  setAddresses,
   showAddAddress,
   setShowAddAddress
 }: AddressesProps) => {
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;      
-    const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);
-    const [addresses,setAddresses] = useState<Address[]>([]);
     const {user} = useUser()
     
-    const getAllAddresses = async () =>{
-        try{
-            const response = await axios.get<GetAllAddressesType>(`${BACKEND_URL}/user/getAllAddresses`,{withCredentials:true})
-            if(response.status===200){
-                console.log("All address of user : ",response.data)
-                setAddresses(response.data.addresses)
-            }
-
-        }
-        catch(error){
-            console.log("Error occured while getting all user address");
-            console.log(error)
-        }
-    }
 
     useEffect(()=>{
         if(user.loggedIn){
-          getAllAddresses()
+          getAllAddresses({setAddresses})
         }
         else{
           setAddresses([])
@@ -157,7 +147,12 @@ const Addresses = ({
                 </div>
 
                 {/* Edit */}
-                <div className="text-blue-600 font-medium cursor-pointer text-sm md:text-md mx-1">
+                <div className="text-blue-600 font-medium cursor-pointer text-sm md:text-md mx-1"
+                  onClick={() => {
+                    setShowAddAddress(true); 
+                    setSelectedAddressId(address.id);
+                    setSelectedAddress(address); 
+                  }}>
                   EDIT
                 </div>
               </div>
