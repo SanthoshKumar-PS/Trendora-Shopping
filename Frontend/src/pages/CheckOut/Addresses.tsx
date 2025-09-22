@@ -4,6 +4,7 @@ import type { Address } from "../../types/Types";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { getAllAddresses } from "../../Api/GetAddresses";
+import ScaleLoader from "react-spinners/ScaleLoader";
 
 type AddressesProps = {
   selectedAddressId: number | null;
@@ -12,6 +13,8 @@ type AddressesProps = {
   setSelectedAddress : React.Dispatch<React.SetStateAction<Address|null>>;
   addresses : Address[];
   setAddresses : React.Dispatch<React.SetStateAction<Address[]>>;
+  addressLoading : boolean;
+  setAddressLoading : React.Dispatch<React.SetStateAction<boolean>>;
   showAddAddress : boolean;
   setShowAddAddress : React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -23,6 +26,8 @@ const Addresses = ({
   setSelectedAddress,
   addresses,
   setAddresses,
+  addressLoading,
+  setAddressLoading,
   showAddAddress,
   setShowAddAddress
 }: AddressesProps) => {
@@ -32,7 +37,7 @@ const Addresses = ({
 
     useEffect(()=>{
         if(user.loggedIn){
-          getAllAddresses({setAddresses})
+          getAllAddresses({setAddresses, setAddressLoading})
         }
         else{
           setAddresses([])
@@ -49,7 +54,14 @@ const Addresses = ({
         <p className="font-medium text-white ">DELIVERY ADDRESS</p>
       </div>
 
-      {selectedAddressId !== null && selectedAddress !== null && (
+      {/* First Loading */}
+      {addressLoading && (
+        <div className="flex items-center justify-center w-full my-4">
+          <ScaleLoader color="#2563eb" height={30} width={4} speedMultiplier={1.3} />
+        </div>
+      )}
+      
+      {!addressLoading && selectedAddressId !== null && selectedAddress !== null && (
         <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
           <div className="mx-3 md:mx-5 my-3 md:my-5 w-full flex justify-between items-start ">
             <div className="flex gap-2 items-start justify-start">
@@ -95,11 +107,11 @@ const Addresses = ({
         </div>
       )}
 
-      {addresses.length === 0 && (
+      {!addressLoading && addresses.length === 0 && (
         <div className="mx-auto mt-4 mb-2 font-medium text-md text-blue-600">No Address Present. Please Add Your Address</div>
       )}
 
-      {addresses &&
+      {!addressLoading &&addresses &&
         addresses.length > 0 &&
         selectedAddressId === null &&
         addresses.map((address, i) => (
@@ -163,7 +175,7 @@ const Addresses = ({
         ))}
 
       {/* Add Address Trigger */}
-      {selectedAddressId === null && !showAddAddress && (
+      {!addressLoading &&selectedAddressId === null && !showAddAddress && (
         <div
           className="flex flex-col lg:flex-row justify-center lg:justify-around items-center hover:cursor-pointer"
           onClick={() => setShowAddAddress((prev) => !prev)}

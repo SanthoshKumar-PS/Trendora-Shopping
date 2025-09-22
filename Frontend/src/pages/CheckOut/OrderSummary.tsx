@@ -2,9 +2,11 @@ import { CircleAlert, CircleMinus, CirclePlus, ListOrdered } from "lucide-react"
 import { useCart } from "../../context/CartContext";
 import { formatCurrency } from "../../lib/formatCurrency";
 import type { ProductWithCart } from "../../types/Types";
+import { useNavigate } from "react-router-dom";
 
 const OrderSummary = ({products=[]}:{products:ProductWithCart[]}) => {
   console.log(products) 
+  const navigate = useNavigate()
   return (
     <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
       {/* Order Summary Header */}
@@ -12,6 +14,13 @@ const OrderSummary = ({products=[]}:{products:ProductWithCart[]}) => {
         <ListOrdered size={20} />
         <p className="font-medium text-white ">ORDER SUMMARY</p>
       </div>
+
+      {/* For No Products */}
+      <p className="text-center mt-4 mb-2 font-medium text-gray-800">No products in checkout</p>
+      <p className="text-center mb-2 font-medium text-gray-800">Add Products to checkout</p>
+      <button className="text-center mb-4 font-medium text-white bg-blue-500 px-3 py-2 rounded-sm w-max self-center"
+        onClick={()=>navigate('/home')}>Add Products</button>
+
 
       {/* Order Details */}
       {products.map((product,index)=>(

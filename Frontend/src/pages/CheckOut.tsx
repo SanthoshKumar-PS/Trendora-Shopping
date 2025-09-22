@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
-import { Badge, BadgeCheck, Bell, Check, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
+import { Bell, Check, ChevronDown, ChevronUp, CreditCard, Fingerprint, LaptopMinimal, Smile, Star, Truck } from "lucide-react"
 import { Input } from "../components/ui/input"
 import AddressForm from "../components/AddressForm"
 import Addresses from "./CheckOut/Addresses"
@@ -43,6 +43,7 @@ const CheckOut = () => {
     const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);    
     const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
     const [addresses,setAddresses] = useState<Address[]>([]);
+    const [addressLoading,setAddressLoading] = useState<boolean>(false);
     
 
     // 1: Login or Signup
@@ -235,6 +236,8 @@ const CheckOut = () => {
                     </div>
                 </div>
 
+
+
                 {/* Second pair of container - Delivery Address */}
                 <Addresses 
                     selectedAddressId={selectedAddressId} 
@@ -243,6 +246,8 @@ const CheckOut = () => {
                     setSelectedAddress={setSelectedAddress} 
                     addresses={addresses}
                     setAddresses={setAddresses}
+                    addressLoading={addressLoading}
+                    setAddressLoading={setAddressLoading}
                     showAddAddress={showAddressForm}
                     setShowAddAddress={setShowAddressForm}
                 />
@@ -257,6 +262,7 @@ const CheckOut = () => {
                         setSelectedAddress={setSelectedAddress}
                         initialData={selectedAddress||undefined}
                         mode={selectedAddress ? "update" : "create"}
+                        setAddressLoading={setAddressLoading}
                         />
                 )}
 
@@ -264,11 +270,12 @@ const CheckOut = () => {
                 {/* Third pair of container - Order Summary */}
                 {/* <OrderSummary products={checkoutProducts}/> */}
 
-      {checkoutProducts.length > 0 ? (
-        <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
-      ) : (
-        <p>No products in checkout</p>
-      )}
+                {/* {checkoutProducts.length > 0 ? (
+                    <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
+                ) : (
+                    <p>No products in checkout</p>
+                )} */}
+                <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
 
 
                 {/* Fourth pair of container - Payment Page */}

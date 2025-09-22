@@ -21,9 +21,10 @@ type AddressFormProps = {
     setAddresses: React.Dispatch<React.SetStateAction<Address[]>>;
     setSelectedAddress : React.Dispatch<React.SetStateAction<Address|null>>;
     initialData? : Address | AddressType;
-    mode: 'create' | 'update'
+    mode: 'create' | 'update';
+    setAddressLoading : React.Dispatch<React.SetStateAction<boolean>>
 }
-const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelectedAddress, initialData,mode='update'}:AddressFormProps) => {
+const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelectedAddress, initialData,mode='update',setAddressLoading}:AddressFormProps) => {
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
     const inputStyle = "w-full appearance-none outline-none border border-gray-300 rounded-xs px-2 py-1 focus:border-1 focus:border-gray-400 focus:shadow text-md bg-white";
     const normalizeAddress = (addr: Address | AddressType): AddressType => ({
@@ -55,22 +56,24 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
       const {name,value} = e.target;
       setFormData(prev=>({...prev,[name]:value}))
     }
+    
+    type AddAddressRespone ={
+      message:string;
+      address: Address | null;
+    }
 
 
-    const handleAddAddress = async (e:React.FormEvent) =>{
+    const handleAddAddress = async (e:React.FormEvent) => {
         e.preventDefault();
         try{
-            type AddAddressRespone ={
-              message:string;
-              address: Address | null
-            }
-            // const payload = {name:name,phone:phone,line1:line1,line2:line2,city:city,state:state,pincode:pincode,type:type};
+            setAddressLoading(true)
             const response = await axios.post<AddAddressRespone>(`${BACKEND_URL}/user/addAddress`,formData,{withCredentials:true})
 
             if (response.status === 201) {
                 console.log("Address added successfully:", response.data);
                 setSelectedAddress(response.data.address)
                 setShowAddressForm(false)
+                await getAllAddresses({setAddresses,setAddressLoading})
             } 
             else {
                 console.warn("Unexpected response status:", response.status, response.data);
@@ -80,6 +83,9 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
         catch(error){
             console.log("Error occured while add new address");
             console.log(error)
+        }
+        finally{
+          setAddressLoading(false); //already declared inside getAllAddresses
         }
 
     }
@@ -96,7 +102,7 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
                 console.log("Address updated successfully:", response.data);
                 setSelectedAddress(response.data.address)
                 setShowAddressForm(false)
-                await getAllAddresses({setAddresses})
+                await getAllAddresses({setAddresses,setAddressLoading})
             } 
             else {
                 console.warn("Unexpected response status:", response.status, response.data);
@@ -107,6 +113,9 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
             console.log("Error occured while updating new address");
             console.log(error)
         }
+        finally{
+          setAddressLoading(false); //already declared inside getAllAddresses
+        }
 
     }
 
@@ -115,7 +124,7 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
     <div className="mx-auto max-w-sm md:max-w-md lg:min-w-full rounded-sm bg-blue-100 p-3 lg:p-4 flex justify-start items-start gap-2">
       <ListPlus size={22} className="mt-0.5 text-blue-600" />
       <div className="w-full flex flex-col justify-start items-start gap-3">
-        <p className="text-blue-600 text-md font-medium">ADD A NEW ADDRESS</p>
+        <p className="text-blue-600 text-md font-medium">{mode==='create'?"ADD A NEW ADDRESS":"UPDATE ADDRESS"}</p>
         <button className="bg-blue-600 rounded-sm px-4 py-2 text-white font-medium flex items-center gap-2">
           <LocateFixed size={20} />
           <p>Enter your location</p>
@@ -223,7 +232,7 @@ const AddressForm = ({showAddressForm,setShowAddressForm, setAddresses, setSelec
 
           <div className="w-full flex justify-start items-center gap-3">
             <button type="submit" className="text-sm md:text-md text-white font-semibold bg-orange-500  px-6 md:px-8 py-3 rounded-xs hover:scale-95 hover:cursor-pointer">
-                SAVE AND DELIVER HERE
+                {mode==='create'?"SAVE AND DELIVER HERE":"UPDATE AND DELIVER HERE"}
             </button>
             <p className="tet-sm md:text-md text-blue-600 bg-transparent hover:cursor-pointer font-medium px-2 py-2"
                 onClick={()=>{setShowAddressForm(false)}}>CANCEL</p>
