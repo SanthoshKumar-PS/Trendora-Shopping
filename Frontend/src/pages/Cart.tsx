@@ -3,28 +3,33 @@ import Navbar from "../components/Navbar"
 import OfferBar from "../components/OfferBar"
 import { useCart } from "../context/CartContext"
 import RatingStars from "../components/RatingStars"
-import { Eye, Pencil } from "lucide-react"
+import { Eye,  SquareCheckBig } from "lucide-react"
 import { useEffect } from "react"
+import type { Product } from "../types/Types"
 
 const Cart = () => {
     const navigate=useNavigate()
-    const {cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching,setCheckoutProducts} = useCart();
+    const {cartId, cartProducts, removeFromCart, refetchCart,setCheckoutProducts} = useCart();
     // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
-useEffect(() => {
-  refetchCart();
-
-  const handleFocus = () => {
+  useEffect(() => {
     refetchCart();
-    console.log("Refetched on window focus");
-  };
 
-  window.addEventListener("focus", handleFocus);
+    const handleFocus = () => {
+      refetchCart();
+      console.log("Refetched on window focus");
+    };
 
-  return () => {
-    window.removeEventListener("focus", handleFocus);
-  };
-}, [refetchCart]);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [refetchCart]);
+
+
+
+
 
 
 return (
@@ -71,7 +76,12 @@ return (
                   <p className="absolute top-4 left-4 px-2 py-1 bg-red text-white font-light text-xs rounded-sm">-{product.discountPercentage}%</p>
                   <div className="absolute top-4 right-4 flex flex-col gap-2 ">
                       <div className="bg-white text-heading p-2 rounded-full hover:scale-115">
-                          <Pencil size={18}/>
+                          <SquareCheckBig size={18} 
+                            onClick={(e)=>{
+                              e.stopPropagation();
+                              removeFromCart({cartId: cartId??0,productId: product.id})
+                            }}/>
+
                           
                       </div>
                       <div className="bg-white text-heading p-2 rounded-full hover:scale-105">
@@ -89,7 +99,6 @@ return (
               onClick={()=>{
                 setCheckoutProducts(cartProducts)
                 navigate('/checkout',{state : {products: cartProducts}})
-                // navigate('/test',{state : {products: cartProducts}})
               }}>
               Checkout all Products
             </button>

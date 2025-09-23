@@ -100,14 +100,33 @@ export const CartProvider = ({children}:{children: React.ReactNode}) =>{
             queryClient.setQueryData(["cart",cartId],data)
         }
     });
-    
 
     const deleteMutation = useMutation({
-        mutationFn:deleteProductFromCart,
-        onSuccess:(data)=>{
-            queryClient.setQueryData(["cart",cartId],data);
+        mutationFn: deleteProductFromCart,
+        onMutate: (variables) => {
+            console.log("Mutation starts")
+            queryClient.cancelQueries({ queryKey: ["cart", variables.cartId] });
+
+            const previousCart = queryClient.getQueryData<Product[]>(["cart", variables.cartId]);
+            console.log("Previous cart ",previousCart)
+
+            queryClient.setQueryData<Product[]>(["cart", variables.cartId], old =>
+            old?.filter(product => product.id !== variables.productId) ?? []
+            );
+            console.log("After filter: ",queryClient.getQueryData<Product[]>(["cart",variables.cartId]))
+
+            return { previousCart };
+        },
+        onError: (_err, variables, context) => {
+            if (context?.previousCart) {
+            queryClient.setQueryData(["cart", variables.cartId], context.previousCart);
+            }
+        },
+        onSettled: (data, _error, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["cart", variables.cartId] });
         }
-    })
+    });
+
 
     const clearCartMutation = useMutation({
     mutationFn: clearCartAPI,

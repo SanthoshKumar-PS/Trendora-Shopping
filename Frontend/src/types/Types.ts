@@ -18,6 +18,13 @@ export type User = {
   updatedAt: Date;
 };
 
+export type CheckoutProduct = {
+  product: Product;
+  quantity : number;
+  totalActualPrice: number,
+  totalDiscountedPrice:number
+}
+
 export type Address = {
   id: number;
   user_id: number;

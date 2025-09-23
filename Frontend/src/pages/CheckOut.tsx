@@ -5,46 +5,52 @@ import { Input } from "../components/ui/input"
 import AddressForm from "../components/AddressForm"
 import Addresses from "./CheckOut/Addresses"
 import OrderSummary from "./CheckOut/OrderSummary"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import handleLoginOrSignup from "./CheckOut/ApiLoginSignup"
 import { useUser } from "../context/UserContext"
 import { useCart } from "../context/CartContext"
-import type { Address, ProductWithCart } from "../types/Types"
+import type { Address, CheckoutProduct, Product, ProductWithCart } from "../types/Types"
 import { handleLogout } from "../Api/Logout"
 
 
 const CheckOut = () => {
     const location = useLocation();
-    const navigate = useNavigate()
     const {user,setUser} = useUser()
     const {checkoutProducts, setCheckoutProducts} = useCart()
+    const [selectedProducts,setSelectedProducts] = useState<CheckoutProduct[]>([]);
     console.log("checkoutProducts: ",checkoutProducts)
 
-  useEffect(() => {
-    if (location.state?.products) {
-      // ✅ Products passed via navigation
-      setCheckoutProducts(location.state.products);
-      localStorage.setItem("checkoutProducts", JSON.stringify(location.state.products));
-    } else {
-      // ✅ Load from localStorage if directly refreshing/opening checkout page
-      console.log("This is from local Storage")
-      const stored = localStorage.getItem("checkoutProducts");
-      const parsed: ProductWithCart[] = stored && stored !== "undefined" ? JSON.parse(stored) : [];
-      setCheckoutProducts(parsed);
+    const updateSelectedProducts = (products:Product[]) =>{
+        const initialData:CheckoutProduct[] = products.map(p=>({
+            product: p,
+            quantity : 1,
+            totalActualPrice: p.actualPrice,
+            totalDiscountedPrice:p.discountedPrice
+        }));
+        setSelectedProducts(initialData)
+        console.log("Selected products : ",initialData)
     }
-  }, [location.state?.products]);
+
+    useEffect(() => {
+        if (location.state?.products) {
+        setCheckoutProducts(location.state.products);
+        localStorage.setItem("checkoutProducts", JSON.stringify(location.state.products));
+        updateSelectedProducts(location.state.products)
+        } else {
+        console.log("This is from local Storage")
+        const stored = localStorage.getItem("checkoutProducts");
+        const parsed: ProductWithCart[] = stored && stored !== "undefined" ? JSON.parse(stored) : [];
+        setCheckoutProducts(parsed);
+        updateSelectedProducts(parsed)
+        }
+    }, [location.state?.products]);
+
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
 
     const [checkOutActive,seCheckOutActive] = useState<number>(1); //1-Login 2-Address 3-Order Summary 4-payment
-    const [activeTab,setActiveTab] = useState<number>(0)
+    const [activeTab,setActiveTab] = useState<number>(0);
 
-    const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)
-    const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);    
-    const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
-    const [addresses,setAddresses] = useState<Address[]>([]);
-    const [addressLoading,setAddressLoading] = useState<boolean>(false);
-    
 
     // 1: Login or Signup
     const [email, setEmail] = useState<string|null>(null);
@@ -91,10 +97,17 @@ const CheckOut = () => {
 
     }
 
+    
+    // 2. Address Required fields
+    const [selectedAddressId, setSelectedAddressId] = useState<number|null>(null)
+    const [selectedAddress, setSelectedAddress] = useState<Address|null>(null);    
+    const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
+    const [addresses,setAddresses] = useState<Address[]>([]);
+    const [addressLoading,setAddressLoading] = useState<boolean>(false);
 
 
 
-    //Payment Details
+    //4. Payment Details
     const [cardNumber, setCardNumber] = useState("");
     const [cardExpiry, setCardExpiry] = useState("");
     const [cardCVV, setCardCVV] = useState("");
@@ -269,13 +282,11 @@ const CheckOut = () => {
 
                 {/* Third pair of container - Order Summary */}
                 {/* <OrderSummary products={checkoutProducts}/> */}
-
-                {/* {checkoutProducts.length > 0 ? (
-                    <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
-                ) : (
-                    <p>No products in checkout</p>
-                )} */}
-                <OrderSummary products={location.state?.products?location.state.products:checkoutProducts?checkoutProducts:[] } />
+                <OrderSummary selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
+                <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-sm text-white">
+                    <p className="font-medium">Total Payable Amount:</p> 
+                    <p className="font-bold">5000</p>
+                </div>
 
 
                 {/* Fourth pair of container - Payment Page */}
