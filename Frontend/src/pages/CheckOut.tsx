@@ -9,8 +9,10 @@ import { useLocation } from "react-router-dom"
 import handleLoginOrSignup from "./CheckOut/ApiLoginSignup"
 import { useUser } from "../context/UserContext"
 import { useCart } from "../context/CartContext"
-import type { Address, CheckoutProduct, Product, ProductWithCart } from "../types/Types"
+import type { Address, CheckoutProduct, PaymentMethod, Product, ProductWithCart } from "../types/Types"
 import { handleLogout } from "../Api/Logout"
+import { formatCurrency } from "../lib/formatCurrency"
+import axios from "axios"
 
 
 const CheckOut = () => {
@@ -105,9 +107,44 @@ const CheckOut = () => {
     const [addresses,setAddresses] = useState<Address[]>([]);
     const [addressLoading,setAddressLoading] = useState<boolean>(false);
 
+    //3. Order Summary
+    const calculateGrandTotals = (selectedProducts: CheckoutProduct[]) => {
+    return selectedProducts.reduce(
+        (totals, item) => {
+        totals.grandTotalActualPrice += item.product.actualPrice * item.quantity;
+        totals.grandTotalDiscountedPrice += item.product.discountedPrice * item.quantity;
+        return totals;
+        },
+        { grandTotalActualPrice: 0, grandTotalDiscountedPrice: 0 }
+    );
+    };
+    const { grandTotalActualPrice, grandTotalDiscountedPrice } = calculateGrandTotals(selectedProducts);
+
+    const handlePlaceOrder = async () => {
+        try{
+            const payload = {
+                deliveryAddressId:selectedAddressId, 
+                grandTotalDiscountedPrice:grandTotalDiscountedPrice, 
+                grandTotalActualPrice:grandTotalActualPrice, 
+                products:selectedProducts
+            };
+
+            const response = await axios.post(`${BACKEND_URL}/user/placeOrder`,payload,{withCredentials:true})
+            console.log(response.status===200?"Order placed successfully":"Error occured while placing order");
+            console.log("Response : ",response.data)
+
+        }
+        catch(error){
+            console.log("Error occured while placing order");
+            console.log(error)
+        }
+    }
+
+
 
 
     //4. Payment Details
+    const [selectedPaymentMethod,setSelectedPaymentMethod] = useState<PaymentMethod | null>("UPI"); //must set to null at beginning
     const [cardNumber, setCardNumber] = useState("");
     const [cardExpiry, setCardExpiry] = useState("");
     const [cardCVV, setCardCVV] = useState("");
@@ -132,10 +169,6 @@ const CheckOut = () => {
     };
 
 
-
-
-
-
   return (
     <div className="bg-zinc-100 min-h-screen">
         <Navbar/>
@@ -145,6 +178,7 @@ const CheckOut = () => {
             <div className="flex flex-col justify-start items-start w-full space-y-6 ">
 
                 {/* First pair of container - Login Or Signup */}
+                {/* To Be deleted */}
                 {false && <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white rounded-xs overflow-hidden">
                     {/* Blue Login Signup */}
                     <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600  text-white">
@@ -220,7 +254,8 @@ const CheckOut = () => {
                             </form>
 
                         </div>)}
-                        {/* Advantages ofour secure login - when login false */}
+
+                        {/* Advantages of our secure login - when login false */}
                         {(!user.loggedIn || changeLogin) && (<div className="my-3 flex flex-col gap-3 justify-center items-start ">
                             <p className="text-gray-500 font-medium">Advantages of our secure login</p>
                             <div className="flex items-center justify-start gap-2 text-blue-600">
@@ -236,17 +271,21 @@ const CheckOut = () => {
                                 <p className="text-sm text-black ">Wishlist, Reviews, Ratings and more.</p>
                             </div>
                         </div>)}
-                        {(user.loggedIn && !changeLogin) && (<div className="">
-                            <span className="font-bold text-gray-700 text-sm  ">Trendora customer - </span> 
-                            <span className="font-medium text-gray-800 text-sm ">{user.email}</span>                        
-                        </div>)}
-                        {(user.loggedIn || !changeLogin) && (
-                            <button className="px-3 py-1 text-sm font-medium text-blue-600 border border-gray-300 rounded-xs my-2 hover:cursor-pointer hover:scale-95" onClick={()=>setChangeLogin(prev=>!prev)}>
-                                {changeLogin?`Continue with ${user.email}`:"CHANGE"}
-                            </button>
-                        )}
-       
+                        
+                             
                     </div>
+                    {/* Trendora customer - Login done */}
+                    {(user.loggedIn && !changeLogin) && (<div className="self-center">
+                        <span className="font-bold text-gray-700 text-sm  ">Trendora customer - </span> 
+                        <span className="font-medium text-gray-800 text-sm ">{user.email}</span>                        
+                    </div>)}
+
+                    {/* Change */}
+                    {(user.loggedIn || !changeLogin) && (
+                        <button className="self-center w-max px-3 py-1 text-sm font-medium text-blue-600 border border-gray-300     rounded-xs my-2 hover:cursor-pointer hover:scale-95" onClick={()=>setChangeLogin(prev=>!prev)}>
+                            {changeLogin?`Continue with ${user.email}`:"CHANGE"}
+                        </button>
+                    )}  
                 </div>
 
 
@@ -265,7 +304,6 @@ const CheckOut = () => {
                     setShowAddAddress={setShowAddressForm}
                 />
 
-
                 {/* Add New Address */}
                 {showAddressForm && (
                     <AddressForm 
@@ -283,11 +321,7 @@ const CheckOut = () => {
                 {/* Third pair of container - Order Summary */}
                 {/* <OrderSummary products={checkoutProducts}/> */}
                 <OrderSummary selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
-                <div className="px-4 py-2 w-full flex justify-start items-center gap-2 bg-blue-600 rounded-sm text-white">
-                    <p className="font-medium">Total Payable Amount:</p> 
-                    <p className="font-bold">5000</p>
-                </div>
-
+  
 
                 {/* Fourth pair of container - Payment Page */}
                 <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
@@ -297,12 +331,51 @@ const CheckOut = () => {
                         <p className="font-medium text-white ">PAYMENT</p>
                     </div>
 
+                    {/* Order Amount details */}
+
+
+
                     {/* Payment Details */}
                     <div className="flex flex-col justify-center items-center p-3 md:p-5 gap-3 md:gap-5"> 
+                        {/* Order Table */}
+                        <table className="w-full bg-blue-100 rounded-lg p-4 max-w-sm self-center">
+                        <tbody className="divide-y-0">
+                            <tr className="flex justify-between py-2 p-4 font-medium">
+                            <td>Total Items</td>
+                            <td>{selectedProducts.length}</td>
+                            </tr>
+                            
+                            <tr className="flex justify-between py-2 p-4 font-medium">
+                            <td>Total Price</td>
+                            <td>{formatCurrency(grandTotalActualPrice)}</td>
+                            </tr>
+                            
+                            <tr className="flex justify-between py-2 p-4 font-medium">
+                            <td>Total Savings</td>
+                            <td>- {formatCurrency(grandTotalActualPrice-grandTotalDiscountedPrice)}</td>
+                            </tr>
+
+                            <tr className="flex justify-between py-2 p-4 border-b  border-dashed border-gray-500 font-medium">
+                            <td>Delivery Fee</td>
+                            <td className="flex justify-end items-end gap-2">
+                                <span className="line-through text-sm">{formatCurrency(40)}</span>
+                                <span>Free</span>
+                            </td>
+                            </tr>
+
+                            <tr className="flex justify-between py-2 p-4 text-blue-700 font-semibold">
+                            <td>Total Amount</td>
+                            <td className="flex gap-2 justify-start items-end">
+                                <span className="line-through text-sm">{formatCurrency(grandTotalActualPrice)}</span>
+                                <span>{formatCurrency(grandTotalDiscountedPrice)}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        </table>
                         {/* Total Amount */}
                         <div className="w-full flex justify-between items-center bg-blue-100 p-2 md:p-3 rounded-md">
-                            <p className="text-blue-600 text-md">Total Amount</p>
-                            <p className="text-blue-600 text-lg font-medium">$10,000</p>
+                            <p className="text-blue-600 text-md">Total Payable Amount</p>
+                            <p className="text-blue-600 text-lg font-medium">{formatCurrency(grandTotalDiscountedPrice)}</p>
                         </div>
 
                         {/* Cashback */}
@@ -311,6 +384,13 @@ const CheckOut = () => {
                             <p className="text-green-600 text-sm">Claim now with payment offers</p>
                         </div>
 
+                        {/* Selected Payment Methods */}
+                        <div className="w-full flex flex-col justify-start items-start gap-1 bg-blue-200 p-2 md:p-3 rounded-md">
+                            <p className="text-purple-600 font-medium">Payment is not set up yet</p>
+                            <p className="text-purple-600 text-sm">You can go ahead and place your order</p>
+                        </div>
+
+                        {/* Border Bottom */}
                         <div className="w-full border-b-1 text-zinc-500"></div>
 
                         {/* Payment Options */}
@@ -340,8 +420,12 @@ const CheckOut = () => {
                                             Verify
                                         </button>
                                     </div>
-                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
-                                        Pay $10000
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer"
+                                        onClick={()=>{
+                                            setSelectedPaymentMethod("UPI");
+                                            setActiveTab(0);
+                                        }}>
+                                        Pay {formatCurrency(grandTotalDiscountedPrice)}
                                     </button>
 
                                 </div>
@@ -402,8 +486,12 @@ const CheckOut = () => {
                                         </div>
                                       
                                     </div>
-                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
-                                        Pay $10000
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer"
+                                        onClick={()=>{
+                                            setSelectedPaymentMethod("Card");
+                                            setActiveTab(0);
+                                        }}>
+                                        Pay {formatCurrency(grandTotalDiscountedPrice)}
                                     </button>
 
                                 </div>
@@ -434,8 +522,12 @@ const CheckOut = () => {
                                 <div className="border-1 border-zinc-300 bg-zinc-100 flex flex-col gap-10 justify-center items-start w-full m-4 px-4 py-4 rounded-sm ">
                                     <p className="text-sm text-zinc-500 font-medium">42,225 people used online payment options in the last hour. Pay online now for safe and contactless delivery.</p>
 
-                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer">
-                                        Place Order
+                                    <button className="w-full text-sm md:text-md text-white font-semibold bg-blue-600     flex-1 flex items-center justify-center gap-2 px-6 py-2 rounded-md  hover:cursor-pointer"
+                                        onClick={()=>{
+                                            setSelectedPaymentMethod("COD");
+                                            setActiveTab(0)
+                                        }}>
+                                        Pay on Delivery
                                     </button>
 
                                 </div>
@@ -456,16 +548,17 @@ const CheckOut = () => {
 
                 </div>
 
+                {/* To be deleted */}
+                <div onClick={()=>{
+                    console.log("Selected Products: ",selectedProducts)
+                    console.log("Selected Address Id: ",selectedAddressId)
+                    console.log("Selected payment method: ",selectedPaymentMethod)
+                    console.log("Grand Total without discount: ",grandTotalActualPrice)
+                    console.log("Grand Total with discount: ",grandTotalDiscountedPrice)
+                    handlePlaceOrder()
 
-
-
-
-                {/* To Be Deleted */}
-                <div className="h-10 bg-red-200 w-full">
-
-                </div>
-                
-
+                }} 
+                className="bg-blue-500 px-4 py-3 text-white font-medium rounded-sm self-center">Print Place order Details </div>
 
 
             </div>

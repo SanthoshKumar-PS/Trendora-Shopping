@@ -69,7 +69,7 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
     const sidebarOptions= seller? sellerSidebarOptions: userSidebarOptions
     const [sidebarOpen,setSidebarOpen]=useState<boolean>(false)
   return (
-    <div className="flex w-full max-w-6xl bg-grey-400 mx-auto my-2 items-center justify-between ">
+    <div className="flex w-full max-w-6xl bg-grey-400 mx-auto py-2 items-center justify-between ">
         <h1 className=" font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">Trendora</h1>
         {/* Navbar Options */}
         <div className="hidden text-md font-medium text-heading md:flex items-center justify-center gap-6">
@@ -84,8 +84,9 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
         </div>
 
         <div className="flex items-center justify-center gap-3 p-2">
-            <div className='relative'>
-                <input type="text" placeholder="Search Products... " className="outline-none rounded-md shadow-md bg-bg-grey px-4 py-2 min-w-[200px] lg:min-w-[300px]" />
+            <div className='hidden md:block relative'>
+                <input type="text" placeholder="Search Products... "
+                className="px-4 py-2 min-w-[200px] lg:min-w-[300px] outline-none rounded-md shadow-md bg-bg-grey border border-gray-300 focus:border-gray-600 focus:ring-1 focus:ring-gray-500 transition duration-200" />
                 <Search size={24} className='absolute right-2 top-2 text-heading'/>
             </div>
             <ShoppingCart size={24} onClick={()=>navigate('/cart')} className='text-heading hover:scale-105'/>

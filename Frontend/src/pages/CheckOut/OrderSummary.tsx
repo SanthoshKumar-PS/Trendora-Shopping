@@ -11,6 +11,7 @@ type OrderSummaryProps = {
 
 
 const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) => {
+
   const increaseQuantity = (productId:number,quantity:number) =>{
     setSelectedProducts(prev=>
         prev.map(p=> productId===p.product.id?{
@@ -37,7 +38,7 @@ const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) 
         prev.filter(p=>p.product.id!==productId)
     )
   }
-  console.log(selectedProducts) 
+  console.log("Selected Products at Order Summary: ",selectedProducts) 
   const navigate = useNavigate()
   return (
     <div className="mx-auto max-w-sm md:max-w-md lg:max-w-full flex flex-col w-full bg-white">
@@ -104,7 +105,8 @@ const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) 
           <span className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-700">
             <span>Offer valid till today</span> <CircleAlert size="16" />
           </span>
-          <button className="text-sm  md:text-md font-medium hover:cursor-pointer">
+          <button className="text-sm  md:text-md font-medium hover:cursor-pointer"
+          onClick={()=>removeProduct(selectedProduct.product.id)}>
             REMOVE
           </button>
         </div>

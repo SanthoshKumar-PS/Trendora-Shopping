@@ -1,5 +1,5 @@
 import Navbar from '../components/Navbar'
-import Endbar from '../components/Endbar'
+import Footer from '../components/Footer'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
@@ -150,7 +150,7 @@ const Login = () => {
       </div>
     </div>
 
-    <Endbar/>
+    <Footer/>
 
 
   </div>

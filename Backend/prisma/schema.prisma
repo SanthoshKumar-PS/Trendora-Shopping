@@ -14,6 +14,17 @@ enum UserRole{
   SELLER
 }
 
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+
+
 model User {
   id Int @id @default(autoincrement())
   email String @unique
@@ -44,9 +55,42 @@ model Address{
   pincode String 
   type String? //Work or Home 
   user User @relation(fields: [user_id],references: [id])
+  orders Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Order {
+  id Int @id @default(autoincrement())
+  orderNo String @unique
+  orderDate DateTime @default(now())
+  userId Int 
+  status OrderStatus @default(CONFIRMED)
+  totalAmount Int
+  paymentMethod String @default("COD")
+  paymentStatus String @default("PENDING")
+  deliveryAddressId Int
+  deliveryCharges Float @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId],references: [id])
+  address Address @relation(fields: [deliveryAddressId],references: [id])
+  orderDetails OrderDetails[]
+}
+
+model OrderDetails {
+  id Int @id @default(autoincrement())
+  orderId Int
+  productId Int
+  actualPrice Float
+  discountedPrice Float
+  quantity Int
+  totalPrice Float //discountedPrice*quantity
+
+  order Order @relation(fields: [orderId],references: [id])
+  product Product @relation(fields: [productId],references: [id])
+}
+
 
 model Product{
   id Int @id @default(autoincrement())
@@ -67,10 +111,10 @@ model Product{
   rating Rating[]
   stockId Int 
   stock Stock @relation(fields: [stockId],references: [id])
-  orderItems OrderItem[]
   @@unique([name, stockId])  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orderDetails OrderDetails[]
 }
 
 model Category{
@@ -118,27 +162,8 @@ model Stock{
   id Int @id @default(autoincrement())
   sellerId Int @unique
   seller User @relation(fields: [sellerId],references: [id]) 
-  product Product[]
+  products Product[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Order{
-  orderId String @id @default(cuid()) 
-  userId Int
-  totalPrice Float
-  user User @relation(fields: [userId],references: [id])
-  items OrderItem[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model OrderItem{
-  orderId String 
-  productId Int
-  quantity Int
-  priceAtPurchase Float
-  product Product @relation(fields: [productId],references: [id])
-  order Order @relation(fields: [orderId], references: [orderId])
-  @@id([orderId, productId]) 
-}

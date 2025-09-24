@@ -1,5 +1,5 @@
 import Navbar from '../components/Navbar'
-import Endbar from '../components/Endbar'
+import Endbar from '../components/Footer'
 import { useNavigate } from 'react-router-dom'
 import axios, {AxiosError } from "axios"
 import { useState } from 'react'

@@ -51,6 +51,11 @@ const SellerProducts = () => {
     <div>
         <Navbar seller={true}/>
         <div className="w-full border-b border-zinc-300"></div>
+        {/* Testing as an advertisement */}
+        <div className="w-full bg-zinc-200 text-zinc-800 font-medium flex justify-center items-center gap-4 py-3">
+          <p>Do you have new products to list? </p>
+          <button className="text-blue-600 hover:scale-105 transition duration-200 hover:border hover:border-blue-500 hover:rounded-xs hover:px-2 hover:py-1 hover:cursor-pointer" onClick={()=>navigate("/addproduct")}>Add Product</button>
+        </div>
 
         <div className="max-w-7xl mx-auto mt-6">
           {/* Heading */}

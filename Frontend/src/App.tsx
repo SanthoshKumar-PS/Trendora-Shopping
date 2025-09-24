@@ -2,7 +2,7 @@ import AddProduct from "./pages/seller/AddProduct"
 import  Home  from "./pages/Home"
 import Login from "./pages/Login"
 import Dashboard from "./pages/seller/Dashboard"
-import Orders from "./pages/seller/Orders"
+import Orders from "./pages/Orders"
 import SignUp from "./pages/SignUp"
 import { BrowserRouter,Routes, Route } from "react-router-dom"
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query'
@@ -31,10 +31,10 @@ function App() {
             <Route path="/products" element={<Products/>}/>
             <Route path="/checkout" element={<CheckOut/>}/>
             <Route path="/cart" element={<Cart/>}/>
+            <Route path="/orders" element={<Orders/>}/>
 
             {/* Seller */}
             <Route path="/dashboard" element={<Dashboard/>}/>
-            <Route path="/orders" element={<Orders/>}/>
             <Route path="/sellerproducts" element={<SellerProducts/>}/>
             <Route path="/addproduct" element={<AddProduct/>}/>
             <Route path="/product/:id" element={<ProductPage/>}/>            

@@ -2,6 +2,7 @@ import express from 'express'
 import { login, logout, register,registerOrLogin, addAddress, updateAddress, getAllAddresses, getHomeProducts} from '../controllers/userController'
 import { authenticateUser } from '../middleware/authenticateUser'
 import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
+import { placeOrder } from '../controllers/orderController'
 
 export const userRouter=express.Router()
 
@@ -13,6 +14,8 @@ userRouter.post("/addAddress",authenticateUser,addAddress)
 userRouter.patch("/updateAddress",authenticateUser,updateAddress)
 userRouter.get("/getAllAddresses",authenticateUser,getAllAddresses)
 userRouter.get("/getHomeProducts",authenticateUser,getHomeProducts)
+
+userRouter.post("/placeOrder",authenticateUser,placeOrder)
 
 userRouter.get("/getCartProducts",authenticateUser,getUserCartProducts)
 userRouter.post("/addProductToCart",authenticateUser,addProductToCart)

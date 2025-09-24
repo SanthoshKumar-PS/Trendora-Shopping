@@ -1,6 +1,6 @@
 import { Copyright } from "lucide-react"
 
-const Endbar = () => {
+const Footer = () => {
     const exclusive=[
         {id:1, heading:'Subscribe',visitPage:''},
         {id:2, heading:'10% Off your first order',visitPage:''},
@@ -65,7 +65,7 @@ const Endbar = () => {
                 </div>
             </div>
         </div>
-        <div className="flex justify-center items-center gap-2 mb-6 text-zinc-400">
+        <div className="flex justify-center items-center gap-2 pb-4 text-zinc-400">
             <Copyright size={20}/> Copyright 2024. All right reserved
         </div>
     </div>
@@ -73,4 +73,4 @@ const Endbar = () => {
   )
 }
 
-export default Endbar
+export default Footer
