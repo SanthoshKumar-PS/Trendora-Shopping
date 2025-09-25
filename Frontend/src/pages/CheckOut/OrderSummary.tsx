@@ -59,9 +59,9 @@ const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) 
 
       {/* Order Details */}
       {selectedProducts.map((selectedProduct,index)=>(
-      <div>
+      <div key={index}>
       {/* Main Card Content */}
-      <div key={index} className="flex justify-center items-center p-3 md:p-5 gap-5 md:gap-5 lg:gap-10">
+      <div className="flex justify-center items-center p-3 md:p-5 gap-5 md:gap-5 lg:gap-10">
         {/* Image and Count */}
         <div className="flex flex-col gap-2 justify-center items-center h-50">
           <img

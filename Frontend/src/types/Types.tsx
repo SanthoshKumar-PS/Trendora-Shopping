@@ -1,3 +1,6 @@
+import { Clock, CheckCircle, Loader2, Truck, PackageCheck, XCircle } from "lucide-react";
+import type React from "react";
+
 export type UserRole = "ADMIN" | "USER" | "SELLER";
 export type OrderStatus = 
   | "PENDING"
@@ -5,16 +8,57 @@ export type OrderStatus =
   | "PROCESSING"
   | "SHIPPED"
   | "DELIVERED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "ERROR";
 
-export const statusMap : Record<OrderStatus,{message:string,color:string}> = {
-  PENDING: { message: "Order is pending", color: "red" },
-  CONFIRMED: { message: "Order has been confirmed", color: "blue" },
-  PROCESSING: { message: "Order is being processed", color: "orange" },
-  SHIPPED: { message: "Order has been shipped", color: "purple" },
-  DELIVERED: { message: "Order delivered successfully", color: "green" },
-  CANCELLED: { message: "Order has been cancelled", color: "gray" },
-}
+export const statusMap: Record<
+  OrderStatus,
+  { heading: string; message: string; style: string; icon: React.ReactNode }
+> = {
+  PENDING: {
+    heading: "Order Pending",
+    message: "Order is pending",
+    style: "bg-red-500 hover:bg-red-600 text-white border border-red-500",
+    icon: <Clock className="w-4 h-4" />,
+  },
+  CONFIRMED: {
+    heading: "Order Confirmed",
+    message: "Order has been confirmed",
+    style: "bg-blue-500 hover:bg-blue-600 text-white border border-blue-500",
+    icon: <CheckCircle className="w-4 h-4" />,
+  },
+  PROCESSING: {
+    heading: "Order Processing",
+    message: "Order is being processed",
+    style: "bg-orange-500 hover:bg-orange-600 text-white border border-orange-500",
+    icon: <Loader2 className="w-4 h-4 animate-spin" />,
+  },
+  SHIPPED: {
+    heading: "Order Shipped",
+    message: "Order has been shipped",
+    style: "bg-purple-500 hover:bg-purple-600 text-white border border-purple-500",
+    icon: <Truck className="w-4 h-4" />,
+  },
+  DELIVERED: {
+    heading: "Order Delivered",
+    message: "Order delivered successfully",
+    style: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
+    icon: <PackageCheck className="w-4 h-4" />,
+  },
+  CANCELLED: {
+    heading: "Order Cancelled",
+    message: "Order has been cancelled",
+    style: "bg-gray-500 hover:bg-gray-600 text-white border border-gray-500",
+    icon: <XCircle className="w-4 h-4" />,
+  },
+  ERROR: {
+    heading: "Error Occurred",
+    message: "Error occurred while placing order",
+    style: "bg-red-500 hover:bg-red-600 text-white border border-red-500",
+    icon: <XCircle className="w-4 h-4" />,
+  },
+};
+
 
 export type PaymentMethod = 
   | "UPI"
@@ -181,5 +225,3 @@ export type Stock = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-

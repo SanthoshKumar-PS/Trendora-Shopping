@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,7 +7,149 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole{
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?
+  image     String?
+  role      UserRole  @default(USER)
+  password  String
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  address   Address[]
+  cart      Cart?
+  orders    Order[]
+  rating    Rating[]
+  stock     Stock?
+  wishlist  Wishlist?
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  phone     String?
+  type      String?
+  user      User     @relation(fields: [user_id], references: [id])
+  orders    Order[]
+}
+
+model Order {
+  id                Int            @id @default(autoincrement())
+  orderNo           String         @unique
+  orderDate         DateTime       @default(now())
+  userId            Int
+  status            OrderStatus    @default(CONFIRMED)
+  totalAmount       Int
+  paymentMethod     String         @default("COD")
+  paymentStatus     String         @default("PENDING")
+  deliveryAddressId Int
+  deliveryCharges   Float          @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  totalActualAmount Decimal?       @db.Decimal
+  address           Address        @relation(fields: [deliveryAddressId], references: [id])
+  user              User           @relation(fields: [userId], references: [id])
+  orderDetails      OrderDetails[]
+}
+
+model OrderDetails {
+  id              Int     @id @default(autoincrement())
+  orderId         Int
+  productId       Int
+  actualPrice     Float
+  discountedPrice Float
+  quantity        Int
+  totalPrice      Float
+  order           Order   @relation(fields: [orderId], references: [id])
+  product         Product @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id                 Int            @id @default(autoincrement())
+  name               String
+  description        String?
+  discountedPrice    Float
+  actualPrice        Float
+  categoryId         Int
+  images             String[]
+  stockId            Int
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  avgRating          Float          @default(0.0)
+  features           Json?
+  numRating          Int            @default(0)
+  discountPercentage Float?         @default(0)
+  orderDetails       OrderDetails[]
+  category           Category       @relation(fields: [categoryId], references: [id])
+  stock              Stock          @relation(fields: [stockId], references: [id])
+  rating             Rating[]
+  carts              Cart[]         @relation("CartProducts")
+  wishlist           Wishlist[]     @relation("WishedProducts")
+
+  @@unique([name, stockId])
+}
+
+model Category {
+  id       Int        @id @default(autoincrement())
+  name     String
+  slug     String     @unique
+  parentId Int?
+  parent   Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryToSubcategory")
+  products Product[]
+}
+
+model Cart {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  products  Product[] @relation("CartProducts")
+}
+
+model Wishlist {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  products  Product[] @relation("WishedProducts")
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  notes     String?
+  productId Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Stock {
+  id        Int       @id @default(autoincrement())
+  sellerId  Int       @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+  seller    User      @relation(fields: [sellerId], references: [id])
+}
+
+enum UserRole {
   ADMIN
   USER
   SELLER
@@ -22,148 +163,3 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
-
-
-
-model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String?
-  image String?
-  role UserRole @default(USER)
-  password String
-  phone String?
-  address Address[]
-  cart Cart?
-  wishlist Wishlist?
-  rating Rating[]
-  stock Stock? 
-  orders Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Address{
-  id Int @id @default(autoincrement())
-  user_id Int
-  name String
-  phone String?
-  line1 String
-  line2 String?
-  city String
-  state String
-  pincode String 
-  type String? //Work or Home 
-  user User @relation(fields: [user_id],references: [id])
-  orders Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Order {
-  id Int @id @default(autoincrement())
-  orderNo String @unique
-  orderDate DateTime @default(now())
-  userId Int 
-  status OrderStatus @default(CONFIRMED)
-  totalAmount Int
-  paymentMethod String @default("COD")
-  paymentStatus String @default("PENDING")
-  deliveryAddressId Int
-  deliveryCharges Float @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId],references: [id])
-  address Address @relation(fields: [deliveryAddressId],references: [id])
-  orderDetails OrderDetails[]
-}
-
-model OrderDetails {
-  id Int @id @default(autoincrement())
-  orderId Int
-  productId Int
-  actualPrice Float
-  discountedPrice Float
-  quantity Int
-  totalPrice Float //discountedPrice*quantity
-
-  order Order @relation(fields: [orderId],references: [id])
-  product Product @relation(fields: [productId],references: [id])
-}
-
-
-model Product{
-  id Int @id @default(autoincrement())
-  name String
-  description String?
-  features Json?
-  discountPercentage Float? @default(0.0)
-  discountedPrice Float
-  actualPrice Float
-  categoryId Int
-  images String[]
-  category Category @relation(fields: [categoryId],references: [id])
-  carts Cart[] @relation("CartProducts")
-  wishlist Wishlist[] @relation("WishedProducts")
-  avgRating Float @default(0.0)
-  numRating Int @default(0) 
-
-  rating Rating[]
-  stockId Int 
-  stock Stock @relation(fields: [stockId],references: [id])
-  @@unique([name, stockId])  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orderDetails OrderDetails[]
-}
-
-model Category{
-  id Int @id @default(autoincrement())
-  name String
-  slug String @unique
-  parentId Int?
-  parent Category? @relation("CategoryToSubcategory",fields: [parentId],references: [id])
-  children Category[] @relation("CategoryToSubcategory")
-  products Product[]
-}
-
-model Cart{
-  id Int @id @default(autoincrement())
-  userId Int @unique
-  products Product[] @relation("CartProducts")
-  user User @relation(fields: [userId],references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Wishlist{
-  id Int @id @default(autoincrement())
-  userId Int @unique
-  products Product[] @relation("WishedProducts")
-  user User @relation(fields: [userId],references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Rating{
-  id Int @id @default(autoincrement())
-  rating Int
-  notes String?
-  productId Int
-  product Product @relation(fields: [productId],references: [id])
-  userId Int
-  user User @relation(fields: [userId],references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@unique([userId, productId])
-}
-
-model Stock{
-  id Int @id @default(autoincrement())
-  sellerId Int @unique
-  seller User @relation(fields: [sellerId],references: [id]) 
-  products Product[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-

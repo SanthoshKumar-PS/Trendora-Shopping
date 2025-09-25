@@ -5,22 +5,28 @@ import { Input } from "../components/ui/input"
 import AddressForm from "../components/AddressForm"
 import Addresses from "./CheckOut/Addresses"
 import OrderSummary from "./CheckOut/OrderSummary"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import handleLoginOrSignup from "./CheckOut/ApiLoginSignup"
 import { useUser } from "../context/UserContext"
 import { useCart } from "../context/CartContext"
-import type { Address, CheckoutProduct, PaymentMethod, Product, ProductWithCart } from "../types/Types"
+import type { Address, CheckoutProduct, OrderStatus, PaymentMethod, Product, ProductWithCart } from "../types/Types"
 import { handleLogout } from "../Api/Logout"
 import { formatCurrency } from "../lib/formatCurrency"
-import axios from "axios"
+import axios, { isAxiosError } from "axios";
+import OrderStatusDialog from "../components/OrderStatusDialog"
 
 
 const CheckOut = () => {
     const location = useLocation();
+    const navigate = useNavigate()
     const {user,setUser} = useUser()
     const {checkoutProducts, setCheckoutProducts} = useCart()
     const [selectedProducts,setSelectedProducts] = useState<CheckoutProduct[]>([]);
     console.log("checkoutProducts: ",checkoutProducts)
+
+    const [dialogopen,setDialogOpen] = useState<boolean>(false);
+    const [orderStatus,setOrderStatus] = useState<OrderStatus>("CONFIRMED");
+    const [apiMessage,setApiMessage] = useState<string | undefined>(undefined);
 
     const updateSelectedProducts = (products:Product[]) =>{
         const initialData:CheckoutProduct[] = products.map(p=>({
@@ -128,15 +134,33 @@ const CheckOut = () => {
                 grandTotalActualPrice:grandTotalActualPrice, 
                 products:selectedProducts
             };
+            type PlaceOrderProps = {
+                message:string
+            }
 
-            const response = await axios.post(`${BACKEND_URL}/user/placeOrder`,payload,{withCredentials:true})
-            console.log(response.status===200?"Order placed successfully":"Error occured while placing order");
-            console.log("Response : ",response.data)
-
+            const response = await axios.post<PlaceOrderProps>(`${BACKEND_URL}/user/placeOrder`,payload,{withCredentials:true})
+            if(response.status===200){
+                console.log("Order placed successfully")
+                console.log("Response : ",response.data)
+                setOrderStatus("CONFIRMED")
+                setDialogOpen(true)
+                console.log("Api Message: ",response.data.message)
+                setApiMessage(response.data.message)
+            }
+            else{
+                console.log("Error occured while placing order");
+            }
         }
-        catch(error){
+        catch(error:any){
             console.log("Error occured while placing order");
             console.log(error)
+            setOrderStatus("ERROR")
+            setDialogOpen(true)
+            if (axios.isAxiosError(error) && error.response) {
+                setApiMessage(error.response.data.message || "Something went wrong");
+            } else {
+                setApiMessage("Internal Error. Please try again.");
+            }
         }
     }
 
@@ -563,6 +587,19 @@ const CheckOut = () => {
 
             </div>
         </div>
+
+        {/* Order Status Dialog Box */}
+        <OrderStatusDialog
+            open={dialogopen}
+            onClose={()=>{
+                setDialogOpen(false);
+                setApiMessage(undefined);
+                if(orderStatus==="CONFIRMED") navigate(`/order/${5}`)
+
+            }}
+            status={orderStatus}
+            message={apiMessage}
+        />
 
     </div>
   )
