@@ -2,7 +2,7 @@ import express from 'express'
 import { login, logout, register,registerOrLogin, addAddress, updateAddress, getAllAddresses, getHomeProducts} from '../controllers/userController'
 import { authenticateUser } from '../middleware/authenticateUser'
 import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
-import { getAllOrders, placeOrder } from '../controllers/orderController'
+import { getAllOrders, placeOrder, getOrderDetails, getPdfOrder } from '../controllers/orderController'
 
 export const userRouter=express.Router()
 
@@ -17,6 +17,8 @@ userRouter.get("/getHomeProducts",authenticateUser,getHomeProducts)
 
 userRouter.post("/placeOrder",authenticateUser,placeOrder)
 userRouter.get("/getAllOrders",authenticateUser,getAllOrders)
+userRouter.get("/order/:id",authenticateUser,getOrderDetails)
+userRouter.get("/getPdfOrder/:id",authenticateUser,getPdfOrder)
 
 userRouter.get("/getCartProducts",authenticateUser,getUserCartProducts)
 userRouter.post("/addProductToCart",authenticateUser,addProductToCart)

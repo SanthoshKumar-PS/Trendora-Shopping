@@ -104,6 +104,7 @@ export type Order = {
   userId: number;
   status: OrderStatus;
   totalAmount: number;
+  totalActualAmount: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   deliveryAddressId: number;

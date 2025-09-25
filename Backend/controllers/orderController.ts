@@ -100,3 +100,67 @@ export const getAllOrders = async (req:any,res:any) => {
     }
 }
 
+export const getOrderDetails = async (req:any, res:any) => {
+    try{
+        const userId = req.id;
+        const orderId = req.params.id;
+        if(!userId || !orderId){
+            return res.status(400).json({message:"Missing orderId or userId",order:null});
+        }
+        const orderDetail = await prisma.order.findUnique({
+            where:{
+                userId:userId,
+                orderNo:orderId
+            },
+            include:{
+                user:true,
+                orderDetails:{
+                    include:{
+                        product:true
+                    }
+                },
+                address:true
+            }
+        })
+
+        return res.status(200).json({message:`${orderId} Details Fetched Successfully.`,order:orderDetail})
+
+    }
+    catch(error){
+        console.log("Internal Server Error");
+        return res.status(500).json({message:"Internal Server Error",order:null})
+    }
+}
+
+export const getPdfOrder = async (req:any, res:any) => {
+    try{
+        const userId = req.id;
+        const orderId = req.params.id;
+        if(!userId || !orderId){
+            return res.status(400).json({message:"Missing orderId or userId",order:null});
+        }
+        const orderDetail = await prisma.order.findUnique({
+            where:{
+                userId:userId,
+                orderNo:orderId
+            },
+            include:{
+                user:true,
+                orderDetails:{
+                    include:{
+                        product:true
+                    }
+                },
+                address:true
+            }
+        })
+
+        return res.status(200).json({message:`${orderId} Details Fetched Successfully.`,order:orderDetail})
+
+    }
+    catch(error){
+        console.log("Internal Server Error");
+        return res.status(500).json({message:"Internal Server Error",order:null})
+    }
+}
+

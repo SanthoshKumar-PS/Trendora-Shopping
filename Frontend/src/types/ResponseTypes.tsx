@@ -1,3 +1,5 @@
+import type { Order } from "./Types";
+
 export type UserOrderResponse = {
   id: number;
   orderNo: string;
@@ -16,3 +18,8 @@ export type UserOrderResponse = {
     orderDetails: number;
   };
 };
+
+export type GetOrderDetailsType = {
+  message : string;
+  order : Order
+}
