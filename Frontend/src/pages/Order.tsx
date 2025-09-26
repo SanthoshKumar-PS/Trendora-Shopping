@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { useUser } from "../context/UserContext";
 import { Button } from "../components/ui/button";
 import { formatCurrency } from "../lib/formatCurrency";
-import { FileDown, Home, MessageSquare, MessagesSquare, User } from "lucide-react";
+import { FileDown, Home, MessagesSquare, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../components/LoadingScreen";
 import Footer from "../components/Footer";
@@ -13,6 +13,12 @@ import type { GetOrderDetailsType } from "../types/ResponseTypes";
 import { formatOrderDate } from "../lib/dateFormatter";
 import { formatStatus } from "../lib/formatStatus";
 import { formatAddress } from "../lib/formatAddress";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PdfDocument from "./pdf/PdfDocument";
+import { Buffer } from "buffer";
+window.Buffer = Buffer;
+
+
 
 const Order = () => {
     const {id} = useParams<{id:string}>();
@@ -141,11 +147,23 @@ const Order = () => {
                         </div>
 
                         {/* Download Invoice */}
-                        <div className="self-center flex items-center justify-center gap-2 py-5 px-4 bg-white rounded-md border border-gray-300 hover:bg-blue-200 hover:cursor-pointer"
-                            onClick={()=>{navigate(`/pdf/${id}`)}}>
-                            <FileDown size={20}/>
-                            <p className="font-medium">Download Invoice</p>
-                        </div>
+                        <button className="self-center flex items-center justify-center gap-2 py-5 px-4 bg-white rounded-md border border-gray-300 hover:bg-blue-200 hover:cursor-pointer">
+                        <PDFDownloadLink
+                            document={<PdfDocument order={order!} />}
+                            fileName={`Invoice-${order?.orderNo}.pdf`}
+                        >
+                            {({ loading }) => (
+                            <div className="flex items-center gap-2">
+                                <FileDown size={20} />
+                                <p className="font-medium">
+                                {loading ? "Preparing Invoice..." : "Download Invoice"}
+                                </p>
+                            </div>
+                            )}
+                        </PDFDownloadLink>
+                        </button>
+
+
 
                     </div>
                 </div>

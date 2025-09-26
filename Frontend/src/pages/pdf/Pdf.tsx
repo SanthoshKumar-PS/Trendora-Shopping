@@ -6,6 +6,7 @@ import type { GetOrderDetailsType } from "../../types/ResponseTypes";
 import { formatPdfDate } from "../../lib/dateFormatter";
 import { formatCurrency } from "../../lib/formatCurrency";
 import { convertNumberToWordsIndian } from "../../lib/convertNumberToWord";
+import LoadingScreen from "../../components/LoadingScreen";
 
 
 const Pdf = () => {
@@ -35,7 +36,11 @@ const Pdf = () => {
 
     useEffect(()=>{
         getPdfDetails();
-    },[])
+    },[]);
+
+    if(isLoading){
+        return <LoadingScreen/>
+    }
   return (
     <div className='flex flex-col p-4 gap-4'>
         {/* Headers */}
@@ -160,9 +165,6 @@ const Pdf = () => {
                     <td className="border border-gray-400 px-2 py-2 text-right" colSpan={6}>
                     Total Amount in Words : <span className="text-blue-600">{convertNumberToWordsIndian(order?.totalAmount??0)}</span>
                     </td>
-                    {/* <td className="border border-gray-400 px-2 py-2 text-center text-blue-600" colSpan={3}>
-                    One Lakh Thirty Six Thousands Only
-                    </td> */}
                 </tr>
                 </tfoot>
                 
