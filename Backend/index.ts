@@ -7,6 +7,7 @@ import uploadRouter from "./routes/seller/uploadRouter";
 import { dataRouter } from "./routes/dataRouter";
 import { sellerProductRouter } from "./routes/seller/sellerProductRouter";
 import { productRouter } from "./routes/productRouter";
+import { dashboardRouter } from "./routes/seller/dashboardRouter";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,7 @@ app.use("/user",userRouter)
 
 app.use("/seller",uploadRouter)
 app.use("/seller",sellerProductRouter)
+app.use("/seller",dashboardRouter)
 
 
 app.get('/', async (__dirname,res)=>{

@@ -3,6 +3,7 @@ import { useCart } from "../../context/CartContext";
 import { formatCurrency } from "../../lib/formatCurrency";
 import type { CheckoutProduct, ProductWithCart } from "../../types/Types";
 import { useNavigate } from "react-router-dom";
+import {AnimatePresence, motion} from "framer-motion"
 
 type OrderSummaryProps = {
   selectedProducts: CheckoutProduct[],
@@ -58,8 +59,14 @@ const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) 
 
 
       {/* Order Details */}
+      <AnimatePresence>
       {selectedProducts.map((selectedProduct,index)=>(
-      <div key={index}>
+      <motion.div key={selectedProduct.product.id} 
+      initial={{scale:0, opacity: 0, x: -100 }}
+      animate={{scale:1, opacity: 1, x: 0 }}
+      exit={{ x: -300, opacity: 0 }} 
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
       {/* Main Card Content */}
       <div className="flex justify-center items-center p-3 md:p-5 gap-5 md:gap-5 lg:gap-10">
         {/* Image and Count */}
@@ -116,9 +123,10 @@ const OrderSummary = ({selectedProducts,setSelectedProducts}:OrderSummaryProps) 
         </div>
       </div>
       <div className="border-b border-gray-300 w-full"></div>
-      </div>
+      </motion.div>
 
       ))}
+      </AnimatePresence>
 
     </div>
   );

@@ -121,7 +121,7 @@ const Login = () => {
       <img src="/SideImage.png" alt="Side Image" className="w-full mb-4 md:mb-0 md:w-[50%] object-contain"/>
       <div className="w-full flex flex-col items-center justify-center gap-4">
         <div className="w-[60%] flex flex-col justify-center items-center md:justify-start md:items-start">
-            <h1 className="text-2xl text-heading font-medium font-serif  ">Create an account</h1>
+            <h1 className="text-2xl text-heading font-medium font-serif  ">Login in account</h1>
             <p className="text-sm text-heading font-medium font-serif">Enter your details below</p>
         </div>
 
@@ -137,15 +137,15 @@ const Login = () => {
             </div>
           )}
 
-          <button type="submit" className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Create Account</button>
+          <button type="submit" className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Log In</button>
 
         </form>
 
 
         <button className="flex justify-center items-center gap-2 bg-white border-1 border-zinc-400 w-[60%] py-2 rounded-md text-heading hover:cursor-pointer hover:scale-105 duration-300 transition-all"><img src="/Icon-Google.png" alt="" className="h-5 w-5 object-contain"/>Sign Up With Google</button>
-            <p onClick={()=>navigate('/')} className="text-sm">Don't have an account? <span className="relative group text-md font-medium">
+            <p onClick={()=>navigate('/signup')} className="text-sm">Don't have an account? <span className="relative group text-md font-medium ">
                 Create Account
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0 group-hover:cursor-pointer"></span>
             </span></p>
       </div>
     </div>

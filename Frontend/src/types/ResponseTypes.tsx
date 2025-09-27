@@ -23,3 +23,30 @@ export type GetOrderDetailsType = {
   message : string;
   order : Order
 }
+
+// Seller Dashboard
+export type GetLastWeekSalesType = {
+  range : string;
+  top5Products : {
+    productName: string;
+    count: number;
+  }[],
+  totalProductsSold: number;
+}
+
+export type TransactionType = {
+  id: number
+  orderNo: string
+  orderDate: string // ISO string
+  totalAmount: number
+  user: {
+    email: string
+  }
+  address: {
+    name: string
+  }
+}
+export type GetLatestTransactionsType = {
+  message: string
+  transactions: TransactionType[]
+}

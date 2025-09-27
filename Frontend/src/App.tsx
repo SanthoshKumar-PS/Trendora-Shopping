@@ -15,6 +15,7 @@ import ProductPage from "./pages/seller/Product"
 import { UserProvider } from "./context/UserContext"
 import Pdf from "./pages/pdf/Pdf"
 import Order from "./pages/Order"
+import Profile from "./pages/Profile"
 
 const queryClient = new QueryClient()
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/" element={<Login/>}/>
             <Route path="/home" element={<Home/>}/>
             <Route path="/login" element={<Login/>}/>
+            <Route path="/profile" element={<Profile/>}/>
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/products" element={<Products/>}/>
             <Route path="/checkout" element={<CheckOut/>}/>
