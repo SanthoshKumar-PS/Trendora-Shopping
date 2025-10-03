@@ -54,7 +54,7 @@ const CheckOut = () => {
     }, [location.state?.products]);
 
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
 
     const [checkOutActive,seCheckOutActive] = useState<number>(1); //1-Login 2-Address 3-Order Summary 4-payment
     const [activeTab,setActiveTab] = useState<number>(0);
@@ -195,7 +195,7 @@ const CheckOut = () => {
 
   return (
     <div className="bg-zinc-100 min-h-screen">
-        <Navbar/>
+        <Navbar seller={user.role==="SELLER"}/>
         <div className="w-full border-b border-zinc-300"></div>
 
         <div className="max-w-4xl mx-auto my-6 ">

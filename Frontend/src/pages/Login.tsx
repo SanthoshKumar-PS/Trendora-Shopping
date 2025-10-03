@@ -112,7 +112,7 @@ const Login = () => {
 
   return (
   <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
-    <Navbar/>
+    <Navbar seller={false}/>
     {/* Border Bottom Below Navbar */}
     <div className="border-b-1 border-b-zinc-400"></div>
     

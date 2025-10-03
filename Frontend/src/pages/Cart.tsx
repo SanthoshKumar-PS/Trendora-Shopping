@@ -6,9 +6,11 @@ import RatingStars from "../components/RatingStars"
 import { Eye,  SquareCheckBig } from "lucide-react"
 import { useEffect } from "react"
 import type { Product } from "../types/Types"
+import { useUser } from "../context/UserContext"
 
 const Cart = () => {
-    const navigate=useNavigate()
+    const navigate=useNavigate();
+    const {user}  = useUser();
     const {cartId, cartProducts, removeFromCart, refetchCart,setCheckoutProducts} = useCart();
     // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
 
@@ -35,7 +37,7 @@ const Cart = () => {
 return (
     <div>
         <OfferBar/>
-        <Navbar/>
+        <Navbar seller={user.role==="SELLER"}/>
         <div className="w-full border-b border-zinc-300"></div>
 
         <div className="max-w-7xl mx-auto mt-6">

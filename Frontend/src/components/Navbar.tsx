@@ -16,7 +16,7 @@ type NavbarProps={
 const Navbar = ({loggedin,seller=false}: NavbarProps) => {
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
     const navigate = useNavigate();  
-    const {setUser} = useUser();
+    const {user,setUser} = useUser();
     
     const userSidebarOptions=[
             {
@@ -26,20 +26,19 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
             },
             {
                 id:2,
-                name:"Contact",
-                destination:"/contact"
+                name:"Orders",
+                destination:"/orders"
             },
             {
                 id:3,
-                name:"Products",
-                destination:"/products"
+                name:"Cart",
+                destination:"/cart"
             },
             {
                 id:4,
-                name:"Sign Up",
-                destination:"/signup"
-            },
-
+                name:"Products",
+                destination:"/products"
+            }
         ];
     const sellerSidebarOptions=[
             {
@@ -59,15 +58,16 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
             },
             {
                 id:4,
-                name:"Inbox",
-                destination:"/inbox"
+                name:"Add Product",
+                destination:"/addproduct"
             },
 
         ]
 
 
     const sidebarOptions= seller? sellerSidebarOptions: userSidebarOptions
-    const [sidebarOpen,setSidebarOpen]=useState<boolean>(false)
+    const [sidebarOpen,setSidebarOpen]=useState<boolean>(false);
+
   return (
     <div className="flex w-full max-w-6xl bg-grey-400 mx-auto py-2 items-center justify-between ">
         <h1 className=" font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">Trendora</h1>
@@ -102,7 +102,7 @@ const Navbar = ({loggedin,seller=false}: NavbarProps) => {
                         <div className='mt-5 w-full flex flex-col'>
                             {
                                 sidebarOptions.map(item=>(
-                                    <div key={item.id} className='font-medium w-full text-center p-2 border-b border-zinc-400'>
+                                    <div key={item.id} onClick={()=>navigate(item.destination)} className='font-medium w-full text-center p-2 border-b border-zinc-400'>
                                         {item.name}
                                     </div>
                                 ))

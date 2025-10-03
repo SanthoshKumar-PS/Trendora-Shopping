@@ -1,10 +1,12 @@
 import axios from "axios"
 import Navbar from "../../components/Navbar"
-import RecentOrders from "../../components/Seller/RecentOrders"
-import { SellerProductSales } from "../../components/Seller/SellerProductSales"
+import RecentOrders from "../../components/SellerDashboard/RecentOrders"
+import { SellerProductSales } from "../../components/SellerDashboard/SellerProductSales"
 import { useEffect, useState } from "react"
 import LoadingScreen from "../../components/LoadingScreen"
 import type { GetLastWeekSalesType, GetLatestTransactionsType, TransactionType } from "../../types/ResponseTypes"
+import {  SalesLineChart } from "../../components/SellerDashboard/SalesLineChart"
+import { ChartBarDefault } from "../../components/SellerDashboard/BarChart"
 
 const Dashboard = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -53,10 +55,8 @@ const Dashboard = () => {
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
             <RecentOrders latestTransactions={latestTransactions} setLatestTransactions={setLatestTransactions}/>
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
-            <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
-            <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
-
-
+            <SalesLineChart/>
+            <ChartBarDefault/>
         </div>
 
     </div>

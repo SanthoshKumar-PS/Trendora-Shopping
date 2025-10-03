@@ -86,7 +86,21 @@ export const getAllOrders = async (req:any,res:any) => {
                 },
                 _count:{
                     select: { orderDetails:true }
+                },
+                orderDetails:{
+                    take:1,
+                    include:{
+                        product:{
+                            select:{
+                                name:true,
+                                images:true
+                            }
+                        }
+                    }
                 }
+            },
+            orderBy:{
+                orderDate:'desc'
             }
         })
 

@@ -7,6 +7,7 @@ import axios from "axios"
 import LoadingScreen from "../../components/LoadingScreen"
 import { useCart } from "../../context/CartContext"
 import type { Product } from "../../types/Types"
+import { formatCurrency } from "../../lib/formatCurrency"
 
 const SellerProducts = () => {
   const navigate=useNavigate()
@@ -76,7 +77,7 @@ const SellerProducts = () => {
                   </div>
                   <div className="p-2 sm:text-sm md:text-md ">
                       <p className="font-semibold font-serif">{product.name}</p>
-                      <p className=" text-red font-medium">${product.discountedPrice} <span className="line-through text-gray-700">${product.actualPrice}</span></p>
+                      <p className=" text-red font-medium">{formatCurrency(product.discountedPrice)} <span className="line-through text-gray-700">{formatCurrency(product.actualPrice)}</span></p>
                       {product.avgRating!==0.0?
                         (
                           <div>
@@ -102,7 +103,8 @@ const SellerProducts = () => {
                             }}/>
                           
                       </div>
-                      <div className="bg-white text-heading p-2 rounded-full hover:scale-115">
+                      <div className="bg-white text-heading p-2 rounded-full hover:scale-115"
+                        onClick={(e)=>{e.stopPropagation();navigate(`/addproduct/${product.id}`)}} >
                           <Pencil size={18}/>
                           
                       </div>

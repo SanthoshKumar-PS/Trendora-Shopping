@@ -8,6 +8,8 @@ import axios from 'axios'
 import type { Feature, Product, ProductWithCart } from '../../types/Types'
 import GetProducts from '../GetProducts'
 import { useCart } from '../../context/CartContext'
+import { formatCurrency } from '../../lib/formatCurrency'
+import { useUser } from '../../context/UserContext'
 const ProductPage = () => {
     const {id}=useParams<{id:string}>()
     const productId = Number(id)
@@ -18,7 +20,8 @@ const ProductPage = () => {
     const [productCategory,setProductCategory] = useState<number|undefined>(undefined);
     const [selectedImageIndex,setSelectedImageIndex] = useState<number>(0);
 
-    // useCart context
+    // useUser, useCart context
+    const { user } = useUser();
     const {cartId, addToCart, removeFromCart, setCheckoutProducts} = useCart()
 
     // Recommedatation Products
@@ -177,7 +180,7 @@ const ProductPage = () => {
 
   return (
     <div>
-        <Navbar seller={true}/>
+        <Navbar seller={user.role==="SELLER"}/>
         <div className="w-full border-b border-zinc-300"></div>
 
         {/* Show Now Top Bar - Only in Middle Screen */}
@@ -247,8 +250,8 @@ const ProductPage = () => {
                     <div className='w-full flex flex-col gap-1 items-start justify-start'>
                         <p className='text-green-600 text-md font-medium'>Special Price</p>
                         <div className='flex items-end gap-2'>
-                            <p className='text-lg font-medium'>${currentProduct?.discountedPrice}</p>
-                            <p className='text-md font-medium text-zinc-500 line-through'>${currentProduct?.actualPrice}</p>
+                            <p className='text-lg font-medium'>{formatCurrency(currentProduct?.discountedPrice??0)}</p>
+                            <p className='text-md font-medium text-zinc-500 line-through'>{formatCurrency(currentProduct?.actualPrice??0)}</p>
                             {(currentProduct?.discountPercentage ?? 0) > 0 &&(
                                 <p className='text-green-600 text-md font-medium'>{currentProduct?.discountPercentage}% off</p>
                             )}

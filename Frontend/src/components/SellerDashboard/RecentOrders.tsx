@@ -6,8 +6,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card"
-import { Badge } from "../../components/ui/badge";
+} from "../ui/card"
+import { Badge } from "../ui/badge";
 import type { TransactionType } from "../../types/ResponseTypes";
 import { formatCurrency } from "../../lib/formatCurrency";
 import { useNavigate } from "react-router-dom";

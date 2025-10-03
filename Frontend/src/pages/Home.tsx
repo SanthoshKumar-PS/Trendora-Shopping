@@ -43,7 +43,7 @@ const Home = () => {
   return (
     <div>
         <OfferBar/>
-        <Navbar/>
+        <Navbar seller={user.role==="SELLER"}/>
         <div className="w-full border-b border-zinc-300"></div>
         
         {/* Options and Offer Image */}

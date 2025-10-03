@@ -1,4 +1,4 @@
-import type { Order } from "./Types";
+import type { Category, Order, Product } from "./Types";
 
 export type UserOrderResponse = {
   id: number;
@@ -17,6 +17,18 @@ export type UserOrderResponse = {
   _count: {
     orderDetails: number;
   };
+  orderDetails: {
+    id: number;
+    productId: number;
+    actualPrice: number;
+    discountedPrice: number;
+    quantity: number;
+    totalPrice: number;
+    product: {
+      name: string;
+      images: string[];
+    };
+  }[];
 };
 
 export type GetOrderDetailsType = {
@@ -49,4 +61,21 @@ export type TransactionType = {
 export type GetLatestTransactionsType = {
   message: string
   transactions: TransactionType[]
+}
+
+//Add/Update Product
+
+export type FetchProductDetailsType = {
+  message : string;
+  product : Product
+}
+
+export interface CategoriesResponse {
+  message: string;
+  categories?: Category[];
+}
+
+export interface AddProductResponse{
+  message:string
+  urls:string[]
 }

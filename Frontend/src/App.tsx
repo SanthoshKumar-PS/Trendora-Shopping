@@ -16,6 +16,7 @@ import { UserProvider } from "./context/UserContext"
 import Pdf from "./pages/pdf/Pdf"
 import Order from "./pages/Order"
 import Profile from "./pages/Profile"
+import PageNotFound from "./pages/PageNotFound"
 
 const queryClient = new QueryClient()
 function App() {
@@ -42,7 +43,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/sellerproducts" element={<SellerProducts/>}/>
             <Route path="/addproduct" element={<AddProduct/>}/>
+            <Route path="/addproduct/:id" element={<AddProduct/>}/>
             <Route path="/product/:id" element={<ProductPage/>}/>            
+            
+            
+            <Route path="*" element={<PageNotFound/>}/>            
           </Routes>
 
         

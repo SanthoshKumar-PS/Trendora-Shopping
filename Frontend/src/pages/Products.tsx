@@ -9,6 +9,7 @@ import { useCart } from "../context/CartContext"
 import type { ProductWithCart } from "../types/Types"
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useUser } from "../context/UserContext"
+import { formatCurrency } from "../lib/formatCurrency"
 
 
 const Products = ({showNavbar=true}:{showNavbar?:boolean}) => {
@@ -119,7 +120,7 @@ const Products = ({showNavbar=true}:{showNavbar?:boolean}) => {
                   </div>
                   <div className="p-2 sm:text-sm md:text-md ">
                       <p className="font-semibold font-serif">{product?.name}</p>
-                      <p className=" text-red font-medium">${product?.discountedPrice} <span className="line-through text-gray-700">${product?.actualPrice}</span></p>
+                      <p className=" text-red font-medium">{formatCurrency(product?.discountedPrice??0)} <span className="line-through text-gray-700">{formatCurrency(product?.actualPrice??0)}</span></p>
                       {product?.avgRating!==0.0?
                         (
                           <div>

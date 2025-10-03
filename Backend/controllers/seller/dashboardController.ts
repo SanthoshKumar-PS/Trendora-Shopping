@@ -1,5 +1,6 @@
 // controllers/dashboardController.ts
 import { PrismaClient } from "@prisma/client";
+import { subDays, startOfDay, endOfDay, format } from "date-fns";
 
 
 const prisma = new PrismaClient();
@@ -130,3 +131,61 @@ export const getRecentTransactions = async (req:any, res:any) => {
         return res.status(500).json({message:"Error while getting recent transactions."})
     }
 }
+
+
+export const getLast7DaysSales = async (req: any, res: any) => {
+  try {
+    const today = new Date();
+
+    // Yesterday (exclude today from calculation)
+    const yesterday = subDays(today, 1);
+
+    // 7 days ago
+    const sevenDaysAgo = subDays(yesterday, 6);
+
+    // Group sales by day
+    const sales = await prisma.order.groupBy({
+      by: ["orderDate"],
+      where: {
+        orderDate: {
+          gte: startOfDay(sevenDaysAgo),
+          lte: endOfDay(yesterday),
+        },
+      },
+      _sum: {
+        totalAmount: true,
+      },
+    });
+
+    // Build result for 7 days
+    const result: { day: string; date: string; totalSales: number }[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const day = subDays(yesterday, 6 - i);
+      const dateStr = format(day, "yyyy-MM-dd");
+      const dayName = format(day, "EEEE"); // Monday, Tuesday, etc.
+
+      const found = sales.find(
+        (s) => format(s.orderDate, "yyyy-MM-dd") === dateStr
+      );
+
+      result.push({
+        day: dayName,
+        date: dateStr,
+        totalSales: found?._sum.totalAmount ?? 0,
+      });
+    }
+
+    return res.json({
+      success: true,
+      range: `${format(sevenDaysAgo, "yyyy-MM-dd")} to ${format(
+        yesterday,
+        "yyyy-MM-dd"
+      )}`,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, error: "Server error" });
+  }
+};

@@ -76,14 +76,13 @@ const Orders = () => {
 
         {orders.map((order,index)=>(
       <div key={index} onClick={()=>{navigate(`/order/${order.orderNo}`)}} className="bg-white border border-gray-300 rounded-sm p-2 md:p-4 flex justify-between items-center md:justify-start md:items-start gap-2 md:gap-4 shadow-sm shadow-zinc-300 hover:cursor-pointer">
-        <img src="/Products/Camera.png" alt="Camera Image" className="w-24 h-24 md:w-30 md:h-30 lg:w-34 lg:h-34 object-cover" />
+        <img src={order.orderDetails[0].product.images[0]} alt="Camera Image" className="w-24 h-24 md:w-30 md:h-30 lg:w-34 lg:h-34 object-cover" />
 
         {/* Product Content */}
         <div className="flex gap-2 flex-col justify-center items-start md:flex-row md:w-full md:justify-between">
           {/* Product Description */}
           <div className="flex flex-col justify-start items-start gap-3  max-w-sm">
             <p className="font-medium">{order.orderNo}</p>
-            {/* <p className="text-gray-500 hidden text-sm md:max-w-xs md:overflow-hidden md:[display:-webkit-box] md:[-webkit-box-orient:vertical] md:[-webkit-line-clamp:2]">The HP Pavilion is a stylish and versatile laptop designed for both productivity and entertainment. With powerful performance, vibrant display options, and immersive audio, its well-suited for students, professionals, and everyday multitasking.</p> */}
             <p className="text-gray-500 hidden text-sm md:max-w-xs md:overflow-hidden md:[display:-webkit-box] md:[-webkit-box-orient:vertical] md:[-webkit-line-clamp:2]">Total Products : {order._count.orderDetails.toString()}</p>
             <p className="text-gray-600 hidden text-sm md:max-w-xs md:overflow-hidden md:[display:-webkit-box] md:[-webkit-box-orient:vertical] md:[-webkit-line-clamp:2]">Deliver To: {order.address.name}, {order.address.city}</p>
           </div>
