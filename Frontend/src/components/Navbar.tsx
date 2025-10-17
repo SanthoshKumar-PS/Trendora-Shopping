@@ -64,7 +64,7 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   return (
-    <motion.div className="p-1 md:p-2 "
+    <motion.div className="p-1 md:p-2 bg-gray-100 "
     initial={{y:-100}}
     animate={{y:0}}
     >
@@ -100,11 +100,12 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
             onClick={() => navigate("/cart")}
             className="text-heading hover:scale-105"
           />
-          <LogOut
-            size={24}
-            onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
-            className="text-heading hover:scale-105"
-          />
+          <motion.button 
+          whileHover={{scale:1.05}}
+          whileTap={{scale:0.95}}
+          onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })} className="px-2 py-1 rounded-lg bg-blue-500 text-white font-medium">
+            Logout
+          </motion.button>
 
           {/* Navbar Small Screen */}
           <div
