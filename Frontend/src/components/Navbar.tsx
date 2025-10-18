@@ -1,10 +1,9 @@
-import { Search, Heart, ShoppingCart, Menu, X, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useUser } from "../context/UserContext";
 import { handleLogout } from "../Api/Logout";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion";
 type NavbarProps = {
   loggedin?: boolean;
   seller?: boolean;
@@ -64,9 +63,10 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   return (
-    <motion.div className="p-1 md:p-2 bg-gray-100 "
-    initial={{y:-100}}
-    animate={{y:0}}
+    <motion.div
+      className="p-1 md:p-2 bg-gray-50 "
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
     >
       <div className="px-1 md:px-2 border border-zinc-300 rounded-md flex w-full max-w-6xl bg-white mx-auto items-center justify-between ">
         <h1 className=" font-bold text-xl text-heading font-serif hover:cursor-pointer p-2">
@@ -100,10 +100,12 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
             onClick={() => navigate("/cart")}
             className="text-heading hover:scale-105"
           />
-          <motion.button 
-          whileHover={{scale:1.05}}
-          whileTap={{scale:0.95}}
-          onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })} className="px-2 py-1 rounded-lg bg-blue-500 text-white font-medium">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
+            className="px-2 py-1 rounded-lg bg-blue-500 text-white font-medium"
+          >
             Logout
           </motion.button>
 

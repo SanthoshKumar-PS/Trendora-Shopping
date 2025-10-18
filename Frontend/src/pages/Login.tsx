@@ -1,101 +1,102 @@
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
-import { CircleAlert } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useUser } from '../context/UserContext';
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { CircleAlert, Lock, Mail, ShoppingBag, User } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext";
 const Login = () => {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
-  const navigate=useNavigate()
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
   // const [email,setEmail]=useState<string|null>(null)
-  const [email,setEmail]=useState<string|null>("srs@gmail.com")
+  const [email, setEmail] = useState<string | null>("srs@gmail.com");
   // const [password,setPassword]=useState<string|null>(null)
-  const [password,setPassword]=useState<string|null>("srs123")
-  const [role,setRole]=useState<'USER'|'ADMIN'|'SELLER'>('USER')
-  const [error,setError]=useState<string|null>(null)
+  const [password, setPassword] = useState<string | null>("srs123");
+  const [role, setRole] = useState<"USER" | "ADMIN" | "SELLER">("USER");
+  const [error, setError] = useState<string | null>(null);
 
   // UserContext, CartContext
-  const { cartId,setCartId } = useCart();
-  const {user,setUser} = useUser()
+  const { cartId, setCartId } = useCart();
+  const { user, setUser } = useUser();
 
-  async function validateAndLogin(e: React.FormEvent){
-    e.preventDefault(); 
-    if(!email && !password){
-      setError("Enter Email and Password Fields")
-      return
+  async function validateAndLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email && !password) {
+      setError("Enter Email and Password Fields");
+      return;
     }
-    
+
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if(!emailRegex.test(email??"")){
+    if (!emailRegex.test(email ?? "")) {
       setError("Please enter a valid email address");
-      return
+      return;
     }
 
-    if((password??"").length<6){
+    if ((password ?? "").length < 6) {
       setError("Password must be at least 6 characters long");
-      return
+      return;
     }
-    loginUser()
+    loginUser();
   }
 
   async function loginUser() {
-    try{
-      const payload={
-        email:email,
-        password:password,
-      }
-      const response = await axios.post(`${BACKEND_URL}/user/login`,payload , {withCredentials:true})
+    try {
+      const payload = {
+        email: email,
+        password: password,
+      };
+      const response = await axios.post(`${BACKEND_URL}/user/login`, payload, {
+        withCredentials: true,
+      });
 
-      if(response.status===200){
-        const data=response.data as any
-        console.log("User has been registered",data)
+      if (response.status === 200) {
+        const data = response.data as any;
+        console.log("User has been registered", data);
         setUser({
           loggedIn: true,
           email: data.email,
           name: data.name,
-          role:data.role,
+          role: data.role,
           image: data.image,
           phone: data.phone,
-          cartId: data.cartId
-        })
-        localStorage.setItem('UserInfo',JSON.stringify({
-          loggedIn: true,
-          email: data.email,
-          name: data.name,
-          role:data.role,
-          image: data.image,
-          phone: data.phone,
-          cartId: data.cartId
-        }))
+          cartId: data.cartId,
+        });
+        localStorage.setItem(
+          "UserInfo",
+          JSON.stringify({
+            loggedIn: true,
+            email: data.email,
+            name: data.name,
+            role: data.role,
+            image: data.image,
+            phone: data.phone,
+            cartId: data.cartId,
+          })
+        );
 
-        if(data.role ==='USER'){
-          console.log("Cart ID of user - ",data.cartId)
-          setCartId(Number(data.cartId))
-          navigate('/home')
+        if (data.role === "USER") {
+          console.log("Cart ID of user - ", data.cartId);
+          setCartId(Number(data.cartId));
+          navigate("/home");
         }
-        if(data.role ==='SELLER'){
-          setCartId(Number(data.cartId))
+        if (data.role === "SELLER") {
+          setCartId(Number(data.cartId));
           // navigate('/dashboard')
-          navigate('/dashboard')
+          navigate("/dashboard");
         }
       }
-
-    }
-    catch(error){
-      const err=error as AxiosError;
+    } catch (error) {
+      const err = error as AxiosError;
 
       if (err.response) {
         if (err.response.status === 500) {
           console.log("Internal Server Error");
           setError(err.response.data?.message || "Server error");
-        } 
-        else if (err.response.status === 404) {
+        } else if (err.response.status === 404) {
           console.log("User not exists");
           setError(err.response.data?.message || "User not exists");
-        } 
-        else {
+        } else {
           console.log("Unexpected Error while registering");
           setError("Unexpected error occurred");
         }
@@ -103,58 +104,115 @@ const Login = () => {
         console.log("Network or other error", err.message);
         setError("Network error. Please try again.");
       }
-      }
     }
-
-
-
-
+  }
 
   return (
-  <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
-    <Navbar seller={false}/>
-    {/* Border Bottom Below Navbar */}
-    <div className="border-b-1 border-b-zinc-400"></div>
-    
-    {/* Login Page */}
-    <div className="mt-10 flex flex-col md:flex-row w-full mb-4">
-      <img src="/SideImage.png" alt="Side Image" className="w-full mb-4 md:mb-0 md:w-[50%] object-contain"/>
-      <div className="w-full flex flex-col items-center justify-center gap-4">
-        <div className="w-[60%] flex flex-col justify-center items-center md:justify-start md:items-start">
-            <h1 className="text-2xl text-heading font-medium font-serif  ">Login in account</h1>
-            <p className="text-sm text-heading font-medium font-serif">Enter your details below</p>
-        </div>
+    <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
+      <Navbar seller={false} />
+      {/* Border Bottom Below Navbar */}
+      {/* <div className="border-b-1 border-b-zinc-400"></div> */}
 
-        
-        <form onSubmit={validateAndLogin} className="w-full flex flex-col items-center gap-4">
-          <input type="text" name='username' required placeholder="Email " value={email??""} onChange={(e)=>setEmail(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
+      <div className="w-full min-h-full flex flex-col space-y-4 items-center justify-center bg-gray-100 p-8">
+        {/* Inner Box Like Card */}
+        <div className="w-full p-8 max-w-md space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl ">
+          <div className="flex justify-center">
+            <img src="/App/LogoWithName.png" alt="" className="h-16" />
+          </div>
+          <div className="text-center space-y-2">
+            <h1 className="text-xl font-bold tracking-tight">Log In</h1>
+            <p className="text-gray-500">
+              Enter your credentials to access your account
+            </p>
+          </div>
 
-          <input type="text" name='password' required placeholder="Password" value={password??""} onChange={(e)=>setPassword(e.target.value)} className="outline-none bg-bg-grey px-4 py-2 rounded-md w-[60%] focus:border-1 focus:border-zinc-400 focus:shadow-md font-serif"/>
-          {error &&(
-            <div className='font-sans font-medium text-red-500 text-sm flex gap-2 items-center'>
-              <span><CircleAlert size={20}/></span>
-              {error}
+          <form onSubmit={validateAndLogin} className="space-y-4">
+            {/* Email */}
+            <div className="space-y-2">
+              <p className="font-medium ">Email</p>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-3 flex items-center">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={email ?? ""}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="santhosh@gmail.com"
+                  required
+                  className="pl-10 w-full border border-gray-300 p-2 focus:border-2 focus:border-blue-600 rounded-lg"
+                />
+              </div>
             </div>
-          )}
 
-          <button type="submit" className="bg-red w-[60%] py-2 rounded-md text-white font-medium font-serif hover:cursor-pointer hover:scale-105 duration-300 transition-all">Log In</button>
+            {/* Password */}
+            <div className="space-y-2">
+              <p className="font-medium ">Password</p>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-3 flex items-center">
+                  <Lock className="h-4 w-4 text-gray-500" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={password ?? ""}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="pl-10 w-full border border-gray-300 p-2 focus:border-2 focus:border-blue-600 rounded-lg"
+                />
+              </div>
+            </div>
 
-        </form>
+            {/* Forgot Password */}
+            <div className="flex justify-end">
+              <button className="text-blue-600 text-sm font-semibold hover:underline">
+                Forgot Password?
+              </button>
+            </div>
 
+            {/* Submit button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:opacity-80 transition duration-300"
+            >
+              Log In
+            </button>
+          </form>
 
-        <button className="flex justify-center items-center gap-2 bg-white border-1 border-zinc-400 w-[60%] py-2 rounded-md text-heading hover:cursor-pointer hover:scale-105 duration-300 transition-all"><img src="/Icon-Google.png" alt="" className="h-5 w-5 object-contain"/>Sign Up With Google</button>
-            <p onClick={()=>navigate('/signup')} className="text-sm">Don't have an account? <span className="relative group text-md font-medium ">
-                Create Account
-                <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0 group-hover:cursor-pointer"></span>
-            </span></p>
+          {/* OR */}
+          <div className="relative text-sm">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-2 text-gray-500 uppercase">Or</span>
+            </div>
+          </div>
+
+          {/* Dont have account */}
+          <div className="text-center text-sm ">
+            <span className="text-gray-600">Don't have an account?</span>
+            <span> </span>
+            <button
+              onClick={() => navigate("/signup")}
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
+        <p className="text-center text-xs text-gray-500/70 mt-8 flex items-center gap-1">
+          By continuing, you agree to our{" "}
+          <p className="underline hover:text-gray-500">Terms of Service</p> and{" "}
+          <p className="underline hover:text-gray-500">Privacy Policy</p>.
+        </p>
       </div>
+
+      <Footer />
     </div>
+  );
+};
 
-    <Footer/>
-
-
-  </div>
-  )
-}
-
-export default Login
+export default Login;
