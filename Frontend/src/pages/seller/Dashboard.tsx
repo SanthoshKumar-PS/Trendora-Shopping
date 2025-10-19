@@ -50,8 +50,8 @@ const Dashboard = () => {
   return (
     <div>
         <Navbar seller={true}/>
-        <div className="w-full border-b border-zinc-300"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
+
+        <div className="bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
             <RecentOrders latestTransactions={latestTransactions} setLatestTransactions={setLatestTransactions}/>
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>
