@@ -1,34 +1,22 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { ProductWithCart } from "../types/Types";
-import { ShoppingCart, SquareCheckBig, Star } from "lucide-react";
+import { Pencil, ShoppingCart, SquareCheckBig, Star } from "lucide-react";
 import { formatCurrency } from "../lib/formatCurrency";
-import { useUser } from "../context/UserContext";
 import { useCart } from "../context/CartContext";
-import { useQueryClient } from "@tanstack/react-query";
 
 type ProductProps = {
   product: ProductWithCart;
+  updateOptimistic: (product: ProductWithCart, result: boolean) => void;
+  seller?: boolean;
 };
-const Product = ({ product }: ProductProps) => {
+const ProductComponent = ({
+  product,
+  updateOptimistic,
+  seller = false,
+}: ProductProps) => {
   const navigate = useNavigate();
-  const { cartId, addToCart, removeFromCart, refetchCart } = useCart();
-  const { user } = useUser();
-  const queryClient = useQueryClient();
-  const updateOptimistic = (product: ProductWithCart, result: boolean) => {
-    return queryClient.setQueryData(["products"], (oldData: any) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page: any) => ({
-          ...page,
-          products: page.products.map((p: any) =>
-            p.id === product?.id ? { ...p, isInCart: result } : p
-          ),
-        })),
-      };
-    });
-  };
+  const { cartId, addToCart, removeFromCart } = useCart();
+
   return (
     <div
       onClick={() => navigate(`/product/${product?.id}`)}
@@ -64,40 +52,58 @@ const Product = ({ product }: ProductProps) => {
           </span>
         </p>
 
-        {/* Add To Cart Button */}
-        <button className="hidden md:flex w-full py-2 rounded-lg bg-blue-600 text-white font-medium justify-center items-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out">
-          {product?.isInCart ? (
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                removeFromCart({
-                  cartId: cartId ?? 0,
-                  productId: product.id,
-                });
-                updateOptimistic(product!, false);
-              }}
-              className="w-full flex justify-center items-center gap-2 "
-            >
-              <SquareCheckBig size={16} />
-              <span>Added To Cart</span>
+        {/* Add and Added To Cart Button - For User Only */}
+        {!seller && (
+          <button className="hidden md:flex w-full py-2 rounded-lg bg-blue-600 text-white font-medium justify-center items-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out">
+            {product?.isInCart ? (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFromCart({
+                    cartId: cartId ?? 0,
+                    productId: product.id,
+                  });
+                  updateOptimistic(product!, false);
+                }}
+                className="w-full flex justify-center items-center gap-2 "
+              >
+                <SquareCheckBig size={16} />
+                <span>Added To Cart</span>
+              </div>
+            ) : (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart({
+                    cartId: cartId ?? 0,
+                    productId: product?.id ?? 0,
+                  });
+                  updateOptimistic(product!, true);
+                }}
+                className="w-full flex justify-center items-center gap-2"
+              >
+                <ShoppingCart size={16} />
+                <span>Add to Cart</span>
+              </div>
+            )}
+          </button>
+        )}
+
+        {/* Edit Product - For Sellers To make changes in Product */}
+        {seller && (
+          <button
+            className="hidden md:flex w-full py-2 rounded-lg bg-blue-600 text-white font-medium justify-center items-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/updateproduct/${product.id}`);
+            }}
+          >
+            <div className="w-full flex justify-center items-center gap-2 ">
+              <Pencil size={16} />
+              <span>Edit Product</span>
             </div>
-          ) : (
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart({
-                  cartId: cartId ?? 0,
-                  productId: product?.id ?? 0,
-                });
-                updateOptimistic(product!, true);
-              }}
-              className="w-full flex justify-center items-center gap-2"
-            >
-              <ShoppingCart size={16} />
-              <span>Add to Cart</span>
-            </div>
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Absolute Discount and Icons */}
@@ -108,7 +114,15 @@ const Product = ({ product }: ProductProps) => {
 
       <div className="absolute top-4 right-4 flex flex-col gap-2 ">
         <div className="opacity-0 group-hover:opacity-100 bg-white text-heading p-2 rounded-full hover:scale-115 transiton-all ease-in-out duration-300">
-          {product?.isInCart ? (
+          {seller ? (
+            <Pencil
+              size={18}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/updateproduct/${product.id}`);
+              }}
+            />
+          ) : product?.isInCart ? (
             <SquareCheckBig
               size={18}
               onClick={(e) => {
@@ -139,4 +153,4 @@ const Product = ({ product }: ProductProps) => {
   );
 };
 
-export default Product;
+export default ProductComponent;

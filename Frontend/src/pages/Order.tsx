@@ -20,7 +20,7 @@ window.Buffer = Buffer;
 
 
 
-const Order = () => {
+const OrderPage = () => {
     const {id} = useParams<{id:string}>();
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
     console.log("orderId: ",id);
@@ -72,7 +72,7 @@ const Order = () => {
                     // Each Product
                     <div key={index} className="flex w-full justify-between items-center p-3 md:p-4 border-b border-zinc-200">
                         <div className="flex flex-col justify-center items-start gap-1">
-                            <Button className="text-xs md:text-sm  bg-zinc-100 text-zinc-500 font-medium hover:bg-zinc-200 rounded-xs">RATE</Button>
+                            <Button className="text-xs md:text-sm  bg-zinc-200/50 text-zinc-500 font-medium hover:bg-zinc-300 rounded-md">RATE</Button>
                             <h1 className="text-md md:text-lg font-medium">{orderDetail.product.name}</h1>
                             <p className="text-zinc-400 text-sm md:text-md">Ordered on: {formatOrderDate(order.createdAt)}</p>
                             <p className="text-zinc-600 text-sm md:text-md">Total Pcs: {orderDetail.quantity}</p>
@@ -189,4 +189,4 @@ const Order = () => {
   )
 }
 
-export default Order
+export default OrderPage

@@ -1,11 +1,11 @@
-import Loading from './Loading'
+import Loading from "./Loading";
 
 const LoadingScreen = () => {
   return (
-        <div className='flex justify-center items-center h-screen'>
-          <Loading />        
-        </div>
-  )
-}
+    <div className="flex justify-center items-center h-screen">
+      <Loading />
+    </div>
+  );
+};
 
-export default LoadingScreen
+export default LoadingScreen;

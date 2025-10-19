@@ -51,9 +51,8 @@ const Orders = () => {
   }
 
   return (
-  <div >
+  <div className="bg-gray-50  ">
     <Navbar seller={user.role==='SELLER'}/>
-    <div className="w-full border-b border-zinc-300"></div>
     
     <div className="max-w-5xl mx-auto px-2 md:px-4">
       {/* Search Bar */}

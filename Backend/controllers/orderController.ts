@@ -59,7 +59,7 @@ export const placeOrder =  async (req:any,res:any) => {
         if(!result.placedOrder || !result.placedProductDetails){
             return res.status(400).json({message:"Order could not be placed. Please try again."})
         }
-        return res.status(200).json({message:"Your order has been placed successfully"});
+        return res.status(200).json({message:"Your order has been placed successfully",orderNo:result.placedOrder.orderNo});
 
     }
     catch(error){
@@ -123,7 +123,7 @@ export const getOrderDetails = async (req:any, res:any) => {
         }
         const orderDetail = await prisma.order.findUnique({
             where:{
-                userId:userId,
+                // userId:userId,
                 orderNo:orderId
             },
             include:{

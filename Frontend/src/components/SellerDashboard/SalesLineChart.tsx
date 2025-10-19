@@ -1,5 +1,5 @@
-import { ChartNoAxesCombined, TrendingUp } from "lucide-react"
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts"
+import { ChartNoAxesCombined, TrendingUp } from "lucide-react";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
@@ -8,15 +8,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card"
-import type { ChartConfig } from "../ui/chart"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "../ui/chart"
+} from "../ui/card";
+import type { ChartConfig } from "../ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import { motion } from "framer-motion";
 
-export const description = "A line chart with a label"
+export const description = "A line chart with a label";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -25,7 +22,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
-]
+];
 
 const chartConfig = {
   desktop: {
@@ -36,68 +33,81 @@ const chartConfig = {
     label: "Mobile",
     color: "var(--chart-2)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function SalesLineChart() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Top Selling Product</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              top: 20,
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Line
-              dataKey="desktop"
-              type="natural"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={{
-                fill: "var(--color-desktop)",
-              }}
-              activeDot={{
-                r: 6,
+    <motion.div
+      className=""
+      initial={{ scale: 1.2 }}
+      animate={{ scale: 1 }}
+      transition={{
+        duration: 0.6,
+        type: "spring",
+        stiffness: 50,
+        damping: 10,
+      }}
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Selling Product</CardTitle>
+          <CardDescription>January - June 2024</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig}>
+            <LineChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                top: 20,
+                left: 12,
+                right: 12,
               }}
             >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
               />
-            </Line>
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm ">
-        <div className="flex gap-2 leading-none font-medium">
-          Trend up this month to increase sales<ChartNoAxesCombined className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing highest selling product 
-        </div>
-      </CardFooter>
-    </Card>
-  )
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Line
+                dataKey="desktop"
+                type="natural"
+                stroke="var(--color-desktop)"
+                strokeWidth={2}
+                dot={{
+                  fill: "var(--color-desktop)",
+                }}
+                activeDot={{
+                  r: 6,
+                }}
+              >
+                <LabelList
+                  position="top"
+                  offset={12}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Line>
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm ">
+          <div className="flex gap-2 leading-none font-medium">
+            Trend up this month to increase sales
+            <ChartNoAxesCombined className="h-4 w-4" />
+          </div>
+          <div className="text-muted-foreground leading-none">
+            Showing highest selling product
+          </div>
+        </CardFooter>
+      </Card>
+    </motion.div>
+  );
 }

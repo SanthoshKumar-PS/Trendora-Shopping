@@ -11,12 +11,13 @@ import { CartProvider } from "./context/CartContext"
 import Cart from "./pages/Cart"
 import SellerProducts from "./pages/seller/SellerProducts"
 import Products from "./pages/Products"
-import ProductPage from "./pages/seller/Product"
+import ProductPage from "./pages/seller/ProductPage"
 import { UserProvider } from "./context/UserContext"
 import Pdf from "./pages/pdf/Pdf"
-import Order from "./pages/Order"
+import OrderPage from "./pages/Order"
 import Profile from "./pages/Profile"
 import PageNotFound from "./pages/PageNotFound"
+
 
 const queryClient = new QueryClient()
 function App() {
@@ -36,14 +37,14 @@ function App() {
             <Route path="/checkout" element={<CheckOut/>}/>
             <Route path="/cart" element={<Cart/>}/>
             <Route path="/orders" element={<Orders/>}/>
-            <Route path="/order/:id" element={<Order/>}/>
+            <Route path="/order/:id" element={<OrderPage/>}/>
             <Route path="/pdf/:id" element={<Pdf/>}/>
 
             {/* Seller */}
             <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/sellerproducts" element={<SellerProducts/>}/>
             <Route path="/addproduct" element={<AddProduct/>}/>
-            <Route path="/addproduct/:id" element={<AddProduct/>}/>
+            <Route path="/updateproduct/:id" element={<AddProduct/>}/>
             <Route path="/product/:id" element={<ProductPage/>}/>            
             
             

@@ -1,18 +1,22 @@
-import { useNavigate } from "react-router-dom"
-import Navbar from "../components/Navbar"
-import OfferBar from "../components/OfferBar"
-import { useCart } from "../context/CartContext"
-import RatingStars from "../components/RatingStars"
-import { Eye,  SquareCheckBig } from "lucide-react"
-import { useEffect } from "react"
-import type { Product } from "../types/Types"
-import { useUser } from "../context/UserContext"
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import OfferBar from "../components/OfferBar";
+import { useCart } from "../context/CartContext";
+import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
+import { useUser } from "../context/UserContext";
+import { formatCurrency } from "../lib/formatCurrency";
+import CartProduct from "../components/CartProduct";
+import { AnimatePresence } from "framer-motion";
 
 const Cart = () => {
-    const navigate=useNavigate();
-    const {user}  = useUser();
-    const {cartId, cartProducts, removeFromCart, refetchCart,setCheckoutProducts} = useCart();
-    // console.log({cartId, setCartId, cartProducts, addToCart, removeFromCart, clearCart, refetchCart, isCartFetching})
+  const navigate = useNavigate();
+  const { user } = useUser();
+  const {
+    cartProducts,
+    refetchCart,
+    setCheckoutProducts,
+  } = useCart();
 
   useEffect(() => {
     refetchCart();
@@ -29,90 +33,69 @@ const Cart = () => {
     };
   }, [refetchCart]);
 
+  return (
+    <div className="bg-gray-50">
+      <OfferBar />
+      <Navbar seller={user.role === "SELLER"} />
 
+      <div className="max-w-5xl mx-auto mt-6 p-4">
+        <h1 className="text-2xl font-bold  ">Shopping Cart</h1>
 
+        {/* Products and checkout */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="md:col-span-2 space-y-4 ">
+            <AnimatePresence>
+              {cartProducts.map((product, i) => (
+                <CartProduct key={i} product={product} mapIndex={i}/>
 
-
-
-return (
-    <div>
-        <OfferBar/>
-        <Navbar seller={user.role==="SELLER"}/>
-        <div className="w-full border-b border-zinc-300"></div>
-
-        <div className="max-w-7xl mx-auto mt-6">
-          {/* Heading */}
-          {/* <div className="flex items-center justify-between px-3 gap-6 mx-6">
-            <h1 className="text-xl text-heading font-medium font-serif  ">All Products</h1>
-            <button className="bg-zinc-800 px-3 py-2 rounded-md text-white font-serif hover:cursor-pointer hover:scale-105"
-              onClick={()=>navigate("/addproduct")}>
-              Add Product
-            </button>
-          </div> */}
-
-          {/* Products */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
-              {cartProducts.map((product, i) =>(
-              <div key={i} onClick={()=>navigate(`/product/${product.id}`)} className="relative group flex flex-col gap-2  items-start justify-start mx-1 ">
-                  <div key={i} className="bg-[#F5F5F5] h-50 w-50 md:h-60 md:w-60  rounded-md overflow-hidden">
-                      <img src={product.images[0]} alt="Product Image" className="object-contain w-full h-full group-hover:scale-95" />
-                  </div>
-                  <div className="p-2 sm:text-sm md:text-md ">
-                      <p className="font-semibold font-serif">{product.name}</p>
-                      <p className=" text-red font-medium">${product.discountedPrice} <span className="line-through text-gray-700">${product.actualPrice}</span></p>
-                      {product.avgRating!==0.0?
-                        (
-                          <div>
-                            <p className=" text-yellow-500 font-medium">{product.avgRating}/5.0</p>
-                            <RatingStars rating={product.avgRating}/>
-                          </div>
-
-                        ):(
-                        <p className=" text-yellow-300 font-medium">No Ratings</p>
-                        )}
-
-                  </div>
-
-
-                  {/* Absolute Discount and Icons */}
-                  <p className="absolute top-4 left-4 px-2 py-1 bg-red text-white font-light text-xs rounded-sm">-{product.discountPercentage}%</p>
-                  <div className="absolute top-4 right-4 flex flex-col gap-2 ">
-                      <div className="bg-white text-heading p-2 rounded-full hover:scale-115">
-                          <SquareCheckBig size={18} 
-                            onClick={(e)=>{
-                              e.stopPropagation();
-                              removeFromCart({cartId: cartId??0,productId: product.id})
-                            }}/>
-
-                          
-                      </div>
-                      <div className="bg-white text-heading p-2 rounded-full hover:scale-105">
-                          <Eye size={18}/>
-                      </div>
-                  </div>
-
-              </div>
-                  ))}
+              ))}
+            </AnimatePresence>
           </div>
 
-          {/* Testing Purpose */}
-          <div className="w-full flex justify-center ">
-            <button className="px-3 py-2  text-sm font-medium text-white bg-blue-600 rounded-xs"
-              onClick={()=>{
-                setCheckoutProducts(cartProducts)
-                navigate('/checkout',{state : {products: cartProducts}})
-              }}>
-              Checkout all Products
+          {/* Order Overview */}
+          <div className="h-max border border-gray-300 p-4 rounded-lg space-y-4 ">
+            <h2 className="text-lg font-medium">Order Overview</h2>
+            <div className="w-full border-t border-gray-300"></div>
+            <div className="flex items-center justify-between">
+              <p className="text-gray-700/70 font-medium">Subtotal</p>
+              <p className="font-medium opacity-90">{formatCurrency(50000)}</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-gray-700/70 font-medium">Savings</p>
+              <p className="font-medium opacity-90">{formatCurrency(5000)}</p>
+            </div>
+            <div className="w-full border-t border-gray-300"></div>
+            <div className="flex items-center justify-between font-bold opacity-90">
+              <p>Total</p>
+              <p>{formatCurrency(45000)}</p>
+            </div>
+
+            <button
+              className="w-full py-2 rounded-lg bg-blue-600 text-white font-medium flex justify-center items-center gap-2 text-sm hover:opacity-80 transition-opacity duration-300 ease-in-out"
+              onClick={() => {
+                setCheckoutProducts(cartProducts);
+                navigate("/checkout", { state: { products: cartProducts } });
+              }}
+            >
+              <span>Checkout</span>
+              <ArrowRight size={18} />
+            </button>
+
+            <button
+              className="w-full py-2 rounded-lg border-1 border-gray-300 text-gray-800/80 font-medium flex justify-center items-center gap-2 text-sm hover:bg-gray-200/50 transition-opacity duration-300 ease-in-out"
+              onClick={() => {
+                navigate("/products");
+              }}
+            >
+              <span>Continue Shopping</span>
+              <ArrowRight size={18} />
             </button>
           </div>
-
-
-
-
         </div>
+
+      </div>
     </div>
-  )
+  );
+};
 
-}
-
-export default Cart
+export default Cart;

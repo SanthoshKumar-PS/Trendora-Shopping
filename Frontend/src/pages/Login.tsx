@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
-import { CircleAlert, Lock, Mail, ShoppingBag, User } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useUser } from "../context/UserContext";
 const Login = () => {
@@ -16,9 +16,8 @@ const Login = () => {
   const [role, setRole] = useState<"USER" | "ADMIN" | "SELLER">("USER");
   const [error, setError] = useState<string | null>(null);
 
-  // UserContext, CartContext
-  const { cartId, setCartId } = useCart();
-  const { user, setUser } = useUser();
+  const { setCartId } = useCart();
+  const { setUser } = useUser();
 
   async function validateAndLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -82,7 +81,6 @@ const Login = () => {
         }
         if (data.role === "SELLER") {
           setCartId(Number(data.cartId));
-          // navigate('/dashboard')
           navigate("/dashboard");
         }
       }
@@ -110,8 +108,6 @@ const Login = () => {
   return (
     <div className="bg-bgColor min-h-screen w-full flex flex-col relative">
       <Navbar seller={false} />
-      {/* Border Bottom Below Navbar */}
-      {/* <div className="border-b-1 border-b-zinc-400"></div> */}
 
       <div className="w-full min-h-full flex flex-col space-y-4 items-center justify-center bg-gray-100 p-8">
         {/* Inner Box Like Card */}

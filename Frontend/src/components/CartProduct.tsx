@@ -1,18 +1,18 @@
 import { Trash } from "lucide-react";
 import { formatCurrency } from "../lib/formatCurrency";
 import { useNavigate } from "react-router-dom";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion";
 import type { Product } from "../types/Types";
 import { useCart } from "../context/CartContext";
 
 type CartProductProps = {
-    product: Product;
-    mapIndex: number;
-}
+  product: Product;
+  mapIndex: number;
+};
 
-const CartProduct = ({product,mapIndex}:CartProductProps) => {
-    const navigate = useNavigate();
-    const {removeFromCart,cartId} = useCart();
+const CartProduct = ({ product, mapIndex }: CartProductProps) => {
+  const navigate = useNavigate();
+  const { removeFromCart, cartId } = useCart();
   return (
     <motion.div
       initial={{ x: -300, opacity: 0 }}
