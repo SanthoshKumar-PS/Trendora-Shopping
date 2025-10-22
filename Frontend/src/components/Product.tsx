@@ -4,11 +4,17 @@ import { Pencil, ShoppingCart, SquareCheckBig, Star } from "lucide-react";
 import { formatCurrency } from "../lib/formatCurrency";
 import { useCart } from "../context/CartContext";
 
-type ProductProps = {
-  product: ProductWithCart;
-  updateOptimistic: (product: ProductWithCart, result: boolean) => void;
-  seller?: boolean;
-};
+type ProductProps =
+  | {
+      product: ProductWithCart;
+      seller: true;
+      updateOptimistic?: never; // not allowed when seller = true
+    }
+  | {
+      product: ProductWithCart;
+      seller?: false | undefined;
+      updateOptimistic: (product: ProductWithCart, result: boolean) => void;
+    };
 const ProductComponent = ({
   product,
   updateOptimistic,
@@ -63,7 +69,7 @@ const ProductComponent = ({
                     cartId: cartId ?? 0,
                     productId: product.id,
                   });
-                  updateOptimistic(product!, false);
+                  updateOptimistic?.(product!, false);
                 }}
                 className="w-full flex justify-center items-center gap-2 "
               >
@@ -78,7 +84,7 @@ const ProductComponent = ({
                     cartId: cartId ?? 0,
                     productId: product?.id ?? 0,
                   });
-                  updateOptimistic(product!, true);
+                  updateOptimistic?.(product!, true);
                 }}
                 className="w-full flex justify-center items-center gap-2"
               >
@@ -131,7 +137,7 @@ const ProductComponent = ({
                   cartId: cartId ?? 0,
                   productId: product.id,
                 });
-                updateOptimistic(product!, false);
+                updateOptimistic?.(product!, false);
               }}
             />
           ) : (
@@ -143,7 +149,7 @@ const ProductComponent = ({
                   cartId: cartId ?? 0,
                   productId: product?.id ?? 0,
                 });
-                updateOptimistic(product!, true);
+                updateOptimistic?.(product!, true);
               }}
             />
           )}
