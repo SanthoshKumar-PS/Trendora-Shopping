@@ -7,12 +7,16 @@ import LoadingScreen from "../../components/LoadingScreen"
 import type { GetLastWeekSalesType, GetLatestTransactionsType, TransactionType } from "../../types/ResponseTypes"
 import {  SalesLineChart } from "../../components/SellerDashboard/SalesLineChart"
 import { ChartBarDefault } from "../../components/SellerDashboard/BarChart"
+import { useUser } from "../../context/UserContext"
 
 const Dashboard = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [isLoading,setIsLoading] = useState<boolean>(true);
   const [lastWeekSalesReport, setLastWeekSalesReport] = useState<GetLastWeekSalesType|null>(null);
   const [latestTransactions, setLatestTransactions] = useState<TransactionType[]>([]);
+
+  const {user} = useUser();
+  console.log("User details, ",user)
 
   const getSalesandTransactions = async () =>{
     try{
@@ -49,7 +53,7 @@ const Dashboard = () => {
 
   return (
     <div>
-        <Navbar seller={true}/>
+        <Navbar seller={true} loggedin={user.loggedIn}/>
 
         <div className="bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>

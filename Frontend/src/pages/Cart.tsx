@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import OfferBar from "../components/OfferBar";
 import { useCart } from "../context/CartContext";
 import { ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 import { formatCurrency } from "../lib/formatCurrency";
 import CartProduct from "../components/CartProduct";
@@ -11,6 +11,9 @@ import { AnimatePresence } from "framer-motion";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const [subTotal, setSubTotal] = useState<number>(0);
+  const [savings, setSavings] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const { user } = useUser();
   const {
     cartProducts,
@@ -32,6 +35,17 @@ const Cart = () => {
       window.removeEventListener("focus", handleFocus);
     };
   }, [refetchCart]);
+
+  useEffect(()=>{
+    console.log("Cart products changed");
+    const totalActualPrice = cartProducts.reduce((acc,curr)=>acc = acc+curr.actualPrice,0);
+    const totalDiscountedPrice = cartProducts.reduce((acc,curr)=>acc = acc+curr.discountedPrice,0);
+    setSubTotal(totalActualPrice)
+    setSavings(totalActualPrice-totalDiscountedPrice)
+    setTotal(totalDiscountedPrice)
+
+
+  },[cartProducts])
 
   return (
     <div className="bg-gray-50">
@@ -58,16 +72,16 @@ const Cart = () => {
             <div className="w-full border-t border-gray-300"></div>
             <div className="flex items-center justify-between">
               <p className="text-gray-700/70 font-medium">Subtotal</p>
-              <p className="font-medium opacity-90">{formatCurrency(50000)}</p>
+              <p className="font-medium opacity-90">{formatCurrency(subTotal)}</p>
             </div>
             <div className="flex items-center justify-between">
               <p className="text-gray-700/70 font-medium">Savings</p>
-              <p className="font-medium opacity-90">{formatCurrency(5000)}</p>
+              <p className="font-medium opacity-90">{formatCurrency(savings)}</p>
             </div>
             <div className="w-full border-t border-gray-300"></div>
             <div className="flex items-center justify-between font-bold opacity-90">
               <p>Total</p>
-              <p>{formatCurrency(45000)}</p>
+              <p>{formatCurrency(total)}</p>
             </div>
 
             <button

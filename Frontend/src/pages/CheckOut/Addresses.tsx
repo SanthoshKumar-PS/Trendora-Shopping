@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { getAllAddresses } from "../../Api/GetAddresses";
 import ScaleLoader from "react-spinners/ScaleLoader";
+import {motion} from "framer-motion"
 
 type AddressesProps = {
   selectedAddressId: number | null;
@@ -121,7 +122,11 @@ const Addresses = ({
         addresses.length > 0 &&
         selectedAddressId === null &&
         addresses.map((address, i) => (
-          <div key={i} className="w-full flex flex-col">
+          <motion.div key={i} 
+          initial={{x:-300,opacity:0}}
+          animate={{x:0,opacity:1}}
+          transition={{delay:i*0.1,type:"spring"}}
+          className="w-full flex flex-col">
             {/* Address Content */}
             <div className="flex flex-col lg:flex-row justify-center lg:justify-around items-center ">
               <div className="mx-3 md:mx-5 my-3 md:my-5 w-full flex justify-between items-start ">
@@ -179,7 +184,7 @@ const Addresses = ({
             </div>
 
             <div className="w-full border-b-1 text-zinc-500"></div>
-          </div>
+          </motion.div>
         ))}
 
       {/* Add Address Trigger */}

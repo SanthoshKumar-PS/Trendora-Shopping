@@ -45,12 +45,12 @@ const SellerProducts = () => {
     <div className="bg-gray-50 space-y-6">
       <Navbar seller={true} />
 
-      <div className="mx-2 w-full max-w-6xl mx-auto bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 px-2 py-4 rounded-lg shadow-md  animate-fadeIn">
+      <div className="mx-2 w-full max-w-6xl md:mx-auto bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 px-2 py-4 rounded-lg shadow-md  animate-fadeIn">
         <div className="text-center md:text-left">
-          <h3 className="text-lg md:text-xl font-bold tracking-wide">
+          <h3 className="text-md md:text-lg font-bold tracking-wide">
             Got new products to share?
           </h3>
-          <p className="text-sm md:text-base text-blue-100 mt-1">
+          <p className="text-sm md:text-base text-blue-100 mt-1 max-w-xs md:max-w-md">
             Showcase your latest items and attract more buyers today.
           </p>
         </div>

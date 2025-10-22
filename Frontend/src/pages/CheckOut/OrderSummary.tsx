@@ -70,24 +70,23 @@ const OrderSummary = ({
       {/* For No Products */}
       {selectedProducts.length === 0 && (
         <div className="flex flex-col justify-center items-center gap-2 mb-2">
-          <p className="text-center mt-4  font-medium text-gray-800">
+          <p className="text-center mt-4  font-medium text-gray-800/70">
             No products in checkout
           </p>
-          <p className="text-center font-medium text-gray-800">
-            Add Products to checkout
-          </p>
-          <button
-            className="text-center font-medium text-white bg-blue-500 px-3 py-2 rounded-sm w-max self-center"
+          <motion.button
+          whileHover={{scale:1.05}}
+          whileTap={{scale:0.95}}
+            className="text-center font-medium text-white bg-blue-500 px-3 py-2 rounded-sm w-max self-center hover:cursor-pointer"
             onClick={() => navigate("/home")}
           >
             Add Products
-          </button>
+          </motion.button>
         </div>
       )}
 
       {/* Order Details */}
-      <AnimatePresence>
-        <div className="mt-2 space-y-4 ">
+      <div className="mt-2 space-y-4 ">
+        <AnimatePresence>
           {selectedProducts.map((selectedProduct, index) => (
             <motion.div
               key={selectedProduct.product.id}
@@ -180,8 +179,8 @@ const OrderSummary = ({
               </div>
             </motion.div>
           ))}
-        </div>
-      </AnimatePresence>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

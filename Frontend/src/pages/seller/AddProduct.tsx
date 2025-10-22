@@ -256,12 +256,10 @@ const AddProduct = () => {
     }
 
   return (
-    <div>
+    <div className="bg-gray-50">
         <Navbar seller={true}/>
-        <div className="w-full border-b border-zinc-300"></div>
 
-
-        <div className="mx-auto mt-6 flex flex-col justify-start items-start gap-4 max-w-[75%] md:max-w-[50%]">
+        <div className="bg-white p-2 md:p-4  mx-auto mt-6 flex flex-col justify-start items-start gap-4 max-w-[85%] md:max-w-[70%] lg:max-w-[60%] rounded-md shadow-xl mb-6">
           {/* Select Category */}
             <h1 className={h1Style}>Select Category *</h1>
             <DropdownMenu>
@@ -389,7 +387,7 @@ const AddProduct = () => {
           )}
 
           {error &&(
-            <div className='col-span-1 md:col-span-2 my-3 font-sans font-medium text-red-500 text-sm flex justify-center gap-2 items-center'>
+            <div className='w-full col-span-1 md:col-span-2 my-3 font-sans font-medium text-red-500 text-sm flex justify-center gap-2 items-center'>
               <span><CircleAlert size={20}/></span>
               {error}
             </div>
@@ -398,7 +396,7 @@ const AddProduct = () => {
 
           {/* Upload Button  */}
           <div className="col-span-1 md:col-span-2 flex justify-center items-center w-full">
-            <button onClick={isEditMode?updateProductDetails:validateAndUpload} className="text-center mb-10 text-md font-serif bg-zinc-400 text-zinc-800 px-3 py-2 rounded-md hover:cursor-pointer hover:scale-95">
+            <button onClick={isEditMode?updateProductDetails:validateAndUpload} className="text-center mb-10 text-md font-serif bg-blue-500 text-white px-3 py-2 rounded-md hover:cursor-pointer hover:scale-95">
               {isEditMode?"Update Product":"Add Product"}
             </button>
 

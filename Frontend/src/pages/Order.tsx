@@ -59,7 +59,7 @@ const OrderPage = () => {
     }
   return (
   <div className="bg-gray-50">
-    <Navbar seller={user.role==='SELLER'}/>
+    <Navbar seller={user.role==='SELLER'} />
     
     <div className="max-w-5xl mx-auto px-2 md:px-4 py-2 md:py-4">
         <div className="flex gap-5 flex-col md:flex-row justify-start items-center md:items-start">

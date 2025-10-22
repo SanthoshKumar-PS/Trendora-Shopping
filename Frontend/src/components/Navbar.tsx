@@ -1,18 +1,20 @@
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, Mail } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { handleLogout } from "../Api/Logout";
 import { motion } from "framer-motion";
 type NavbarProps = {
-  loggedin?: boolean;
+  // loggedin?: boolean;
   seller?: boolean;
+  showSearchBar?:boolean;
 };
 
-const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
+const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const { user, setUser } = useUser();
+  const loggedin = user.loggedIn
 
   const userSidebarOptions = [
     {
@@ -34,7 +36,7 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
       id: 4,
       name: "Products",
       destination: "/products",
-    },
+    }
   ];
   const sellerSidebarOptions = [
     {
@@ -56,10 +58,10 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
       id: 4,
       name: "Add Product",
       destination: "/addproduct",
-    },
+    }
   ];
 
-  const sidebarOptions = seller ? sellerSidebarOptions : userSidebarOptions;
+  const sidebarOptions = (seller ? sellerSidebarOptions : userSidebarOptions);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   return (
@@ -78,7 +80,11 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
             <p
               key={item.id}
               className="relative group hover:cursor-pointer"
-              onClick={() => navigate(item.destination)}
+              onClick={() =>
+                item.name === "Logout"
+                  ? handleLogout({ BACKEND_URL, setUser, navigate })
+                  : navigate(item.destination)
+              }
             >
               {item.name}
               <span className="absolute left-1/2 -bottom-1 block h-[1.5px] w-0 bg-heading transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
@@ -87,27 +93,36 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
         </div>
 
         <div className="flex items-center justify-end gap-3 p-2">
-          <div className="hidden md:block relative">
+          {showSearchBar && (<div className="hidden md:block relative">
             <input
               type="text"
               placeholder="Search Products... "
               className="px-4 py-2 min-w-[200px] lg:min-w-[300px] outline-none rounded-md shadow-md bg-white/70 border border-gray-300 focus:border-gray-600 focus:ring-1 focus:ring-gray-500 transition duration-200"
             />
             <Search size={24} className="absolute right-2 top-2 text-heading" />
-          </div>
-          <ShoppingCart
+          </div>)}
+          {/* <ShoppingCart
             size={24}
             onClick={() => navigate("/cart")}
             className="text-heading hover:scale-105"
-          />
-          <motion.button
+          /> */}
+          {loggedin && (<motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
-            className="px-2 py-1 rounded-lg bg-blue-500 text-white font-medium"
+            className="px-3 py-1 rounded-full bg-blue-500 text-white font-medium"
           >
             Logout
-          </motion.button>
+          </motion.button>)}
+          {!loggedin && (<motion.button
+            // whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            // onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
+            className="hidden md:flex px-3 py-1 rounded-full bg-blue-500 text-white font-medium items-center gap-1"
+          >
+            <Mail size={16}/>
+            Subscribe
+          </motion.button>)}
 
           {/* Navbar Small Screen */}
           <div
@@ -130,7 +145,7 @@ const Navbar = ({ loggedin, seller = false }: NavbarProps) => {
                   <div
                     key={item.id}
                     onClick={() => navigate(item.destination)}
-                    className="font-medium w-full text-center p-2 border-b border-zinc-400"
+                    className="font-medium w-full text-center p-2 border-b border-gray-300/50 hover:cursor-pointer"
                   >
                     {item.name}
                   </div>
