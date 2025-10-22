@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { CircleAlert, Lock, Mail, User } from "lucide-react";
 import { useCart } from "../context/CartContext";
-
+import { motion } from "framer-motion";
 const SignUp = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
@@ -86,12 +86,23 @@ const SignUp = () => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen w-full flex flex-col relative">
+    <div className="bg-gray-50 min-h-screen w-full flex flex-col relative">
       <Navbar seller={false} />
 
-      <div className="w-full min-h-full flex flex-col space-y-4 items-center justify-center bg-gray-100 p-8">
+      <div className="w-full min-h-full flex flex-col space-y-4 items-center justify-center p-8">
         {/* Inner Box Like Card */}
-        <div className="w-full p-8 max-w-md space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl ">
+        <motion.div
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0.5 }}
+          transition={{
+            duration: 0.5,
+            type: "spring",
+            stiffness: 100,
+            damping: 10,
+          }}
+          className="w-full p-8 max-w-md space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl"
+        >
           <div className="flex justify-center">
             <img src="/App/LogoWithName.png" alt="" className="h-16" />
           </div>
@@ -159,7 +170,6 @@ const SignUp = () => {
               </div>
             </div>
 
-
             {/* Submit button */}
             <button
               type="submit"
@@ -190,7 +200,7 @@ const SignUp = () => {
               Log In
             </button>
           </div>
-        </div>
+        </motion.div>
         <p className="text-center text-xs text-gray-500/70 mt-8 flex items-center gap-1">
           By continuing, you agree to our{" "}
           <p className="underline hover:text-gray-500">Terms of Service</p> and{" "}

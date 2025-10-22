@@ -58,21 +58,20 @@ const OrderPage = () => {
         return <LoadingScreen/>
     }
   return (
-  <div className="bg-gray-100">
+  <div className="bg-gray-50">
     <Navbar seller={user.role==='SELLER'}/>
-    <div className="w-full border-b border-zinc-300"></div>
     
     <div className="max-w-5xl mx-auto px-2 md:px-4 py-2 md:py-4">
         <div className="flex gap-5 flex-col md:flex-row justify-start items-center md:items-start">
             {/* Left Portion */}
-            <div className="w-full flex flex-col gap-3 mg:gap-4">
+            <div className="w-full flex flex-col gap-3 mg:gap-4 shadow-xl">
                 {/* First Card Section - With Products */}
                 <div className="w-full bg-white flex flex-col shadow-sm rounded-xs overflow-hidden ">
                     {order?.orderDetails.map((orderDetail,index)=>
                     // Each Product
                     <div key={index} className="flex w-full justify-between items-center p-3 md:p-4 border-b border-zinc-200">
                         <div className="flex flex-col justify-center items-start gap-1">
-                            <Button className="text-xs md:text-sm  bg-zinc-200/50 text-zinc-500 font-medium hover:bg-zinc-300 rounded-md">RATE</Button>
+                            <Button className="text-xs md:text-sm  bg-zinc-200/50 text-zinc-500 font-medium hover:bg-zinc-300 rounded-md px-3 py-1">RATE</Button>
                             <h1 className="text-md md:text-lg font-medium">{orderDetail.product.name}</h1>
                             <p className="text-zinc-400 text-sm md:text-md">Ordered on: {formatOrderDate(order.createdAt)}</p>
                             <p className="text-zinc-600 text-sm md:text-md">Total Pcs: {orderDetail.quantity}</p>
@@ -89,15 +88,12 @@ const OrderPage = () => {
                     </div>
                 </div>
 
-                {/* Recent issue section - Now empty */}
-                <div className="w-full bg-white flex flex-col shadow-sm rounded-xs overflow-hidden ">
-                    {/* This is myissue */}
-                </div>
+
             </div>
 
             {/* Right Portion */}
             {/* Delivery Details and Price Details */}
-            <div className="flex flex-col justify-start items-center gap-3 md:gap-4">
+            <div className="flex flex-col justify-start items-center gap-3 md:gap-4 shadow-xl">
                 {/* Delivery Details */}
                 <div className="w-full bg-white flex flex-col shadow-sm rounded-xs overflow-hidden p-2 md:p-4 gap-2">
                     <p className="font-medium">Delivery Address</p>
