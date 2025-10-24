@@ -1,20 +1,34 @@
-import { Search, ShoppingCart, Menu, X, Mail } from "lucide-react";
+import { Search, Menu, X, Mail } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { handleLogout } from "../Api/Logout";
 import { motion } from "framer-motion";
-type NavbarProps = {
-  // loggedin?: boolean;
-  seller?: boolean;
-  showSearchBar?:boolean;
-};
+type NavbarProps =
+  | {
+      seller?: boolean;
+      showSearchBar: true;
+      searchParams: string;
+      setSearchParams: (value: string) => void;
+    }
+  | {
+      seller?: boolean;
+      showSearchBar?: false;
+      searchParams?: never;
+      setSearchParams?: never;
+    };
 
-const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
+const Navbar = ({
+  seller = false,
+  showSearchBar = false,
+  ...props
+}: NavbarProps) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const { user, setUser } = useUser();
-  const loggedin = user.loggedIn
+  const loggedin = user.loggedIn;
+  const searchParams = showSearchBar ? props.searchParams : undefined;
+  const setSearchParams = showSearchBar ? props.setSearchParams : undefined;
 
   const userSidebarOptions = [
     {
@@ -36,7 +50,7 @@ const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
       id: 4,
       name: "Products",
       destination: "/products",
-    }
+    },
   ];
   const sellerSidebarOptions = [
     {
@@ -58,10 +72,14 @@ const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
       id: 4,
       name: "Add Product",
       destination: "/addproduct",
-    }
+    },
   ];
 
-  const sidebarOptions = (seller ? sellerSidebarOptions : userSidebarOptions);
+  const sidebarOptions = seller ? sellerSidebarOptions : userSidebarOptions;
+  const mobileSideBarOptions = [
+    ...sidebarOptions,
+    { id: 5, name: "Logout", destination: "/login" },
+  ];
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   return (
@@ -93,36 +111,48 @@ const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
         </div>
 
         <div className="flex items-center justify-end gap-3 p-2">
-          {showSearchBar && (<div className="hidden md:block relative">
-            <input
-              type="text"
-              placeholder="Search Products... "
-              className="px-4 py-2 min-w-[200px] lg:min-w-[300px] outline-none rounded-md shadow-md bg-white/70 border border-gray-300 focus:border-gray-600 focus:ring-1 focus:ring-gray-500 transition duration-200"
-            />
-            <Search size={24} className="absolute right-2 top-2 text-heading" />
-          </div>)}
+          {showSearchBar &&
+            searchParams !== undefined &&
+            setSearchParams !== undefined && (
+              <div className="hidden md:block relative">
+                <input
+                  type="text"
+                  value={searchParams}
+                  onChange={(e) => setSearchParams(e.target.value)}
+                  placeholder="Search Products... "
+                  className="px-4 py-2 min-w-[200px] lg:min-w-[300px] outline-none rounded-md shadow-sm bg-white/70 border border-blue-100 focus:border-blue-600/50 focus:ring-1 focus:ring-blue-500/50 transition-all duration-300"
+                />
+                <span className="absolute right-2 top-0 bottom-0 text-gray-700/80 flex items-center">
+                  {searchParams?(<X size={18} className="hover:cursor-pointer" onClick={()=>setSearchParams("")} />):(<Search size={18} className="" />)}
+                </span>
+              </div>
+            )}
           {/* <ShoppingCart
             size={24}
             onClick={() => navigate("/cart")}
             className="text-heading hover:scale-105"
           /> */}
-          {loggedin && (<motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
-            className="px-3 py-1 rounded-full bg-blue-500 text-white font-medium"
-          >
-            Logout
-          </motion.button>)}
-          {!loggedin && (<motion.button
-            // whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            // onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
-            className="hidden md:flex px-3 py-1 rounded-full bg-blue-500 text-white font-medium items-center gap-1"
-          >
-            <Mail size={16}/>
-            Subscribe
-          </motion.button>)}
+          {loggedin && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
+              className="hidden md:block px-3 py-1 rounded-full bg-blue-500 text-white font-medium"
+            >
+              Logout
+            </motion.button>
+          )}
+          {!loggedin && (
+            <motion.button
+              // whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              // onClick={() => handleLogout({ BACKEND_URL, setUser, navigate })}
+              className="hidden md:flex px-3 py-1 rounded-full bg-blue-500 text-white font-medium items-center gap-1"
+            >
+              <Mail size={16} />
+              Subscribe
+            </motion.button>
+          )}
 
           {/* Navbar Small Screen */}
           <div
@@ -141,10 +171,15 @@ const Navbar = ({seller = false, showSearchBar = false }: NavbarProps) => {
                 Trendora
               </h1>
               <div className="mt-5 w-full flex flex-col">
-                {sidebarOptions.map((item) => (
+                {mobileSideBarOptions.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => navigate(item.destination)}
+                    onClick={() => {
+                      item.name === "Logout"
+                        ? handleLogout({ BACKEND_URL, setUser, navigate })
+                        : navigate(item.destination);
+                      setSidebarOpen(false);
+                    }}
                     className="font-medium w-full text-center p-2 border-b border-gray-300/50 hover:cursor-pointer"
                   >
                     {item.name}

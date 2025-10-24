@@ -1,4 +1,4 @@
-import {  Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -6,12 +6,14 @@ import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 import type { Product } from "../../types/Types";
 import ProductComponent from "../../components/Product";
+import SearchBar from "../../components/SearchBar";
 
 const SellerProducts = () => {
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [searchParams, setSearchParams] = useState<string>("");
 
   const getSellerProducts = async () => {
     interface ViewProductResponse {
@@ -37,15 +39,37 @@ const SellerProducts = () => {
     getSellerProducts();
   }, []);
 
+  const filteredProducts = products.filter((product) => {
+    const value = searchParams.toLowerCase();
+    return (
+      product?.name.toLowerCase().includes(value) ||
+      product?.discountedPrice.toString().toLowerCase().includes(value) ||
+      product?.actualPrice.toString().toLowerCase().includes(value) ||
+      product?.description?.toLowerCase().includes(value)
+    );
+  });
+
   if (loading) {
     return <LoadingScreen />;
   }
 
   return (
-    <div className="bg-gray-50 space-y-6">
-      <Navbar seller={true} />
+    <div className="bg-gray-50 space-y-2 md:space-y-6 ">
+      <Navbar
+        seller={true}
+        showSearchBar={true}
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+      />
 
-      <div className="mx-2 w-full max-w-6xl md:mx-auto bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 px-2 py-4 rounded-lg shadow-md  animate-fadeIn">
+      <div className="md:hidden">
+        <SearchBar
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
+        />
+      </div>
+
+      <div className="mx-auto w-[90%] max-w-6xl md:mx-auto bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 px-2 py-4 rounded-lg shadow-md  animate-fadeIn">
         <div className="text-center md:text-left">
           <h3 className="text-md md:text-lg font-bold tracking-wide">
             Got new products to share?
@@ -67,7 +91,7 @@ const SellerProducts = () => {
       <div className="max-w-7xl mx-auto ">
         {/* Products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mx-4 md:mx-auto max-w-7xl justify-items-center">
-          {products.map((product, i) => (
+          {filteredProducts.map((product, i) => (
             <ProductComponent key={i} product={product} seller={true} />
           ))}
         </div>

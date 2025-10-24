@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
 import type { ProductWithCart } from "../types/Types";
-import {
-  useInfiniteQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
 import ProductComponent from "../components/Product";
+import Footer from "../components/Footer";
+import SearchBar from "../components/SearchBar";
 
 const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [products, setProducts] = useState<ProductWithCart[]>([]);
   const { user } = useUser();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useState<string>("");
 
   interface ViewProductResponse {
     message: string;
@@ -42,6 +42,15 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
     });
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
+  const filteredProducts = allProducts.filter((product) => {
+    const value = searchParams.toLowerCase();
+    return (
+      product?.name.toLowerCase().includes(value) ||
+      product?.discountedPrice.toString().toLowerCase().includes(value) ||
+      product?.actualPrice.toString().toLowerCase().includes(value) ||
+      product?.description?.toLowerCase().includes(value)
+    );
+  });
 
   const updateOptimistic = (product: ProductWithCart, result: boolean) => {
     return queryClient.setQueryData(["products"], (oldData: any) => {
@@ -66,8 +75,8 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
       const windowSize = window.innerHeight;
       const websiteHeight = document.documentElement.scrollHeight;
 
-      if ((scrollTop + windowSize) / websiteHeight > 0.7) {
-        console.log("Fetching next set of values");
+      if ((scrollTop + windowSize) / websiteHeight > 0.65) {
+        console.log("Fetching next set of products");
         fetchNextPage();
       }
     };
@@ -81,19 +90,40 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
   }
 
   return (
-    <div className="bg-gray-50">
-      {showNavbar && <Navbar seller={user.role === "SELLER"} showSearchBar={true} />}
+    <div className="bg-gray-50 space-y-2 md:space-y-6">
+      {showNavbar && (
+        <Navbar
+          seller={user.role === "SELLER"}
+          showSearchBar={true}
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
+        />
+      )}
 
-      <div className="max-w-7xl mx-auto mt-6 ">
+      <div className="md:hidden">
+        <SearchBar searchParams={searchParams} setSearchParams={setSearchParams}/>
+      </div>
+
+      <div className="max-w-7xl mx-auto my-6 ">
         {/* Products */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
-          {allProducts &&
-            allProducts.map((product, i) => (
-            <ProductComponent key={i} product={product!} updateOptimistic={updateOptimistic}/>
-
-            ))}
+        <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
+          {filteredProducts.length ? (
+            filteredProducts.map((product, i) => (
+              <ProductComponent
+                key={i}
+                product={product!}
+                updateOptimistic={updateOptimistic}
+              />
+            ))
+          ) : (
+            <div className=" col-span-full flex justify-center text-center py-4">
+              No products found
+            </div>
+          )}
         </div>
       </div>
+
+      <Footer/>
     </div>
   );
 };

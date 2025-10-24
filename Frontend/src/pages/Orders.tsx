@@ -69,7 +69,7 @@ const Orders = () => {
         <div className="w-full flex justify-start items-center gap-3 my-4">
           <div className="flex-1 relative">
             <span className="absolute top-0 bottom-0 left-0 ml-3 flex items-center text-gray-700/80">
-              <Search size={18} className=""/>
+              <Search size={18} />
             </span>
             <input
             type="text"
