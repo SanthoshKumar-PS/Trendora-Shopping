@@ -82,7 +82,7 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
 
   return (
     <div className="bg-gray-50">
-      {showNavbar && <Navbar seller={user.role === "SELLER"} />}
+      {showNavbar && <Navbar seller={user.role === "SELLER"} showSearchBar={true} />}
 
       <div className="max-w-7xl mx-auto mt-6 ">
         {/* Products */}
