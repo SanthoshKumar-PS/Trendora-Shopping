@@ -213,8 +213,8 @@ const Login = () => {
         </motion.div>
         <p className="text-center text-xs text-gray-500/70 mt-8 flex items-center gap-1">
           By continuing, you agree to our{" "}
-          <p className="underline hover:text-gray-500">Terms of Service</p> and{" "}
-          <p className="underline hover:text-gray-500">Privacy Policy</p>.
+          <span className="underline hover:text-gray-500">Terms of Service</span> and{" "}
+          <span className="underline hover:text-gray-500">Privacy Policy</span>.
         </p>
       </div>
 

@@ -15,7 +15,7 @@ const Footer = () => {
       Support: [
         {
           id: 1,
-          heading: "111 Church Street,Bangalore - 635147",
+          heading: "SRS illam, Amman Nagar, Hosur, Dinnur - 635147",
           visitPage: "",
         },
         { id: 2, heading: "trendora@gmail.com", visitPage: "" },

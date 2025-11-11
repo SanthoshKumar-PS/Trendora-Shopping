@@ -21,7 +21,6 @@ model User {
   cart      Cart?
   orders    Order[]
   rating    Rating[]
-  stock     Stock?
   wishlist  Wishlist?
 }
 
@@ -81,7 +80,6 @@ model Product {
   actualPrice        Float
   categoryId         Int
   images             String[]
-  stockId            Int
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
   avgRating          Float          @default(0.0)
@@ -90,12 +88,12 @@ model Product {
   discountPercentage Float?         @default(0)
   orderDetails       OrderDetails[]
   category           Category       @relation(fields: [categoryId], references: [id])
-  stock              Stock          @relation(fields: [stockId], references: [id])
   rating             Rating[]
   carts              Cart[]         @relation("CartProducts")
   wishlist           Wishlist[]     @relation("WishedProducts")
-
-  @@unique([name, stockId])
+  quantityInStock Int      @default(0)
+  reorderLevel    Int      @default(5)
+  isActive        Boolean  @default(true)
 }
 
 model Category {
@@ -138,15 +136,6 @@ model Rating {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, productId])
-}
-
-model Stock {
-  id        Int       @id @default(autoincrement())
-  sellerId  Int       @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  products  Product[]
-  seller    User      @relation(fields: [sellerId], references: [id])
 }
 
 enum UserRole {

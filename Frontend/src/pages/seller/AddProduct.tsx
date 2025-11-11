@@ -67,6 +67,7 @@ const AddProduct = () => {
   };
   const updateProductDetails = async () =>{
     try{
+      setError(null);
       setLoading(true);
       const cleanedFeatures = featureInputs.filter(
         (f) => f.label.trim() !== "" && f.value.trim() !== ""
@@ -112,6 +113,7 @@ const AddProduct = () => {
   };
 
   const validateAndUpload= ()=>{
+    setError(null);
     if(selectedCategoryName==='Select' && !productName && !productDescription && !discountedPrice && !actualPrice){
       setError("Enter all fields to add product");
       return
@@ -259,7 +261,7 @@ const AddProduct = () => {
     <div className="bg-gray-50">
         <Navbar seller={true}/>
 
-        <div className="bg-white p-2 md:p-4  mx-auto mt-6 flex flex-col justify-start items-start gap-4 max-w-[85%] md:max-w-[70%] lg:max-w-[60%] rounded-md shadow-xl mb-6">
+        <div className="bg-white p-2 md:p-4  mx-auto mt-4 md:mt-6 flex flex-col justify-start items-start gap-4 max-w-[95%] md:max-w-[70%] lg:max-w-[60%] rounded-md shadow-xl mb-6">
           {/* Select Category */}
             <h1 className={h1Style}>Select Category *</h1>
             <DropdownMenu>

@@ -1,3 +1,4 @@
+import { number } from "framer-motion";
 import { Clock, CheckCircle, Loader2, Truck, PackageCheck, XCircle } from "lucide-react";
 import type React from "react";
 
@@ -91,7 +92,6 @@ export type User = {
   cart?: Cart | null;
   wishlist?: Wishlist | null;
   rating?: Rating[];
-  stock?: Stock | null;
   orders?: Order[];
   createdAt: Date;
   updatedAt: Date;
@@ -166,15 +166,16 @@ export type Product = {
   images: string[];                      // Prisma String[]
   avgRating: number;                     // default 0.0
   numRating: number;                     // default 0
-  stockId: number;
 
   category?: Category;
-  stock?: Stock;
   ratings?: Rating[];
   orderDetails : OrderDetails[]
 
   createdAt: Date; // Dates come as ISO strings
   updatedAt: Date;
+  quantityInStock: number;
+  reorderLevel: number;
+  isActive: boolean;
 };
 
 export type ProductWithCart = Product & {
@@ -215,14 +216,6 @@ export type Rating = {
   notes: string | null;
   productId: number;
   userId: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type Stock = {
-  id: number;
-  sellerId: number;
-  products: Product[]
   createdAt: Date;
   updatedAt: Date;
 };

@@ -29,11 +29,6 @@ export const getLast7DaysSalesBySeller = async (req: any, res: any) => {
             in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"],   
           },
         },
-        product: {
-          stock: {
-            sellerId: sellerId, 
-          },
-        },
       },
       _sum: {
         quantity: true,
@@ -96,9 +91,7 @@ export const getRecentTransactions = async (req:any, res:any) => {
                 orderDetails :{
                     some:{
                         product:{
-                            stock:{
-                                sellerId:id
-                            }
+                            isActive:true
                         }
                     }
                 }

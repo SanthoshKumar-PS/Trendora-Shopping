@@ -6,20 +6,14 @@ export const viewSellerProducts = async (req:any,res:any) => {
         const userId=req.id;
         const userEmail=req.email;
 
-        const userStock = await prisma.stock.findUnique({
-            where : {sellerId:userId}
-        })
-        if(!userStock){
-            return res.status(404).json({message:"There is no stock for this user"})
-        }
-
         const sellerProducts = await prisma.product.findMany({
-            where : {stockId : userStock.id}
-        }) 
+            orderBy: { createdAt: "desc" },
+        });
 
-        return res.status(200).json({message:"Returing all products to the seller", products : sellerProducts})
-
-
+        if (sellerProducts.length === 0) {
+            return res.status(404).json({ message: "No products found." });
+        }
+        return res.status(200).json({ message: "Returning all products", products: sellerProducts });
     }
     catch{
         console.log("Error occured in Seller View Product")
@@ -37,10 +31,6 @@ export const addProduct = async (req:any,res:any) => {
             return res.status(400).json({message:"All fields are required"});
         }
 
-        const userStock=await prisma.stock.findUnique({
-            where: {sellerId:userId}
-        })
-
         const newProduct = await prisma.product.create({
             data:{
                 name:productName,
@@ -52,9 +42,6 @@ export const addProduct = async (req:any,res:any) => {
                 category: {
                     connect : {id:categoryId}
                 },
-                stock:{
-                    connect:{id:userStock.id}
-                }
             }
         })
 

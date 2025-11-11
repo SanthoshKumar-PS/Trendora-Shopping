@@ -42,6 +42,7 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
     });
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
+  console.log("All products with cart: ",allProducts)
   const filteredProducts = allProducts.filter((product) => {
     const value = searchParams.toLowerCase();
     return (
@@ -106,7 +107,7 @@ const Products = ({ showNavbar = true }: { showNavbar?: boolean }) => {
 
       <div className="max-w-7xl mx-auto my-6 ">
         {/* Products */}
-        <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
+        <div className="w-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-8 gap-x-4 mt-6 mx-4 md:mx-auto max-w-7xl justify-items-center">
           {filteredProducts.length ? (
             filteredProducts.map((product, i) => (
               <ProductComponent

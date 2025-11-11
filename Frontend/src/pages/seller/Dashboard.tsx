@@ -53,7 +53,7 @@ const Dashboard = () => {
 
   return (
     <div>
-        <Navbar seller={true} loggedin={user.loggedIn}/>
+        <Navbar seller={true}/>
 
         <div className="bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
             <SellerProductSales lastWeekSalesReport={lastWeekSalesReport} setLastWeekSalesReport={setLastWeekSalesReport}/>

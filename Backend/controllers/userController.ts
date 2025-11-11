@@ -31,15 +31,6 @@ export const register= async (req:any,res:any)=>{
             include:{cart:true}
         })
 
-        if(role==='SELLER'){
-            const createdStock= await prisma.stock.create({
-                data:{
-                    sellerId:createdUser.id
-                }
-            })
-        }
-
-
         const token=generateToken(createdUser.id,createdUser.email)
         res.cookie("token",token,{
             httpOnly:true,
@@ -292,7 +283,6 @@ export const getHomeProducts = async (req:any,res:any)=>{
             take:limit,
             include :{
                 category:true,
-                stock:true,
                 carts: {
                     where: { userId: currentUserId }, // check only this user’s cart
                     select: { id: true },
