@@ -59,10 +59,16 @@ const Cart = () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div className="md:col-span-2 space-y-4 ">
             <AnimatePresence>
-              {cartProducts.map((product, i) => (
+              {cartProducts.length>0 && cartProducts.map((product, i) => (
                 <CartProduct key={i} product={product} mapIndex={i}/>
 
               ))}
+              {cartProducts.length===0 && (
+                <div className="flex flex-col justify-center items-center my-4 text-lg font-medium h-full ">
+                  <span>No products in cart.</span>
+                  <span>Add some products to checkout.</span>
+                </div>
+              )}
             </AnimatePresence>
           </div>
 
@@ -85,7 +91,8 @@ const Cart = () => {
             </div>
 
             <button
-              className="w-full py-2 rounded-lg bg-blue-600 text-white font-medium flex justify-center items-center gap-2 text-sm hover:opacity-80 transition-opacity duration-300 ease-in-out"
+              className="w-full py-2 rounded-lg bg-blue-600 text-white font-medium flex justify-center items-center gap-2 text-sm hover:opacity-80 transition-opacity duration-300 ease-in-out disabled:opacity-50"
+              disabled={cartProducts.length===0}
               onClick={() => {
                 setCheckoutProducts(cartProducts);
                 navigate("/checkout", { state: { products: cartProducts } });

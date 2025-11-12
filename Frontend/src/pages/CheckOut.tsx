@@ -105,6 +105,7 @@ const CheckOut = () => {
       });
       setUser({
         loggedIn: true,
+        id:data.id,
         email: data.email,
         name: data.name ?? "",
         role: data.role,

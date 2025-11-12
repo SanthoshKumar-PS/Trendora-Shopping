@@ -42,7 +42,7 @@ const ProductPage = () => {
         }
         try{
             setLoading(true)
-            const payload = { productId : productId}
+            const payload = { currentUserId:user.id,productId : productId}
             const response = await axios.get<ProductDetailRespone>(`${BACKEND_URL}/api/productdetails`,{
                 params : payload,
                 withCredentials : true
@@ -76,7 +76,7 @@ const ProductPage = () => {
     async function getProductRecommendation(categoryProduct:number,pageNum:number){
         type ProductsRecommendType = {
             message : string
-            products : Product[],
+            products : ProductWithCart[],
             currentPage : number,
             totalPages : number
         }

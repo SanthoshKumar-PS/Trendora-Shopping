@@ -21,6 +21,7 @@ export const handleLogout = async ({ BACKEND_URL, setUser, navigate, clearPrevio
     if (response.status === 200) {
       setUser({
         loggedIn: false,
+        id:undefined,
         email: "",
         name: "",
         role: "USER",

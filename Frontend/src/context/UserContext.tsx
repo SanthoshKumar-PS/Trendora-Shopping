@@ -3,6 +3,7 @@ import { useCart } from "./CartContext";
 
 export type UserLog = {
     loggedIn : boolean;
+    id?:number,
     email: string;
     name:string;
     role: "ADMIN"|"USER" | "SELLER"
@@ -25,6 +26,7 @@ export const UserProvider = ({children} : {children : React.ReactNode}) => {
             : {
                 loggedIn: false,
                 email: "",
+                id:undefined,
                 name: "",
                 role:"USER",
                 image: "",
@@ -56,12 +58,13 @@ export const UserProvider = ({children} : {children : React.ReactNode}) => {
           // If UserInfo is removed (logout)
           setUser({
             loggedIn: false,
+            id:undefined,
             email: "",
             name: "",
             role: "USER",
             image: "",
             phone: "",
-            cartId: null,
+            cartId: undefined,
           });
         }
       }

@@ -2,6 +2,7 @@ import axios from "axios";
 
 export type AuthResponse = {
   message: string;
+  id:number;
   email: string;
   name: string | null;
   role: "ADMIN" | "USER" | "SELLER";
@@ -35,6 +36,7 @@ export default async function handleLoginOrSignup({
     );
     if (response.status === 200 || response.status === 201) {
       console.log("Login or Signup successful");
+      console.log("Login data : setter",response.data)
       return response.data;
     } else if (response.status === 401) {
       console.log("Existing user...Wrong Password");
