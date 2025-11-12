@@ -1,6 +1,6 @@
 import express from "express";
-import upload from "../../middleware/uploadMiddleware";
-import { uploadImages }  from "../../controllers/seller/uploadController";
+import upload from "../../../middleware/uploadMiddleware";
+import { uploadImages }  from "../../../controllers/trendora/seller/uploadController";
 
 const uploadRouter = express.Router();
 

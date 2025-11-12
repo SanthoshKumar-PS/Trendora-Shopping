@@ -1,6 +1,6 @@
 import express from "express";
-import { addProduct, getProductDetails, updateProduct, viewSellerProducts } from "../../controllers/seller/sellerProductController";
-import { authenticateUser } from "../../middleware/authenticateUser";
+import { addProduct, getProductDetails, updateProduct, viewSellerProducts } from "../../../controllers/trendora/seller/sellerProductController";
+import { authenticateUser } from "../../../middleware/authenticateUser";
 
 export const sellerProductRouter = express.Router();
 

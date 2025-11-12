@@ -150,6 +150,7 @@ export const registerOrLogin = async (req:any,res:any) => {
                 path: "/"
             })
             return res.status(201).json({message:"Signin Successful",
+                id:loggingUser.id,
                 email:loggingUser.email, 
                 name:loggingUser.name, 
                 role:loggingUser.role, 

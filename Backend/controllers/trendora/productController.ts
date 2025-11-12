@@ -34,7 +34,8 @@ export const getProductDetailsById = async (req:any,res:any)=>{
 
 export const getRecommendedProducts = async (req:any, res:any)=>{
     try{
-        const {productId, productCategory,pageStr,limitStr} = req.query;
+        let {productId, productCategory,pageStr,limitStr,currentUserId} = req.query;
+        if(!currentUserId) {currentUserId=0}
         const page = Number(pageStr)
         const limit = Number(limitStr)
 
@@ -69,7 +70,7 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
 
         const skip = (page - 1) * limit;
 
-        const products = await prisma.product.findMany({
+        const fetchedProducts = await prisma.product.findMany({
             where: {
             categoryId: { in: categoryIds },
             id: {not:productIdNum}
@@ -79,8 +80,17 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
             take: limit,
             include: {
             category: true,
+                carts: {
+                    where: { userId: currentUserId },
+                    select: { id: true },
+                },
             },
         });
+
+        const productsWithCart = fetchedProducts.map(p=>({
+            ...p,
+            isInCart : p.carts.length>0
+        }))
 
         const totalProducts = await prisma.product.count({
             where: {
@@ -89,7 +99,7 @@ export const getRecommendedProducts = async (req:any, res:any)=>{
             },
         });
 
-        return res.status(200).json({message:"Successfully fetched all products in category",products:products,totalPages: Math.ceil(totalProducts / limit), currentPage: page,})
+        return res.status(200).json({message:"Successfully fetched all products in category",products:productsWithCart,totalPages: Math.ceil(totalProducts / limit), currentPage: page,})
 
     }
     catch(error){

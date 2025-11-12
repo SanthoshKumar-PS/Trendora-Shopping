@@ -1,8 +1,8 @@
 import express from 'express'
-import { login, logout, register,registerOrLogin, addAddress, updateAddress, getAllAddresses, getHomeProducts} from '../controllers/userController'
-import { authenticateUser } from '../middleware/authenticateUser'
-import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../controllers/cartController'
-import { getAllOrders, placeOrder, getOrderDetails, getPdfOrder } from '../controllers/orderController'
+import { login, logout, register,registerOrLogin, addAddress, updateAddress, getAllAddresses, getHomeProducts} from '../../controllers/trendora/userController'
+import { authenticateUser } from '../../middleware/authenticateUser'
+import { getUserCartProducts, addProductToCart, deleteProductFromCart, clearCart } from '../../controllers/trendora/cartController'
+import { getAllOrders, placeOrder, getOrderDetails, getPdfOrder } from '../../controllers/trendora/orderController'
 
 export const userRouter=express.Router()
 

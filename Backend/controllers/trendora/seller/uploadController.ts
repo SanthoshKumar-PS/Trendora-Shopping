@@ -1,5 +1,5 @@
 import {Request, RequestHandler, Response} from "express"
-import cloudinary from "../../config/cloudinary"
+import cloudinary from "../../../config/cloudinary"
 
 
 export const uploadImages : RequestHandler = async (req:Request, res:Response)=>{
