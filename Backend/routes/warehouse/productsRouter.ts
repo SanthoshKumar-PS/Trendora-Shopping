@@ -1,8 +1,12 @@
 import express from 'express'
-import { getAllProducts, getLowStockProducts } from '../../controllers/warehouse/productController';
+import { getAllProducts, getLowStockProducts,getStockProductsOverview, getRecentOrder } from '../../controllers/warehouse/productController';
 
 export const productsRouter = express.Router();
 
 productsRouter.get('/products',getAllProducts)
 
 productsRouter.get('/lowstockproducts',getLowStockProducts)
+
+productsRouter.get('/stockproductsoverview',getStockProductsOverview)
+
+productsRouter.get('/orders',getRecentOrder)

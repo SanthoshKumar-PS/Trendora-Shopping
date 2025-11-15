@@ -7,6 +7,7 @@ export type OrderStatus =
   | "PENDING"
   | "CONFIRMED"
   | "PROCESSING"
+  | "PROCESSED"
   | "SHIPPED"
   | "DELIVERED"
   | "CANCELLED"
@@ -31,6 +32,12 @@ export const statusMap: Record<
   PROCESSING: {
     heading: "Order Processing",
     message: "Order is being processed",
+    style: "bg-orange-500 hover:bg-orange-600 text-white border border-orange-500",
+    icon: <Loader2 className="w-4 h-4 animate-spin" />,
+  },
+  PROCESSED: {
+    heading: "Order Processed",
+    message: "Order is ready to dispatch",
     style: "bg-orange-500 hover:bg-orange-600 text-white border border-orange-500",
     icon: <Loader2 className="w-4 h-4 animate-spin" />,
   },
