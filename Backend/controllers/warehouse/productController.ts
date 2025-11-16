@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { OrderStatus, Prisma, PrismaClient } from "@prisma/client"
 import { Request, Response } from "express";
 const prisma = new PrismaClient();
 
@@ -74,9 +74,55 @@ export const getStockProductsOverview = async (req:Request,res:Response) => {
 
 export const getRecentOrder = async (req:Request,res:Response) => {
     try{
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 20;
+        const skip = (page-1)*limit;
+        const search = req.query.search ? String(req.query.search) : "";
+        let activeStatus = req.query.activeStatus;
+        if(Array.isArray(activeStatus)){
+            activeStatus = activeStatus[0];
+        }
+        if(activeStatus==='all' || !activeStatus){
+            activeStatus=undefined;
+        }
+
+        const whereClause: Prisma.OrderWhereInput = {
+            AND:[
+                search?{
+                    OR : [
+                        {orderNo : {contains:search, mode:"insensitive"}},
+                        {paymentMethod: {contains: search, mode:"insensitive"}},
+                        {paymentStatus: {contains: search, mode:"insensitive"}},
+                        {user:{
+                                OR: [
+                                    {email: {contains: search, mode:"insensitive"}},
+                                    {name : {contains:search, mode:"insensitive"}},
+                                    {phone: {contains:search, mode:"insensitive"}}
+                                ]
+                            }
+                        },
+                        {orderDetails:{
+                            some:{
+                                product:{
+                                    OR:[
+                                        {name: {contains: search, mode:"insensitive"}},
+                                        {description: {contains: search, mode:"insensitive"}}
+                                    ]
+                                }
+                            }
+                        }}
+                    ]
+                }:{},
+                activeStatus?{
+                    status: {equals:activeStatus as OrderStatus}
+                }:{}
+            ]
+        }
+
         const allOrders = await prisma.order.findMany({
-            take:20,
-            skip:0,
+            take:limit,
+            skip: skip,
+            where:whereClause,
             include:{
                 orderDetails:{
                     include:{
@@ -104,34 +150,40 @@ export const getRecentOrder = async (req:Request,res:Response) => {
                 updatedAt:'desc'
             }
         })
-        const placedCount = await prisma.order.aggregate({
-            _count: {
-                id:true
-            },
-            where: {
-                status:'CONFIRMED'
-            }
-        })
+        const totalOrdersCount = await prisma.order.count({ where: {
+            AND : [
+                whereClause,
+                {
+                    status: {
+                        in: ['CONFIRMED', 'PROCESSING', 'PROCESSED', 'SHIPPED']
+                    }
+                }
+            ]
+        } });
 
-        const processingCount = await prisma.order.aggregate({
+        const statusCount = await prisma.order.groupBy({
+            // where:whereClause,
+            by:["status"],
             _count:{
                 id:true
-            },
-            where: {
-                status: 'PROCESSING'
             }
         })
-
-        const processedCount = await prisma.order.aggregate({
-            _count:{
-                id:true
-            },
-            where: {
-                status: 'PROCESSED'
-            }
+        console.log("All status: ",statusCount, totalOrdersCount)
+        const counts = {
+            CONFIRMED: 0,
+            PROCESSING: 0,
+            PROCESSED: 0,
+            SHIPPED: 0
+        };
+        statusCount.map(row=>{
+            if(row.status==='CONFIRMED') counts.CONFIRMED = row._count.id;
+            if(row.status==='PROCESSING') counts.PROCESSING = row._count.id;
+            if(row.status==='PROCESSED') counts.PROCESSED = row._count.id;
+            if(row.status==='SHIPPED') counts.SHIPPED = row._count.id;
         })
+        console.log(counts)
 
-        res.status(200).json({message:"Products fetched", products:allOrders})
+        res.status(200).json({message:"Products fetched", orders:allOrders, counts, totalPages: Math.ceil(totalOrdersCount/limit), currentPage:page})
         return
     }
     catch(error:any){

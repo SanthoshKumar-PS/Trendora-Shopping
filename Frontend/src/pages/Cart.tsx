@@ -48,7 +48,7 @@ const Cart = () => {
   },[cartProducts])
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 min-h-screen">
       <OfferBar />
       <Navbar seller={user.role === "SELLER"} />
 

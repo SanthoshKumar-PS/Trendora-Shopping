@@ -97,11 +97,6 @@ const Orders = () => {
 
         {/* Order Cards */}
         <div className="my-4 flex flex-col gap-2 md:gap-3">
-          {orders.length === 0 && (
-            <div className="my-30 flex flex-col justify-center items-center gap-4 font-medium text-md text-gray-600">
-              No orders found
-            </div>
-          )}
 
           {filteredOrders.length ? (
             filteredOrders.map((order, index) => (
@@ -158,8 +153,8 @@ const Orders = () => {
               </div>
             ))
           ) : (
-            <div className="p-2 py-10  flex justify-center items-center ">
-              <p className="text-center font-medium text-lg text-gray-700/70">No orders found</p>
+            <div className="my-30 flex flex-col justify-center items-center gap-4 font-medium text-md text-gray-600">
+              No orders found
             </div>
           )}
         </div>
