@@ -1,8 +1,9 @@
+import { cn } from "../lib/utils";
 import Loading from "./Loading";
 
-const LoadingScreen = () => {
+const LoadingScreen = ({height="h-screen"}:{height?:string}) => {
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className={cn("flex justify-center items-center",height)}>
       <Loading />
     </div>
   );

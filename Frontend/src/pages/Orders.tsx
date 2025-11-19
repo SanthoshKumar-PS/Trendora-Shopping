@@ -1,4 +1,4 @@
-import { ChevronRight, Search, X } from "lucide-react";
+import { ChevronRight, MoveDown, MoveUp, Search, X } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useUser } from "../context/UserContext";
 import { formatCurrency } from "../lib/formatCurrency";
@@ -11,7 +11,9 @@ import type { UserOrderResponse } from "../types/ResponseTypes";
 import { formatOrderDate } from "../lib/dateFormatter";
 import { formatStatus } from "../lib/formatStatus";
 import { useNavigate } from "react-router-dom";
-
+import Pagination from "../components/pagination/Pagination";
+import { useDebounce } from "../components/DebounceSearch";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "../components/ui/select"
 const Orders = () => {
   const { user, setUser } = useUser();
 
@@ -19,22 +21,40 @@ const Orders = () => {
   const [orders, setOrders] = useState<UserOrderResponse[]>([]);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  
   const [searchParams, setSearchParams] = useState<string>("");
+  const debounceValue = useDebounce(searchParams,500);
+  const [totalOrdersCount,setTotalOrdersCount] = useState<number>(0);
+  const [pageNo,setPageNo] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [limit,setLimit] = useState<number>(5);
+
 
   const getAllUserOrder = async () => {
     try {
       type UserOrderResponseType = {
         message: string;
         orders: UserOrderResponse[];
+        totalOrdersCount:number;
+        totalPages:number;
       };
       setIsLoading(true);
       const response = await axios.get<UserOrderResponseType>(
         `${BACKEND_URL}/user/getAllOrders`,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          params:{
+            pageNo,
+            limit,
+            search:debounceValue
+          }
+        },
       );
       if (response.status === 200) {
         console.log(response.data);
         setOrders(response.data.orders);
+        setTotalPages(response.data.totalPages);
+        setTotalOrdersCount(response.data.totalOrdersCount);
       }
     } catch (error) {
       console.log("Error occured while fetching orders");
@@ -45,26 +65,14 @@ const Orders = () => {
 
   useEffect(() => {
     getAllUserOrder();
-  }, []);
+  }, [pageNo,limit,debounceValue]);
 
-  const filteredOrders = orders.filter((order) => {
-    const value = searchParams.toLowerCase();
-    return (
-      order.orderNo.toLowerCase().includes(value) ||
-      order.status.toLowerCase().includes(value) ||
-      order.totalAmount.toString().toLowerCase().includes(value)
-    );
-  });
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
 
   return (
-    <div className="bg-gray-50  ">
+    <div className="bg-gray-50 ">
       <Navbar seller={user.role === "SELLER"} />
-
-      <div className="max-w-5xl mx-auto px-2 md:px-4">
+      
+      <div className="max-w-5xl mx-auto px-2 md:px-4 space-y-4 my-2 md:my-4">
         {/* Search Bar */}
         <div className="w-full flex justify-start items-center gap-3 my-4">
           <div className="flex-1 relative">
@@ -75,6 +83,7 @@ const Orders = () => {
             type="text"
             onChange={(e) => {
               setSearchParams(e.target.value);
+              setPageNo(1)
             }}
             value={searchParams}
             className="pl-10 outline-none w-full bg-white border border-gray-300 rounded-sm px-3 py-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-gray-800 transition duration-200"
@@ -96,10 +105,13 @@ const Orders = () => {
         </div>
 
         {/* Order Cards */}
-        <div className="my-4 flex flex-col gap-2 md:gap-3">
+        {isLoading?(
+          <LoadingScreen height="my-40 md:my-40"/>
+        ):(
+        <div className=" flex flex-col gap-2 md:gap-3">
 
-          {filteredOrders.length ? (
-            filteredOrders.map((order, index) => (
+          {orders.length ? (
+            orders.map((order, index) => (
               <div
                 key={index}
                 onClick={() => {
@@ -158,6 +170,40 @@ const Orders = () => {
             </div>
           )}
         </div>
+        )}
+
+        {/* Pagination and Rows Count */}
+        <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 md:items-center md:px-10">
+
+          {/* Page Numbers */}
+          <div className="w-full md:w-auto flex justify-center md:justify-start">
+            <Pagination
+              currentPage={pageNo}
+                totalPages={totalPages}
+                onChange={(p) => setPageNo(p)}
+            />
+          </div>
+
+          {/* No Of Rows */}
+          <div className="w-full md:w-auto flex justify-center items-center md:justify-end gap-3">
+            <span className="font-medium">Results: {Math.min((pageNo-1)*limit+1,totalOrdersCount)} - {Math.min(totalOrdersCount,pageNo*limit)} of {totalOrdersCount}</span>
+            <select
+                className="border border-gray-300 rounded-md shadow-md px-1 py-1 bg-gray-100"
+                value={limit}
+                onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPageNo(1)
+                }}
+            >
+                {[2, 5, 10, 20, 30, 100].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                {pageSize}
+                </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
       </div>
 
       {/* Footer*/}
