@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { OrderStatus, Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -71,12 +71,51 @@ export const placeOrder =  async (req:any,res:any) => {
 export const getAllOrders = async (req:any,res:any) => {
     try{
         const userId = req.id;
+        const {pageNo,limit,search} = req.query;
+        const skip = (Number(pageNo)-1)*Number(limit);
         if(!userId){
             return res.status(404).json({message:"Unauthorized User Access",orders:[]});
         }
+        const whereClause:Prisma.OrderWhereInput = search?
+        {
+            AND:[
+                {userId:userId},
+                {
+                    OR:[
+                        {orderNo : {contains:search,mode:'insensitive'}},
+                        // {status: { equals:search.toUpperCase() as OrderStatus}},
+                        {address:{
+                            OR:[
+                                {name: {contains:search,mode:'insensitive'}},
+                                {phone: {contains:search,mode:'insensitive'}},
+                                {type: {contains:search,mode:'insensitive'}},
+                                {line1: {contains:search,mode:'insensitive'}},
+                                {line2: {contains:search,mode:'insensitive'}},
+                                {city: {contains:search,mode:'insensitive'}},
+                                {state: {contains:search,mode:'insensitive'}},
+                                {pincode: {contains:search,mode:'insensitive'}},
+                            ]
+                        }},
+                        {orderDetails:{
+                            some: {
+                                product: {
+                                    OR:[
+                                        {name: {contains:search,mode:'insensitive'}},
+                                        {description: {contains:search,mode:'insensitive'}},
+                                    ]
+                                }
+                            }
+                        }}
+                    ]
+                }
+            ]
+        } : {userId:userId}
+
 
         const allOrders = await prisma.order.findMany({
-            where:{userId:userId},
+            where:whereClause,
+            take:Number(limit),
+            skip,
             include:{
                 address:{
                     select:{
@@ -103,13 +142,17 @@ export const getAllOrders = async (req:any,res:any) => {
                 orderDate:'desc'
             }
         })
+        const totalOrdersCount = await prisma.order.count({
+            where:whereClause
+        });
 
         console.log("User orders fetched");
-        return res.status(200).json({message:"User orders fetched",orders:allOrders});
+        return res.status(200).json({message:"User orders fetched",orders:allOrders,totalOrdersCount, totalPages:Math.ceil(totalOrdersCount/limit)});
 
     }
     catch(error){
         console.log("Internal Server Error");
+        console.log(error);
         res.status(500).json({message:"Internal Server Error",orders:[]});
     }
 }

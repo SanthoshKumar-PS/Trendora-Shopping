@@ -23,6 +23,31 @@ export const getAllProducts = async (req:Request,res:Response) => {
     }
 }
 
+export const updateProductById = async (req:Request,res:Response) => {
+    try{
+        const {id, name, quantityInStock, reorderLevel, discountedPrice, actualPrice} = req.body;
+        if(!id){
+            res.status(400).json({error:"Product ID is required to update"})
+            return;
+        }
+        const updatedProduct = await prisma.product.update({
+            where:{
+                id:id
+            },
+            data:{
+                quantityInStock:quantityInStock,
+                reorderLevel:reorderLevel,
+                discountedPrice:discountedPrice,
+                actualPrice:actualPrice
+            }
+        })
+
+        res.status(200).json({message:"Updated Successfully", product:updatedProduct});
+    } catch(error:any){
+         res.status(500).json({message:"Internal Server Error"})
+    }
+}
+
 export const getLowStockProducts = async (req:Request,res:Response) => {
     try{
         const allProducts = await prisma.product.findMany({
