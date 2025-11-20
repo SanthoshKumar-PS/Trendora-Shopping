@@ -71,7 +71,11 @@ export const placeOrder =  async (req:any,res:any) => {
 export const getAllOrders = async (req:any,res:any) => {
     try{
         const userId = req.id;
-        const {pageNo,limit,search} = req.query;
+        const {pageNo,limit,search,sort,status} = req.query;
+        console.log({pageNo,limit,search,sort,status});
+        const normalizedStatus = status?.toUpperCase() as OrderStatus | undefined;
+        console.log("normalizedStatus: ",normalizedStatus)
+
         const skip = (Number(pageNo)-1)*Number(limit);
         if(!userId){
             return res.status(404).json({message:"Unauthorized User Access",orders:[]});
@@ -107,10 +111,24 @@ export const getAllOrders = async (req:any,res:any) => {
                             }
                         }}
                     ]
-                }
+                },
+                ...(normalizedStatus ? [{ status: { equals: normalizedStatus } }] : []),
             ]
-        } : {userId:userId}
+        } : {
+            AND:[
+                {userId:userId},
+                ...(normalizedStatus ? [{ status: { equals: normalizedStatus } }] : [])
+            ]
+        };
 
+        const orderByClause: Prisma.OrderOrderByWithRelationInput[] = sort
+        ? [
+            { totalAmount: sort as "asc" | "desc" },
+            { orderDate: "desc" }
+            ]
+        : [
+            { orderDate: "desc" }
+        ];
 
         const allOrders = await prisma.order.findMany({
             where:whereClause,
@@ -138,9 +156,7 @@ export const getAllOrders = async (req:any,res:any) => {
                     }
                 }
             },
-            orderBy:{
-                orderDate:'desc'
-            }
+            orderBy:orderByClause
         })
         const totalOrdersCount = await prisma.order.count({
             where:whereClause
