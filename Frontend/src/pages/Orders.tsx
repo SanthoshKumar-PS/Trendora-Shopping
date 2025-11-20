@@ -13,7 +13,7 @@ import { formatStatus } from "../lib/formatStatus";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../components/pagination/Pagination";
 import { useDebounce } from "../components/DebounceSearch";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "../components/ui/select"
+import SelectFilters, { type FilterState } from "../components/orders/SelectFilters";
 const Orders = () => {
   const { user, setUser } = useUser();
 
@@ -28,6 +28,7 @@ const Orders = () => {
   const [pageNo,setPageNo] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit,setLimit] = useState<number>(5);
+  const [filters, setFilters] = useState<FilterState>({ sort:null, status:null });
 
 
   const getAllUserOrder = async () => {
@@ -46,7 +47,9 @@ const Orders = () => {
           params:{
             pageNo,
             limit,
-            search:debounceValue
+            search:debounceValue,
+            sort:filters.sort,
+            status:filters.status
           }
         },
       );
@@ -65,7 +68,7 @@ const Orders = () => {
 
   useEffect(() => {
     getAllUserOrder();
-  }, [pageNo,limit,debounceValue]);
+  }, [pageNo,limit,debounceValue,filters.sort, filters.status]);
 
 
   return (
@@ -73,6 +76,7 @@ const Orders = () => {
       <Navbar seller={user.role === "SELLER"} />
       
       <div className="max-w-5xl mx-auto px-2 md:px-4 space-y-4 my-2 md:my-4">
+
         {/* Search Bar */}
         <div className="w-full flex justify-start items-center gap-3 my-4">
           <div className="flex-1 relative">
@@ -103,6 +107,9 @@ const Orders = () => {
             <span>Search Orders</span>
           </button>
         </div>
+        
+        {/* Filters */}
+        <SelectFilters filters={filters} setFilters={setFilters}/>
 
         {/* Order Cards */}
         {isLoading?(
@@ -128,7 +135,7 @@ const Orders = () => {
                 {/* Product Content */}
                 <div className="flex gap-2 flex-col justify-center items-start md:flex-row md:w-full md:justify-between">
                   {/* Product Description */}
-                  <div className="flex flex-col justify-start items-start gap-3  max-w-sm">
+                  <div className="flex-1 flex flex-col justify-start items-start gap-3  max-w-sm">
                     <p className="font-medium">{order.orderNo}</p>
                     <p className="text-gray-500 hidden text-sm md:max-w-xs md:overflow-hidden md:[display:-webkit-box] md:[-webkit-box-orient:vertical] md:[-webkit-line-clamp:2]">
                       Total Products : {order._count.orderDetails.toString()}
